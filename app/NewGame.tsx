@@ -22,6 +22,12 @@ export default function NewGame() {
     setPlayers(updated);
   };
 
+  const onCreate = async () => {
+    const res = await fetch("/api/create");
+    const json = await res.json();
+    console.log(json);
+  };
+
   return (
     <div className="flex flex-col w-96 p-4 rounded-md">
       <h2 className="text-xl my-4">Players</h2>
@@ -48,7 +54,9 @@ export default function NewGame() {
           </div>
         );
       })}
-      <button className="self-center px-8 py-2 mt-4 rounded-full bg-red-200">Create Game</button>
+      <button className="self-center px-8 py-2 mt-4 rounded-full bg-red-200" onClick={onCreate}>
+        Create Game
+      </button>
     </div>
   );
 }

@@ -23,7 +23,6 @@ function shuffleWithSeed<T>(arr: T[], seed: string): T[] {
 }
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const arr = shuffleWithSeed([1, 2, 3, 4, 5], searchParams.get("seed") ?? "lol");
+  const arr = shuffleWithSeed([1, 2, 3, 4, 5], "lol");
   return NextResponse.json({ hello: arr });
 }
