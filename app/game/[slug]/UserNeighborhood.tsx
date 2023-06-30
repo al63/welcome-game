@@ -3,7 +3,7 @@ import { House } from "@/app/util/PlayerTypes";
 
 interface Props {
   config: Neighborhood;
-  houses: House[];
+  houses: Array<House | null>;
   fences: boolean[];
 }
 
