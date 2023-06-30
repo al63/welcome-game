@@ -28,7 +28,7 @@ function House({ house }: { house: House }) {
   return (
     <div className="flex flex-col text-xs items-center">
       <div>{house.value}</div>
-      <div>{house.modifier}</div>
+      {house.modifier === "BIS" ? <div>BIS</div> : null}
     </div>
   );
 }
