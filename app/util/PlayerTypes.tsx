@@ -11,9 +11,9 @@ export interface PlayerState {
   playerId: string;
   gameId: string;
   score: number;
-  housesRowOne: House[];
-  housesRowTwo: House[];
-  housesRowThree: House[];
+  housesRowOne: Array<House | null>;
+  housesRowTwo: Array<House | null>;
+  housesRowThree: Array<House | null>;
   fencesRowOne: boolean[];
   fencesRowTwo: boolean[];
   fencesRowThree: boolean[];
