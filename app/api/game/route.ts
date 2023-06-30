@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const params = request.nextUrl.searchParams;
     const id = params.get("id") ?? undefined;
     const player = params.get("player");
-    const query: Filter<GameState | PlayerState> = { id };
+    const query: Filter<GameState> = { id };
 
     if (!id || !player) {
       return NextResponse.json("Missing parameters", { status: 400 });
@@ -42,14 +42,16 @@ export async function GET(request: NextRequest) {
 
     // Grab all player states associated with a game
     const playerStates = db.collection<PlayerState>("player_states");
-    const playerStatesCursor = playerStates.find<PlayerState>(query);
-    if ((await playerStates.countDocuments(query)) === 0) {
-      return NextResponse.json("No player states found", { status: 500 });
-    }
+    const playerStateQuery: Filter<PlayerState> = { gameId: id };
+    const playerStatesCursor = playerStates.find<PlayerState>(playerStateQuery);
 
     const playerStatesMap: PlayerStateMap = {};
     for await (const doc of playerStatesCursor) {
       playerStatesMap[doc.playerId] = doc;
+    }
+
+    if (Object.keys(playerStatesMap).length === 0) {
+      return NextResponse.json("No player states found", { status: 500 });
     }
 
     const response: GetGameAPIResponse = {
