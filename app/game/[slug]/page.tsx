@@ -16,7 +16,7 @@ const dummy = {
 };
 dummy.housesRowOne[1] = {
   value: 4,
-  modifier: "BIS",
+  modifier: "GARDEN",
 };
 dummy.housesRowOne[2] = {
   value: 16,

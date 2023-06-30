@@ -11,7 +11,7 @@ export function UserBoard({ playerState }: Props) {
   return (
     <div>
       <div className="flex">
-        <div className="flex flex-col grow">
+        <div className="flex flex-col">
           <UserNeighborhood config={ROW_ONE} houses={playerState.housesRowOne} fences={playerState.fencesRowOne} />
           <UserNeighborhood config={ROW_TWO} houses={playerState.housesRowTwo} fences={playerState.fencesRowTwo} />
           <UserNeighborhood
