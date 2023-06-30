@@ -8,5 +8,5 @@ interface Props {
 }
 
 export function UserNeighborhood(props: Props) {
-  return "neighborhood";
+  return <div>neighborhood</div>;
 }

@@ -182,6 +182,7 @@ const ADJECTIVES = [
     "Cockroach",
     "Crab",
     "Crocodile",
+    "Dinosaur",
     "Dolphin",
     "Donkey",
     "Dragonfly",
@@ -264,5 +265,7 @@ const ADJECTIVES = [
   ];
 
 export function generateGameId(){
-    return ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)] + COLORS[Math.floor(Math.random() * COLORS.length)] + ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+    return ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)] + 
+    COLORS[Math.floor(Math.random() * COLORS.length)] + 
+    ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
 }

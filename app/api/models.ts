@@ -1,7 +1,15 @@
-import { PlanCard } from "../util/CardTypes";
+import { GameState } from "../util/GameTypes";
+import { PlayerState } from "../util/PlayerTypes";
 
 export interface CreateGameAPIRequest {
-    seed: number;
-    players: string[];
-    plans: Array<PlanCard>;
-  }
+  players: string[];
+}
+
+export interface PlayerStateMap {
+  [playerId: string]: PlayerState
+}
+
+export interface GetGameAPIResponse {
+  gameState: GameState;
+  playerStates: PlayerStateMap;
+}

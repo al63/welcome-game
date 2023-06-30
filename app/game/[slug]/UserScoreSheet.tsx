@@ -1,3 +1,3 @@
 export function UserScoreSheet() {
-  return "ScoreSheet";
+  return <div>ScoreSheet</div>
 }

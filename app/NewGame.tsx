@@ -23,7 +23,14 @@ export default function NewGame() {
   };
 
   const onCreate = async () => {
-    const res = await fetch("/api/create");
+    const res = await fetch("/api/game", {
+      method: 'POST',
+      headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({players: players})
+    });
     const json = await res.json();
     console.log(json);
   };

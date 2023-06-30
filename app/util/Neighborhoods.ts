@@ -1,4 +1,4 @@
-interface Neighborhood {
+export interface Neighborhood {
   houses: number;
   pools: number[];
   parkScores: number[];
