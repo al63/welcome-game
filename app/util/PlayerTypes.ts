@@ -4,7 +4,6 @@ export interface House {
   value: number;
   modifier: GameCardType;
   usedForPlan?: boolean;
-  pool?: boolean;
 }
 
 export interface PlayerState {

@@ -14,6 +14,14 @@ const dummy = {
   estateModifiers: new Array(6).fill(0),
   permitRefusals: 0,
 };
+dummy.housesRowOne[1] = {
+  value: 4,
+  modifier: "BIS",
+};
+dummy.housesRowOne[2] = {
+  value: 16,
+  modifier: "POOL",
+};
 
 export default function Game({ params }: { params: { slug: string } }) {
   return (

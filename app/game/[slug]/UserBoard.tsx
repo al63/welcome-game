@@ -10,9 +10,18 @@ interface Props {
 export function UserBoard({ playerState }: Props) {
   return (
     <div>
-      <UserNeighborhood config={ROW_ONE} houses={playerState.housesRowOne} fences={playerState.fencesRowOne} />
-      <UserNeighborhood config={ROW_TWO} houses={playerState.housesRowTwo} fences={playerState.fencesRowTwo} />
-      <UserNeighborhood config={ROW_THREE} houses={playerState.housesRowThree} fences={playerState.fencesRowThree} />
+      <div className="flex">
+        <div className="flex flex-col grow">
+          <UserNeighborhood config={ROW_ONE} houses={playerState.housesRowOne} fences={playerState.fencesRowOne} />
+          <UserNeighborhood config={ROW_TWO} houses={playerState.housesRowTwo} fences={playerState.fencesRowTwo} />
+          <UserNeighborhood
+            config={ROW_THREE}
+            houses={playerState.housesRowThree}
+            fences={playerState.fencesRowThree}
+          />
+        </div>
+        <div className="mx-4">CARDS TO DRAW</div>
+      </div>
       <UserScoreSheet />
     </div>
   );
