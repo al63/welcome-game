@@ -1,6 +1,8 @@
+export type GameCardType = "GARDEN" | "BIS" | "ESTATE" | "TEMP" | "POOL" | "FENCE";
+
 export interface GameCard {
   value: number;
-  backingType: "GARDEN" | "BIS" | "ESTATE" | "TEMP" | "POOL" | "FENCE";
+  backingType: GameCardType;
 }
 
 interface SizeRequirement {
