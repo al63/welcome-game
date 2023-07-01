@@ -20,7 +20,11 @@ dummy.housesRowOne[1] = {
 };
 
 dummy.housesRowOne[2] = {
-  value: 16,
+  value: 5,
+  modifier: "POOL",
+};
+dummy.housesRowOne[4] = {
+  value: 6,
   modifier: "BIS",
 };
 
