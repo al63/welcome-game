@@ -1,7 +1,11 @@
 import { PlayerState } from "@/app/util/PlayerTypes";
-import { BIS_SCORES, POOL_SCORES } from "@/app/util/Scoring";
+import { BIS_SCORES, PERMIT_REFUSAL_SCORES, POOL_SCORES, TEMP_SCORES } from "@/app/util/Scoring";
 import { computeScore } from "@/app/util/Scoring";
 import React from "react";
+
+function Divider({ symbol }: { symbol: string }) {
+  return <div className="mb-20 text-xl font-bold">{symbol}</div>;
+}
 
 function SectionContainer({
   children,
@@ -85,9 +89,9 @@ function TempAgencies({ count, score }: { count: number; score: number }) {
     <SectionContainer title="Temp Agency">
       <div className="grid grid-cols-3">{agencies}</div>
       <div className="flex mt-2">
-        <Value value={7} active={score === 7} />
-        <Value value={4} active={score === 4} />
-        <Value value={1} active={score === 1} />
+        {TEMP_SCORES.map((s) => {
+          return <Value value={s} active={score === s} key={s} />;
+        })}
       </div>
     </SectionContainer>
   );
@@ -105,6 +109,16 @@ function BIS({ count, score }: { count: number; score: number }) {
   );
 }
 
+function PermitRefusals({ count, score }: { count: number; score: number }) {
+  return (
+    <SectionContainer title="Oopsies" negative>
+      {PERMIT_REFUSAL_SCORES.map((s, index) => {
+        return <Value value={s} checked={count > index} active={count === index} key={s} />;
+      })}
+    </SectionContainer>
+  );
+}
+
 export function UserScoreSheet({ playerState }: { playerState: PlayerState }) {
   const userScores = React.useMemo(() => computeScore(playerState.playerId, [playerState]), [playerState]);
   if (userScores == null) {
@@ -114,10 +128,18 @@ export function UserScoreSheet({ playerState }: { playerState: PlayerState }) {
   return (
     <div className="flex items-end">
       <Plans scores={playerState.completedPlans} />
+      <Divider symbol="+" />
       <Parks scores={userScores.parks} />
+      <Divider symbol="+" />
       <Pools count={userScores.pools.count} score={userScores.pools.score} />
+      <Divider symbol="+" />
       <TempAgencies count={userScores.tempAgencies.count} score={userScores.tempAgencies.score} />
+      <Divider symbol="-" />
       <BIS count={userScores.bis.count} score={userScores.bis.score}></BIS>
+      <Divider symbol="-" />
+      <PermitRefusals count={playerState.permitRefusals} score={userScores.permitRefusals} />
+      <Divider symbol="=" />
+      <div className="mb-20 ml-2 text-xl font-bold">{userScores.summation}</div>
     </div>
   );
 }

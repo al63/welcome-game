@@ -12,7 +12,7 @@ const dummy = {
   fencesRowThree: new Array(11).fill(false),
   completedPlans: [0, 0, 0],
   estateModifiers: new Array(6).fill(0),
-  permitRefusals: 0,
+  permitRefusals: 2,
 };
 dummy.housesRowOne[1] = {
   value: 4,

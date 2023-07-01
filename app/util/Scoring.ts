@@ -5,6 +5,7 @@ import { House, PlayerState } from "./PlayerTypes";
 export const POOL_SCORES = [0, 3, 6, 9, 13, 17, 21, 26, 31, 36];
 export const TEMP_SCORES = [7, 4, 1];
 export const BIS_SCORES = [0, 1, 3, 6, 9, 12, 16, 20, 24, 28];
+export const PERMIT_REFUSAL_SCORES = [0, 0, 3, 5];
 
 interface UserScore {
   plans: number;
@@ -83,8 +84,17 @@ export function computeScore(playerId: string, playerStates: PlayerState[]): Use
   const bis = houseRows.reduce((accum, cur) => accum + countType(cur, "BIS"), 0);
   const bisScore = BIS_SCORES[bis] ?? 0;
 
+  const permitRefusalsScore = PERMIT_REFUSAL_SCORES[playerState.permitRefusals];
+
   const summation =
-    plansScores + parkScores[0] + parkScores[1] + parkScores[2] + poolsScore + tempAgenciesScore - bisScore;
+    plansScores +
+    parkScores[0] +
+    parkScores[1] +
+    parkScores[2] +
+    poolsScore +
+    tempAgenciesScore -
+    bisScore -
+    permitRefusalsScore;
 
   return {
     plans: plansScores,
@@ -102,7 +112,7 @@ export function computeScore(playerId: string, playerStates: PlayerState[]): Use
       count: bis,
       score: bisScore,
     },
-    permitRefusals: 0,
+    permitRefusals: permitRefusalsScore,
     summation,
   };
 }
