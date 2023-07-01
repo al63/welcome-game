@@ -81,8 +81,11 @@ function Pools({ count, score }: { count: number; score: number }) {
 function TempAgencies({ count, score }: { count: number; score: number }) {
   const agencies = [];
   for (let i = 0; i < 11; i++) {
-    const bg = count > i ? "bg-orange-600" : "bg-orange-200";
-    agencies.push(<div className={`${bg} m-2 rotate-45 h-4 w-4 text-sm`} />);
+    agencies.push(
+      <div className={`bg-orange-200 m-2 h-4 w-4 text-lg flex items-center justify-center rotate-45 font-bold`}>
+        {count > i ? "+" : ""}
+      </div>
+    );
   }
 
   return (
@@ -111,7 +114,7 @@ function BIS({ count, score }: { count: number; score: number }) {
 
 function PermitRefusals({ count, score }: { count: number; score: number }) {
   return (
-    <SectionContainer title="Oopsies" negative>
+    <SectionContainer title="Refusals" negative>
       {PERMIT_REFUSAL_SCORES.map((s, index) => {
         return <Value value={s} checked={count > index} active={count === index} key={s} />;
       })}
