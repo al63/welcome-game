@@ -1,28 +1,9 @@
 import { NextResponse } from "next/server";
 
-import seedrandom from "seedrandom";
-
-// Move later, but need a way to be able to deterministically shuffle the deck and draw from it .
-// Can just create random seed at game start time, store it + number cards drawn, and re-shuffle deck whenever we draw new cards.
-function shuffleWithSeed<T>(arr: T[], seed: string): T[] {
-  const rng = seedrandom(seed);
-  const seedRand = (func: seedrandom.PRNG, min: number, max: number) => {
-    return Math.floor(func() * (max - min + 1)) + min;
-  };
-  const resp: T[] = [];
-  const keys = Object.keys(Array.from(new Array(arr.length)));
-
-  for (let i = 0; i < arr.length; i++) {
-    const r = seedRand(rng, 0, keys.length - 1);
-    const g = keys[r];
-    keys.splice(r, 1);
-    resp.push(arr[Number(g)]);
-  }
-
-  return resp;
-}
+import Srand from "seeded-rand";
 
 export async function GET(request: Request) {
-  const arr = shuffleWithSeed([1, 2, 3, 4, 5], "lol");
-  return NextResponse.json({ hello: arr });
+  const test = new Srand(new Date().getMilliseconds());
+  const res = test.shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
+  return NextResponse.json({ hello: res });
 }
