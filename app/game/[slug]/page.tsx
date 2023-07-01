@@ -1,3 +1,4 @@
+import { GameCard, GameCardType } from "@/app/util/CardTypes";
 import { UserBoard } from "./UserBoard";
 
 const dummy = {
@@ -15,6 +16,19 @@ const dummy = {
   estateModifiers: new Array(6).fill(0),
   permitRefusals: 2,
 };
+
+const dummyRevealedCardValues: GameCard[] = [
+  { value: 8, backingType: "FENCE" },
+  { value: 3, backingType: "TEMP" },
+  { value: 7, backingType: "GARDEN" },
+];
+
+const dummyRevealedCardModifiers: GameCardType[] = ["FENCE", "ESTATE", "POOL"];
+const dummyCards = {
+  revealedCardValues: dummyRevealedCardValues,
+  revealedCardModifiers: dummyRevealedCardModifiers,
+};
+
 dummy.housesRowOne[1] = {
   value: 4,
   modifier: "GARDEN",
@@ -36,7 +50,7 @@ dummy.housesRowOne[5] = {
 export default function Game({ params }: { params: { slug: string } }) {
   return (
     <div className="w-full">
-      <UserBoard playerState={dummy} />
+      <UserBoard playerState={dummy} cardState={dummyCards} />
     </div>
   );
 }

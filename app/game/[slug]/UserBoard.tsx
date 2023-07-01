@@ -2,12 +2,18 @@ import { ROW_ONE, ROW_TWO, ROW_THREE } from "@/app/util/Neighborhoods";
 import { PlayerState } from "@/app/util/PlayerTypes";
 import { UserNeighborhood } from "./UserNeighborhood";
 import { UserScoreSheet } from "./UserScoreSheet";
+import { Card } from "./Card";
+import { GameCard, GameCardType } from "@/app/util/CardTypes";
 
 interface Props {
   playerState: PlayerState;
+  cardState: {
+    revealedCardValues: GameCard[];
+    revealedCardModifiers: GameCardType[];
+  };
 }
 
-export function UserBoard({ playerState }: Props) {
+export function UserBoard({ playerState, cardState }: Props) {
   return (
     <div>
       <div className="flex">
@@ -20,7 +26,16 @@ export function UserBoard({ playerState }: Props) {
             fences={playerState.fencesRowThree}
           />
         </div>
-        <div className="mx-4">CARDS TO DRAW</div>
+        <div>
+          {cardState.revealedCardValues.map((card: GameCard, index: number) => {
+            return <Card value={card.value} modifier={card.backingType} index={index} />;
+          })}
+        </div>
+        <div>
+          {cardState.revealedCardValues.map((card: GameCard, index: number) => {
+            return <Card value={null} modifier={card.backingType} index={index + 1} />;
+          })}
+        </div>
       </div>
       <UserScoreSheet playerState={playerState} />
     </div>
