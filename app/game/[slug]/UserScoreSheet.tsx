@@ -1,6 +1,6 @@
-import { ROW_ONE, ROW_THREE, ROW_TWO } from "@/app/util/Neighborhoods";
-import { House, PlayerState } from "@/app/util/PlayerTypes";
+import { PlayerState } from "@/app/util/PlayerTypes";
 import { POOL_SCORES } from "@/app/util/Pools";
+import { computeScore } from "@/app/util/Scoring";
 import React from "react";
 
 function SectionContainer({ children, title }: { children: React.ReactNode; title: string }) {
@@ -30,14 +30,14 @@ function Value({ value, checked, active }: { value: number; checked: boolean; ac
   );
 }
 
-function Plans({ completedPlans }: { completedPlans: number[] }) {
+function Plans({ scores }: { scores: number[] }) {
   return (
     <SectionContainer title="Plans">
-      {completedPlans.map((plan, index) => {
+      {scores.map((score, index) => {
         return (
           <div className="text-center" key={index}>
             <div className="text-red-600 text-lg">{`n${index + 1}`}</div>
-            <Score score={plan} />
+            <Score score={score} />
           </div>
         );
       })}
@@ -45,37 +45,22 @@ function Plans({ completedPlans }: { completedPlans: number[] }) {
   );
 }
 
-function Parks({ houseRows }: { houseRows: Array<Array<House | null>> }) {
-  const scores = houseRows.map((row) => {
-    return row.reduce((accum, cur) => {
-      return accum + (cur?.modifier === "GARDEN" ? 1 : 0);
-    }, 0);
-  });
-
+function Parks({ scores }: { scores: number[] }) {
   return (
     <SectionContainer title="Parks">
-      <Score score={ROW_ONE.parkScores[scores[0]]} />
-      <Score score={ROW_TWO.parkScores[scores[1]]} />
-      <Score score={ROW_THREE.parkScores[scores[2]]} />
+      {scores.map((score, index) => {
+        return <Score score={score} key={index} />;
+      })}
     </SectionContainer>
   );
 }
 
-function Pools({ houseRows }: { houseRows: Array<Array<House | null>> }) {
-  const pools = houseRows.reduce((accum, cur) => {
-    return (
-      accum +
-      cur.reduce((accum, cur) => {
-        return accum + (cur?.modifier === "POOL" ? 1 : 0);
-      }, 0)
-    );
-  }, 0);
-
+function Pools({ count, score }: { count: number; score: number }) {
   return (
     <SectionContainer title="Pools">
       <div className="grid grid-cols-2">
         {POOL_SCORES.map((score, index) => {
-          return <Value value={score} checked={pools > index} active={pools === index} key={score} />;
+          return <Value value={score} checked={count > index} active={count === index} key={score} />;
         })}
       </div>
     </SectionContainer>
@@ -83,13 +68,16 @@ function Pools({ houseRows }: { houseRows: Array<Array<House | null>> }) {
 }
 
 export function UserScoreSheet({ playerState }: { playerState: PlayerState }) {
-  const houseRows = [playerState.housesRowOne, playerState.housesRowTwo, playerState.housesRowThree];
+  const userScores = React.useMemo(() => computeScore(playerState.playerId, [playerState]), [playerState]);
+  if (userScores == null) {
+    return null;
+  }
 
   return (
     <div className="flex items-end">
-      <Plans completedPlans={playerState.completedPlans} />
-      <Parks houseRows={houseRows} />
-      <Pools houseRows={houseRows} />
+      <Plans scores={userScores.plans} />
+      <Parks scores={userScores.parks} />
+      <Pools count={userScores.pools.count} score={userScores.pools.score} />
     </div>
   );
 }
