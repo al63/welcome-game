@@ -48,29 +48,44 @@ export function computeScore(playerId: string, playerStates: PlayerState[]): Use
   }, 0);
   const poolsScore = POOL_SCORES[pools];
 
-  const tempAgenciesByPlayer = playerStates.map((state) => {
-    const rows = [state.housesRowOne, state.housesRowTwo, state.housesRowThree];
-    const tempAgencies = rows.reduce((accum, cur) => {
-      return (
-        accum +
-        cur.reduce((accum, cur) => {
-          return accum + (cur?.modifier === "TEMP" ? 1 : 0);
-        }, 0)
-      );
-    }, 0);
-    return {
-      playerId: state.playerId,
-      tempAgencies,
-    };
-  });
+  // pain ahead: have to compute the count of temp agencies for each player, and determine what our place is accounting for ties
+  const tempAgenciesByPlayer = playerStates
+    .map((state) => {
+      const rows = [state.housesRowOne, state.housesRowTwo, state.housesRowThree];
+      const tempAgencies = rows.reduce((accum, cur) => {
+        return (
+          accum +
+          cur.reduce((accum, cur) => {
+            return accum + (cur?.modifier === "TEMP" ? 1 : 0);
+          }, 0)
+        );
+      }, 0);
+      return {
+        playerId: state.playerId,
+        tempAgencies,
+      };
+    })
+    .filter((x) => x.tempAgencies > 0);
+
   tempAgenciesByPlayer.sort((x, y) => {
     return x.tempAgencies - y.tempAgencies;
   });
 
-  // TODO: same number of agencies
-  const playersTempAgencies = tempAgenciesByPlayer.find((item) => item.playerId === playerId)!;
-  const tempAgenciesCount = playersTempAgencies?.tempAgencies;
-  const tempAgenciesScore = TEMP_SCORES[tempAgenciesByPlayer.indexOf(playersTempAgencies)] ?? 0;
+  let place = -1;
+  let tempAgenciesCount = 0;
+  let prevScore = -1;
+  for (let i = 0; i < tempAgenciesByPlayer.length; i++) {
+    if (tempAgenciesByPlayer[i].tempAgencies > prevScore) {
+      place++;
+      prevScore = tempAgenciesByPlayer[i].tempAgencies;
+    }
+
+    if (tempAgenciesByPlayer[i].playerId === playerId) {
+      tempAgenciesCount = tempAgenciesByPlayer[i].tempAgencies;
+      break;
+    }
+  }
+  const tempAgenciesScore = TEMP_SCORES[place] ?? 0;
 
   const summation = plansScores + parkScores[0] + parkScores[1] + parkScores[2] + poolsScore + tempAgenciesScore;
 

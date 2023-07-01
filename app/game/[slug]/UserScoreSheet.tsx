@@ -17,13 +17,11 @@ function Score({ score }: { score: number }) {
 }
 
 function Value({ value, checked, active }: { value?: number; checked?: boolean; active?: boolean }) {
-  const bg = checked ? "bg-gray-400" : "bg-white";
-
   return (
     <div
-      className={`${bg} ${
-        active ? "font-bold text-black" : "text-gray-500"
-      } m-1 flex items-center justify-center h-6 w-6 rounded-md text-sm`}
+      className={`${active ? "font-bold" : ""} ${
+        checked ? "line-through" : ""
+      } m-1 flex items-center justify-center h-6 w-6 rounded-md text-sm text-black bg-white`}
     >
       {value}
     </div>
