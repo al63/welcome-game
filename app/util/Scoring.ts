@@ -1,9 +1,11 @@
 import { ROW_ONE, ROW_THREE, ROW_TWO } from "./Neighborhoods";
 import { PlayerState } from "./PlayerTypes";
-import { POOL_SCORES } from "./Pools";
+
+export const POOL_SCORES = [0, 3, 6, 9, 13, 17, 21, 26, 31, 36];
+export const TEMP_SCORES = [7, 4, 1];
 
 interface UserScore {
-  plans: number[];
+  plans: number;
   parks: number[];
   pools: {
     count: number;
@@ -16,6 +18,7 @@ interface UserScore {
   estates: number[];
   bis: number;
   permitRefusals: number;
+  summation: number;
 }
 
 export function computeScore(playerId: string, playerStates: PlayerState[]): UserScore | null {
@@ -23,6 +26,8 @@ export function computeScore(playerId: string, playerStates: PlayerState[]): Use
   if (!playerState) {
     return null;
   }
+
+  const plansScores = playerState.completedPlans.reduce((accum, cur) => accum + cur, 0);
 
   const houseRows = [playerState.housesRowOne, playerState.housesRowTwo, playerState.housesRowThree];
 
@@ -41,20 +46,48 @@ export function computeScore(playerId: string, playerStates: PlayerState[]): Use
       }, 0)
     );
   }, 0);
+  const poolsScore = POOL_SCORES[pools];
+
+  const tempAgenciesByPlayer = playerStates.map((state) => {
+    const rows = [state.housesRowOne, state.housesRowTwo, state.housesRowThree];
+    const tempAgencies = rows.reduce((accum, cur) => {
+      return (
+        accum +
+        cur.reduce((accum, cur) => {
+          return accum + (cur?.modifier === "TEMP" ? 1 : 0);
+        }, 0)
+      );
+    }, 0);
+    return {
+      playerId: state.playerId,
+      tempAgencies,
+    };
+  });
+  tempAgenciesByPlayer.sort((x, y) => {
+    return x.tempAgencies - y.tempAgencies;
+  });
+
+  // TODO: same number of agencies
+  const playersTempAgencies = tempAgenciesByPlayer.find((item) => item.playerId === playerId)!;
+  const tempAgenciesCount = playersTempAgencies?.tempAgencies;
+  const tempAgenciesScore = TEMP_SCORES[tempAgenciesByPlayer.indexOf(playersTempAgencies)] ?? 0;
+
+  const summation = plansScores + parkScores[0] + parkScores[1] + parkScores[2] + poolsScore + tempAgenciesScore;
 
   return {
-    plans: [0, 0, 0],
+    plans: plansScores,
     parks: parkScores,
     pools: {
       count: pools,
-      score: POOL_SCORES[pools],
+      score: poolsScore,
     },
     tempAgencies: {
-      count: 0,
-      score: 0,
+      count: tempAgenciesCount,
+      score: tempAgenciesScore,
     },
     estates: [0, 0, 0, 0, 0, 0],
     bis: 0,
     permitRefusals: 0,
+    summation,
   };
 }

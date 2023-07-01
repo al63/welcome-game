@@ -25,7 +25,7 @@ dummy.housesRowOne[2] = {
 };
 dummy.housesRowOne[4] = {
   value: 6,
-  modifier: "BIS",
+  modifier: "TEMP",
 };
 
 export default function Game({ params }: { params: { slug: string } }) {

@@ -1,5 +1,5 @@
 import { PlayerState } from "@/app/util/PlayerTypes";
-import { POOL_SCORES } from "@/app/util/Pools";
+import { POOL_SCORES } from "@/app/util/Scoring";
 import { computeScore } from "@/app/util/Scoring";
 import React from "react";
 
@@ -16,14 +16,14 @@ function Score({ score }: { score: number }) {
   return <div className="m-1 flex items-center justify-center h-8 w-8 rounded-full bg-white text-black">{score}</div>;
 }
 
-function Value({ value, checked, active }: { value: number; checked: boolean; active: boolean }) {
-  const bg = checked ? "bg-gray-600" : "bg-white";
+function Value({ value, checked, active }: { value?: number; checked?: boolean; active?: boolean }) {
+  const bg = checked ? "bg-gray-400" : "bg-white";
 
   return (
     <div
       className={`${bg} ${
-        active ? "font-bold" : ""
-      } m-1 flex items-center justify-center h-6 w-6 rounded-md text-sm text-black`}
+        active ? "font-bold text-black" : "text-gray-500"
+      } m-1 flex items-center justify-center h-6 w-6 rounded-md text-sm`}
     >
       {value}
     </div>
@@ -67,6 +67,25 @@ function Pools({ count, score }: { count: number; score: number }) {
   );
 }
 
+function TempAgencies({ count, score }: { count: number; score: number }) {
+  const agencies = [];
+  for (let i = 0; i < 11; i++) {
+    const bg = count > i ? "bg-orange-600" : "bg-orange-200";
+    agencies.push(<div className={`${bg} m-2 rotate-45 h-4 w-4 text-sm`} />);
+  }
+
+  return (
+    <SectionContainer title="Temp Agency">
+      <div className="grid grid-cols-3">{agencies}</div>
+      <div className="flex mt-2">
+        <Value value={7} active={score === 7} />
+        <Value value={4} active={score === 4} />
+        <Value value={1} active={score === 1} />
+      </div>
+    </SectionContainer>
+  );
+}
+
 export function UserScoreSheet({ playerState }: { playerState: PlayerState }) {
   const userScores = React.useMemo(() => computeScore(playerState.playerId, [playerState]), [playerState]);
   if (userScores == null) {
@@ -75,9 +94,10 @@ export function UserScoreSheet({ playerState }: { playerState: PlayerState }) {
 
   return (
     <div className="flex items-end">
-      <Plans scores={userScores.plans} />
+      <Plans scores={playerState.completedPlans} />
       <Parks scores={userScores.parks} />
       <Pools count={userScores.pools.count} score={userScores.pools.score} />
+      <TempAgencies count={userScores.tempAgencies.count} score={userScores.tempAgencies.score} />
     </div>
   );
 }
