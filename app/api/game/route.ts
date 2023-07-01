@@ -13,10 +13,12 @@ import { PlayerState } from "@/app/util/PlayerTypes";
 // MAYBE TODO: clean up game state if player state somehow fails
 // TODO: think about what data we're not returning to the client (i.e. seed)
 // TODO make deck api
+// make action APIs
+// make scoring logic
+// logic to detect objective completion
 
-// Grab the game state as well as verifying that the provided player is also in this game
+// Grab the game state and all of the player boards provided that the requested player is in this session
 // ex: localhost:3000/api/game?id=bubgame&player=liz
-// this will grab all of the player boards too :^)
 export async function GET(request: NextRequest) {
   try {
     const params = request.nextUrl.searchParams;
@@ -35,6 +37,8 @@ export async function GET(request: NextRequest) {
     if (!gameState) {
       return NextResponse.json("Game not found", { status: 404 });
     }
+
+    // validate requested player exists in the game
     const players = gameState.players;
     if (!players || !players.includes(player)) {
       return NextResponse.json("Player not found", { status: 404 });
@@ -91,6 +95,7 @@ export async function POST(request: NextRequest) {
         playerId: player,
         gameId: gameId,
         score: 0,
+        turn: 0,
         housesRowOne: new Array(10).fill(null),
         housesRowTwo: new Array(11).fill(null),
         housesRowThree: new Array(12).fill(null),
@@ -106,8 +111,7 @@ export async function POST(request: NextRequest) {
     if (!playerRes.acknowledged) {
       return NextResponse.json("Failed to create players", { status: 500 });
     }
-    // TODO: return slug + names for URL generation
-    return NextResponse.json("Successfully created game state and player states", { status: 201 });
+    return NextResponse.json({ gameId: gameId, players: [req.players] }, { status: 201 });
   } catch (e) {
     return NextResponse.json(e, { status: 500 });
   }
