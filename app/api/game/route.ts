@@ -4,7 +4,6 @@ import clientPromise from "../../../lib/mongodb";
 import { Filter } from "mongodb";
 import { CreateGameAPIRequest, GetGameAPIResponse, PlayerStateMap } from "../models";
 import { generateGameId } from "@/app/api/utils/GameIdGenerator";
-import seedrandom from "seedrandom";
 import { drawPlans } from "@/app/api/utils/PlanDeck";
 import { PlayerState } from "@/app/util/PlayerTypes";
 import { ActiveCards, drawCards, shuffleWithSeedAndDrawOffset } from "../utils/Deck";
@@ -77,12 +76,12 @@ export async function POST(request: NextRequest) {
   try {
     const req = (await request.json()) as CreateGameAPIRequest;
     const gameId = generateGameId();
-    const seed: number = seedrandom(gameId)();
-    const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, 1);
+    const seedDate: number = new Date().getMilliseconds();
+    const shuffledDeck = shuffleWithSeedAndDrawOffset(seedDate, 1);
     const activeCards: ActiveCards = drawCards(shuffledDeck);
     const gameObj: GameState = {
       id: gameId,
-      seed: seedrandom(gameId)(),
+      seed: seedDate,
       seedOffset: 1,
       revealedCardValues: activeCards.revealedNumbers,
       revealedCardModifiers: activeCards.revealedModifiers.map((gameCard) => gameCard.backingType),

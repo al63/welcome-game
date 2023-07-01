@@ -1,29 +1,19 @@
 import { GAME_DECK } from "@/app/util/GameDeck";
 import { GameCard } from "@/app/util/CardTypes";
+import Srand from "seeded-rand";
 
 export interface ActiveCards {
   revealedNumbers: GameCard[];
   revealedModifiers: GameCard[];
 }
 
-// Deterministically shuffle the deck and draw from it.
 // Create random seed at game start time, store it + number cards drawn, and re-shuffle deck whenever we draw new cards.
 // Deterministically shuffle and then use the offset to determine how many draws have occurred
 // Offset will be multiples of 3 -- will start at because the first turn of the game has 3 cards drawn
 export function shuffleWithSeedAndDrawOffset(seed: number, offset: number): GameCard[] {
   const deck = GAME_DECK;
-  const seedRand = (seed: number, min: number, max: number) => {
-    return Math.floor(seed * (max - min + 1)) + min;
-  };
-  const res: GameCard[] = [];
-  const keys = Object.keys(Array.from(new Array(deck.length)));
-
-  for (let i = 0; i < deck.length; i++) {
-    const r = seedRand(seed, 0, keys.length - 1);
-    const g = keys[r];
-    keys.splice(r, 1);
-    res.push(deck[Number(g)]);
-  }
+  const srandSeeded = new Srand(seed);
+  const res: GameCard[] = srandSeeded.shuffle(deck);
 
   // now that we have the full shuffled deck, draw the number of times as indicated by the offset.
   // the offset represents the number of times we've drawn, not the number of cards
