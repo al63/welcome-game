@@ -4,6 +4,7 @@ const dummy = {
   playerId: "bob",
   gameId: "bub",
   score: 12,
+  turn: 10,
   housesRowOne: new Array(10).fill(null),
   housesRowTwo: new Array(11).fill(null),
   housesRowThree: new Array(12).fill(null),

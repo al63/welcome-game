@@ -1,4 +1,4 @@
-import { GameState } from "@/app/util/GameTypes";
+import { GameState, PlayerScores } from "@/app/util/GameTypes";
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
 import { Filter } from "mongodb";
@@ -7,16 +7,21 @@ import { generateGameId } from "@/app/api/utils/GameIdGenerator";
 import seedrandom from "seedrandom";
 import { drawPlans } from "@/app/api/utils/PlanDeck";
 import { PlayerState } from "@/app/util/PlayerTypes";
+import { ActiveCards, drawCards, shuffleWithSeedAndDrawOffset } from "../utils/Deck";
 
 // TODO: add TTL
 // TODO: do stupid checking to make sure we don't have collisions
 // MAYBE TODO: clean up game state if player state somehow fails
 // TODO: think about what data we're not returning to the client (i.e. seed)
 // TODO make deck api
+// make action APIs
+// make scoring logic
+// logic to detect objective completion
+// TODO: generate new seed if we havae to shuffle the deck partway thru the game
+// move scoring to the game state, server/api will calc
 
-// Grab the game state as well as verifying that the provided player is also in this game
+// Grab the game state and all of the player boards provided that the requested player is in this session
 // ex: localhost:3000/api/game?id=bubgame&player=liz
-// this will grab all of the player boards too :^)
 export async function GET(request: NextRequest) {
   try {
     const params = request.nextUrl.searchParams;
@@ -35,7 +40,9 @@ export async function GET(request: NextRequest) {
     if (!gameState) {
       return NextResponse.json("Game not found", { status: 404 });
     }
-    const players = gameState.players;
+
+    // validate requested player exists in the game
+    const players = Object.keys(gameState.players);
     if (!players || !players.includes(player)) {
       return NextResponse.json("Player not found", { status: 404 });
     }
@@ -70,13 +77,21 @@ export async function POST(request: NextRequest) {
   try {
     const req = (await request.json()) as CreateGameAPIRequest;
     const gameId = generateGameId();
+    const seed: number = seedrandom(gameId)();
+    const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, 1);
+    const activeCards: ActiveCards = drawCards(shuffledDeck);
     const gameObj: GameState = {
       id: gameId,
       seed: seedrandom(gameId)(),
-      seedOffset: 0,
-      players: req.players,
+      seedOffset: 1,
+      revealedCardValues: activeCards.revealedNumbers,
+      revealedCardModifiers: activeCards.revealedModifiers.map((gameCard) => gameCard.backingType),
+      players: req.players.reduce<PlayerScores>((accum, cur) => {
+        accum[cur] = 0;
+        return accum;
+      }, {}),
       plans: drawPlans(),
-      turn: 0,
+      turn: 1,
       active: true,
     };
     const client = await clientPromise;
@@ -91,6 +106,7 @@ export async function POST(request: NextRequest) {
         playerId: player,
         gameId: gameId,
         score: 0,
+        turn: 1,
         housesRowOne: new Array(10).fill(null),
         housesRowTwo: new Array(11).fill(null),
         housesRowThree: new Array(12).fill(null),
@@ -106,8 +122,7 @@ export async function POST(request: NextRequest) {
     if (!playerRes.acknowledged) {
       return NextResponse.json("Failed to create players", { status: 500 });
     }
-    // TODO: return slug + names for URL generation
-    return NextResponse.json("Successfully created game state and player states", { status: 201 });
+    return NextResponse.json({ gameId: gameId, players: [req.players] }, { status: 201 });
   } catch (e) {
     return NextResponse.json(e, { status: 500 });
   }
