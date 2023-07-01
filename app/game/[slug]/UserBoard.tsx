@@ -22,7 +22,7 @@ export function UserBoard({ playerState }: Props) {
         </div>
         <div className="mx-4">CARDS TO DRAW</div>
       </div>
-      <UserScoreSheet />
+      <UserScoreSheet playerState={playerState} />
     </div>
   );
 }

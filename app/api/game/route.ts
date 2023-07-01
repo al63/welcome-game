@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
         fencesRowOne: new Array(9).fill(null),
         fencesRowTwo: new Array(10).fill(null),
         fencesRowThree: new Array(11).fill(null),
-        completedPlans: [false, false, false],
+        completedPlans: [0, 0, 0],
         estateModifiers: new Array(6).fill(0),
         permitRefusals: 0,
       };

@@ -16,7 +16,7 @@ export interface PlayerState {
   fencesRowOne: boolean[];
   fencesRowTwo: boolean[];
   fencesRowThree: boolean[];
-  completedPlans: boolean[];
+  completedPlans: number[];
   estateModifiers: number[];
   permitRefusals: number;
 }
