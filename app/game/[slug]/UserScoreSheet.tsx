@@ -1,11 +1,20 @@
 import { PlayerState } from "@/app/util/PlayerTypes";
-import { POOL_SCORES } from "@/app/util/Scoring";
+import { BIS_SCORES, POOL_SCORES } from "@/app/util/Scoring";
 import { computeScore } from "@/app/util/Scoring";
 import React from "react";
 
-function SectionContainer({ children, title }: { children: React.ReactNode; title: string }) {
+function SectionContainer({
+  children,
+  title,
+  negative,
+}: {
+  children: React.ReactNode;
+  title: string;
+  negative?: boolean;
+}) {
+  const color = negative ? "bg-red-300" : "bg-blue-300";
   return (
-    <div className="bg-blue-300 p-2 m-2 flex flex-col items-center rounded-lg">
+    <div className={`${color} p-2 m-2 flex flex-col items-center rounded-lg`}>
       <h1 className="text-gray-600 text-lg">{title}</h1>
       {children}
     </div>
@@ -84,6 +93,18 @@ function TempAgencies({ count, score }: { count: number; score: number }) {
   );
 }
 
+function BIS({ count, score }: { count: number; score: number }) {
+  return (
+    <SectionContainer title="BIS" negative>
+      <div className="grid grid-cols-2">
+        {BIS_SCORES.map((score, index) => {
+          return <Value value={score} checked={count > index} active={count === index} key={score} />;
+        })}
+      </div>
+    </SectionContainer>
+  );
+}
+
 export function UserScoreSheet({ playerState }: { playerState: PlayerState }) {
   const userScores = React.useMemo(() => computeScore(playerState.playerId, [playerState]), [playerState]);
   if (userScores == null) {
@@ -96,6 +117,7 @@ export function UserScoreSheet({ playerState }: { playerState: PlayerState }) {
       <Parks scores={userScores.parks} />
       <Pools count={userScores.pools.count} score={userScores.pools.score} />
       <TempAgencies count={userScores.tempAgencies.count} score={userScores.tempAgencies.score} />
+      <BIS count={userScores.bis.count} score={userScores.bis.score}></BIS>
     </div>
   );
 }
