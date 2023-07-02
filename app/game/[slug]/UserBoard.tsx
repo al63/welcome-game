@@ -2,7 +2,7 @@ import { ROW_ONE, ROW_TWO, ROW_THREE } from "@/app/util/Neighborhoods";
 import { PlayerState } from "@/app/util/PlayerTypes";
 import { UserNeighborhood } from "./UserNeighborhood";
 import { UserScoreSheet } from "./UserScoreSheet";
-import { Card } from "./Card";
+import { Card, UpcomingCards } from "./Card";
 import { GameCard, GameCardType } from "@/app/util/CardTypes";
 
 interface Props {
@@ -27,14 +27,17 @@ export function UserBoard({ playerState, cardState }: Props) {
           />
         </div>
         <div>
-          {cardState.revealedCardValues.map((card: GameCard, index: number) => {
-            return <Card value={card.value} modifier={card.backingType} index={index} />;
-          })}
-        </div>
-        <div>
-          {cardState.revealedCardValues.map((card: GameCard, index: number) => {
-            return <Card value={null} modifier={card.backingType} index={index + 1} />;
-          })}
+          <UpcomingCards upcoming={cardState.revealedCardValues.map((card) => card.backingType)} />
+          <div className="flex flex-row">
+            {cardState.revealedCardValues.map((card: GameCard, index: number) => {
+              return <Card value={card.value} backingModifier={card.backingType} key={index} type="number" />;
+            })}
+          </div>
+          <div className="flex flex-row">
+            {cardState.revealedCardModifiers.map((modifier: GameCardType, index: number) => {
+              return <Card modifier={modifier} key={index} type="modifier" />;
+            })}
+          </div>
         </div>
       </div>
       <UserScoreSheet playerState={playerState} />
