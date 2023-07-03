@@ -11,7 +11,7 @@ const dummy = {
   housesRowOne: new Array(10).fill(null),
   housesRowTwo: new Array(11).fill(null),
   housesRowThree: new Array(12).fill(null),
-  fencesRowOne: new Array(9).fill(false),
+  fencesRowOne: [true, false, false, true, true, false, false, false, true],
   fencesRowTwo: new Array(10).fill(false),
   fencesRowThree: new Array(11).fill(false),
   completedPlans: [0, 0, 0],
@@ -34,15 +34,18 @@ const dummyCards = {
 dummy.housesRowOne[1] = {
   value: 4,
   modifier: "GARDEN",
+  usedForPlan: true,
 };
 
 dummy.housesRowOne[2] = {
   value: 5,
   modifier: "POOL",
+  usedForPlan: true,
 };
-dummy.housesRowOne[4] = {
+dummy.housesRowOne[3] = {
   value: 6,
   modifier: "TEMP",
+  usedForPlan: true,
 };
 dummy.housesRowOne[5] = {
   value: 6,

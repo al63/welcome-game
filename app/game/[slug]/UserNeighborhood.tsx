@@ -41,11 +41,19 @@ interface CellProps {
 function Cell({ house, pool }: CellProps) {
   const occupied = house != null;
   return (
-    <div className={`${occupied ? "bg-gray-100" : ""} border w-12 h-12 relative flex justify-center items-center`}>
+    <div
+      className={`${occupied ? "bg-gray-100" : ""} ${
+        house?.usedForPlan ? "border-t-black border-t-4" : ""
+      } border w-12 h-12 relative flex justify-center items-center`}
+    >
       {pool ? <div className="bg-blue-500 w-2 h-2 top-1 right-1 absolute" /> : null}
       {house != null ? <House house={house} showModifiers /> : null}
     </div>
   );
+}
+
+function Fence() {
+  return <div className={`border-2 border-black w-0 h-12`} />;
 }
 
 interface RowProps {
@@ -68,7 +76,13 @@ export function UserNeighborhoodRow({ config, houses, fences }: RowProps) {
       <ParksProgress scores={config.parkScores} count={numGardens} />
       <div className="flex mb-2">
         {houses.map((house, index) => {
-          return <Cell key={index} house={house} pool={config.pools.includes(index)} />;
+          const fenceAfter = index < fences.length && fences[index];
+          return (
+            <div className="flex" key={index}>
+              <Cell house={house} pool={config.pools.includes(index)} />
+              {fenceAfter ? <Fence /> : null}
+            </div>
+          );
         })}
       </div>
     </div>
