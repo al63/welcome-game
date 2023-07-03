@@ -43,7 +43,7 @@ function Cell({ house, pool, mini }: CellProps) {
   const occupied = house != null;
   return (
     <div
-      className={`${occupied ? "bg-gray-100" : "bg-white"} ${house?.usedForPlan ? "border-t-black border-t-4" : ""} ${
+      className={`${occupied ? "bg-gray-100" : "bg-white"} ${house?.usedForPlan ? "border-t-black border-t-2" : ""} ${
         mini ? "w-6 h-6" : "w-12 h-12"
       } border relative flex justify-center items-center`}
     >
@@ -54,7 +54,7 @@ function Cell({ house, pool, mini }: CellProps) {
 }
 
 function Fence({ mini, active }: { mini: boolean; active: boolean }) {
-  return <div className={`border-2 ${active ? "border-black" : "border-transparent"} w-0 ${mini ? "h-6" : "h-12"}`} />;
+  return <div className={`border ${active ? "border-black" : "border-transparent"} w-0 ${mini ? "h-6" : "h-12"}`} />;
 }
 
 interface RowProps {

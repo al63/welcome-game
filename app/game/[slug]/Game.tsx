@@ -5,9 +5,9 @@ import { PlayersGrid } from "./PlayersGrid";
 import { PlayerStates } from "@/app/util/PlayerTypes";
 import { CardState } from "@/app/util/CardTypes";
 import React from "react";
-import { CityPlans } from "./CityPlans";
 import { EventLog } from "./EventLog";
 import { Turn } from "./Turn";
+import { Cards } from "./Cards";
 
 interface GameProps {
   playerStates: PlayerStates;
@@ -28,9 +28,8 @@ export default function Game({ playerStates, cardState, playerId }: GameProps) {
           viewedPlayerId={viewedPlayerId}
         />
         <div className="flex flex-col mx-4 mt-4">
-          <Turn />
-          <div className="flex flex-col flex-grow justify-end">
-            <CityPlans />
+          <Turn cardState={cardState} />
+          <div className="mt-auto">
             <EventLog />
           </div>
         </div>

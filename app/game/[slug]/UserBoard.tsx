@@ -2,7 +2,7 @@ import { PlayerStates } from "@/app/util/PlayerTypes";
 import { UserCity } from "./UserCity";
 import { UserScoreSheet } from "./UserScoreSheet";
 import { CardState } from "@/app/util/CardTypes";
-import { Cards } from "./Cards";
+import { CityPlans } from "./CityPlans";
 
 interface Props {
   playerStates: PlayerStates;
@@ -20,7 +20,7 @@ export function UserBoard({ playerStates, playerId, viewedPlayerId, cardState }:
         <div className="mr-8">
           <UserCity playerState={playerState} />
         </div>
-        <Cards cardState={cardState} />
+        <CityPlans />
       </div>
       <UserScoreSheet playerStates={playerStates} playerId={viewedPlayerId} />
     </div>
