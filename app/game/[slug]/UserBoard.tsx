@@ -1,19 +1,21 @@
 import { ROW_ONE, ROW_TWO, ROW_THREE } from "@/app/util/Neighborhoods";
-import { PlayerState } from "@/app/util/PlayerTypes";
+import { Players } from "@/app/util/PlayerTypes";
 import { UserNeighborhood } from "./UserNeighborhood";
 import { UserScoreSheet } from "./UserScoreSheet";
 import { Card, UpcomingCards } from "./Card";
 import { GameCard, GameCardType } from "@/app/util/CardTypes";
 
 interface Props {
-  playerState: PlayerState;
+  playerStates: Players;
+  playerId: string;
   cardState: {
     revealedCardValues: GameCard[];
     revealedCardModifiers: GameCardType[];
   };
 }
 
-export function UserBoard({ playerState, cardState }: Props) {
+export function UserBoard({ playerStates, playerId, cardState }: Props) {
+  const playerState = playerStates[playerId];
   return (
     <div className="m-2">
       <div className="flex">
