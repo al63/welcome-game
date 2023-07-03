@@ -106,6 +106,7 @@ export async function POST(request: NextRequest) {
       return {
         playerId: player,
         gameId: gameId,
+        cityName: generateGameId(),
         score: 0,
         turn: 1,
         housesRowOne: new Array(10).fill(null),

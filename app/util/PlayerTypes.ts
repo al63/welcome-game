@@ -13,6 +13,7 @@ export interface PlayerStates {
 export interface PlayerState {
   playerId: string;
   gameId: string;
+  cityName: string;
   score: number;
   turn: number;
   housesRowOne: Array<House | null>;

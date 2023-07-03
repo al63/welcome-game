@@ -55,18 +55,22 @@ dummy.housesRowOne[5] = {
 const states = {
   [dummy.playerId]: {
     ...dummy,
+    cityName: "The Cool Zone",
   },
   bub: {
     ...dummy,
     playerId: "bub",
+    cityName: "BubTown, USA",
   },
   bubbo: {
     ...dummy,
     playerId: "bubbo",
+    cityName: "Bubbolubbo",
   },
   bibby: {
     ...dummy,
     playerId: "bibby",
+    cityName: "The Bibcrib",
   },
 };
 
