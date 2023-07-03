@@ -1,5 +1,5 @@
 import { PlayerStates } from "@/app/util/PlayerTypes";
-import { UserNeighborhood } from "./UserNeighborhood";
+import { UserCity } from "./UserCity";
 import { UserScoreSheet } from "./UserScoreSheet";
 import { CardState } from "@/app/util/CardTypes";
 import { Cards } from "./Cards";
@@ -14,11 +14,11 @@ interface Props {
 export function UserBoard({ playerStates, playerId, viewedPlayerId, cardState }: Props) {
   const playerState = playerStates[viewedPlayerId];
   return (
-    <div>
-      <h1 className="text-xl p-2">{`${viewedPlayerId}'s Neighborhood`}</h1>
+    <div className="bg-orange-100 inline-block p-4 rounded-lg drop-shadow-sm">
+      <h1 className="text-xl p-2">{`${viewedPlayerId}'s City`}</h1>
       <div className="flex">
         <div className="mr-4">
-          <UserNeighborhood playerState={playerState} />
+          <UserCity playerState={playerState} />
         </div>
         <Cards cardState={cardState} />
       </div>

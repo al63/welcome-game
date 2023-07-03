@@ -1,5 +1,5 @@
 import { PlayerStates } from "@/app/util/PlayerTypes";
-import { UserNeighborhood } from "./UserNeighborhood";
+import { UserCity } from "./UserCity";
 
 interface PlayersGridProps {
   playerStates: PlayerStates;
@@ -10,7 +10,7 @@ interface PlayersGridProps {
 export function PlayersGrid({ playerStates, onSetViewedPlayer, viewedPlayerId }: PlayersGridProps) {
   return (
     <div className="my-4">
-      <h1 className="text-xl p-2">All Neighborhoods</h1>
+      <h1 className="text-xl p-2">All Cities</h1>
       <div className="flex flex-wrap">
         {Object.keys(playerStates).map((playerId) => {
           const border = viewedPlayerId === playerId ? "border-black" : "border-gray";
@@ -21,7 +21,7 @@ export function PlayersGrid({ playerStates, onSetViewedPlayer, viewedPlayerId }:
               onClick={() => onSetViewedPlayer(playerId)}
             >
               <h2 className="text-md font-semibold">{playerId}</h2>
-              <UserNeighborhood playerState={playerStates[playerId]} mini />
+              <UserCity playerState={playerStates[playerId]} mini />
             </div>
           );
         })}

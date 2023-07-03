@@ -13,7 +13,7 @@ function ParksProgress({ scores, count }: ParksProgressProps) {
       {scores.map((score, index) => {
         return (
           <div
-            className={`m-1 rounded-full text-center w-6 ${count >= index ? "bg-green-600" : "bg-green-100"}`}
+            className={`m-1 rounded-full text-center w-6 ${count >= index ? "bg-green-600" : "bg-green-300"}`}
             key={index}
           >
             {score}
@@ -42,7 +42,7 @@ function Cell({ house, pool }: CellProps) {
   const occupied = house != null;
   return (
     <div
-      className={`${occupied ? "bg-gray-100" : ""} ${
+      className={`${occupied ? "bg-gray-100" : "bg-white"} ${
         house?.usedForPlan ? "border-t-black border-t-4" : ""
       } border w-12 h-12 relative flex justify-center items-center`}
     >
@@ -62,7 +62,7 @@ interface RowProps {
   fences: boolean[];
 }
 
-export function UserNeighborhoodRow({ config, houses, fences }: RowProps) {
+function UserNeighborhood({ config, houses, fences }: RowProps) {
   const numGardens = React.useMemo(() => {
     return houses.filter((house) => house?.modifier === "GARDEN").length;
   }, [houses]);
@@ -98,7 +98,7 @@ function MiniCell({ house }: CellProps) {
   );
 }
 
-export function MiniUserNeighborhoodRow({ config, houses, fences }: RowProps) {
+function MiniUserNeighborhood({ config, houses, fences }: RowProps) {
   return (
     <div className="flex flex-col items-end">
       <div className="flex mb-2">
@@ -115,8 +115,8 @@ interface NeighborhoodProps {
   mini?: boolean;
 }
 
-export function UserNeighborhood({ playerState, mini }: NeighborhoodProps) {
-  const Component = mini ? MiniUserNeighborhoodRow : UserNeighborhoodRow;
+export function UserCity({ playerState, mini }: NeighborhoodProps) {
+  const Component = mini ? MiniUserNeighborhood : UserNeighborhood;
 
   return (
     <div>
