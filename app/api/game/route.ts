@@ -12,7 +12,6 @@ import { ActiveCards, drawCards, shuffleWithSeedAndDrawOffset } from "../utils/D
 // TODO: do stupid checking to make sure we don't have collisions
 // MAYBE TODO: clean up game state if player state somehow fails
 // TODO: think about what data we're not returning to the client (i.e. seed)
-// TODO make deck api
 // make action APIs
 // make scoring logic
 // logic to detect objective completion
