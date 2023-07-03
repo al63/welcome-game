@@ -35,34 +35,36 @@ function House({ house, showModifiers }: { house: House; showModifiers: boolean 
 
 interface CellProps {
   house: House | null;
-  pool: boolean;
+  pool?: boolean;
+  mini: boolean;
 }
 
-function Cell({ house, pool }: CellProps) {
+function Cell({ house, pool, mini }: CellProps) {
   const occupied = house != null;
   return (
     <div
-      className={`${occupied ? "bg-gray-100" : "bg-white"} ${
-        house?.usedForPlan ? "border-t-black border-t-4" : ""
-      } border w-12 h-12 relative flex justify-center items-center`}
+      className={`${occupied ? "bg-gray-100" : "bg-white"} ${house?.usedForPlan ? "border-t-black border-t-4" : ""} ${
+        mini ? "w-6 h-6" : "w-12 h-12"
+      } border relative flex justify-center items-center`}
     >
-      {pool ? <div className="bg-blue-500 w-2 h-2 top-1 right-1 absolute" /> : null}
-      {house != null ? <House house={house} showModifiers /> : null}
+      {pool && !mini ? <div className="bg-blue-500 w-2 h-2 top-1 right-1 absolute" /> : null}
+      {house != null ? <House house={house} showModifiers={!mini} /> : null}
     </div>
   );
 }
 
-function Fence() {
-  return <div className={`border-2 border-black w-0 h-12`} />;
+function Fence({ mini }: { mini: boolean }) {
+  return <div className={`border-2 border-black w-0 ${mini ? "h-6" : "h-12"}`} />;
 }
 
 interface RowProps {
   config: Neighborhood;
   houses: Array<House | null>;
   fences: boolean[];
+  mini: boolean;
 }
 
-function UserNeighborhood({ config, houses, fences }: RowProps) {
+function UserNeighborhood({ config, houses, fences, mini }: RowProps) {
   const numGardens = React.useMemo(() => {
     return houses.filter((house) => house?.modifier === "GARDEN").length;
   }, [houses]);
@@ -73,37 +75,16 @@ function UserNeighborhood({ config, houses, fences }: RowProps) {
 
   return (
     <div className="flex flex-col items-end">
-      <ParksProgress scores={config.parkScores} count={numGardens} />
+      {mini ? null : <ParksProgress scores={config.parkScores} count={numGardens} />}
       <div className="flex mb-2">
         {houses.map((house, index) => {
           const fenceAfter = index < fences.length && fences[index];
           return (
             <div className="flex" key={index}>
-              <Cell house={house} pool={config.pools.includes(index)} />
-              {fenceAfter ? <Fence /> : null}
+              {<Cell house={house} pool={config.pools.includes(index)} mini={mini} />}
+              {fenceAfter ? <Fence mini={mini} /> : null}
             </div>
           );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function MiniCell({ house }: CellProps) {
-  const occupied = house != null;
-  return (
-    <div className={`${occupied ? "bg-gray-100" : ""} border w-6 h-6 relative flex justify-center items-center`}>
-      {house != null ? <House house={house} showModifiers={false} /> : null}
-    </div>
-  );
-}
-
-function MiniUserNeighborhood({ config, houses, fences }: RowProps) {
-  return (
-    <div className="flex flex-col items-end">
-      <div className="flex mb-2">
-        {houses.map((house, index) => {
-          return <MiniCell key={index} house={house} pool={config.pools.includes(index)} />;
         })}
       </div>
     </div>
@@ -116,13 +97,26 @@ interface NeighborhoodProps {
 }
 
 export function UserCity({ playerState, mini }: NeighborhoodProps) {
-  const Component = mini ? MiniUserNeighborhood : UserNeighborhood;
-
   return (
     <div>
-      <Component config={ROW_ONE} houses={playerState.housesRowOne} fences={playerState.fencesRowOne} />
-      <Component config={ROW_TWO} houses={playerState.housesRowTwo} fences={playerState.fencesRowTwo} />
-      <Component config={ROW_THREE} houses={playerState.housesRowThree} fences={playerState.fencesRowThree} />
+      <UserNeighborhood
+        config={ROW_ONE}
+        houses={playerState.housesRowOne}
+        fences={playerState.fencesRowOne}
+        mini={!!mini}
+      />
+      <UserNeighborhood
+        config={ROW_TWO}
+        houses={playerState.housesRowTwo}
+        fences={playerState.fencesRowTwo}
+        mini={!!mini}
+      />
+      <UserNeighborhood
+        config={ROW_THREE}
+        houses={playerState.housesRowThree}
+        fences={playerState.fencesRowThree}
+        mini={!!mini}
+      />
     </div>
   );
 }
