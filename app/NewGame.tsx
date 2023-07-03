@@ -79,7 +79,7 @@ export default function NewGame() {
       <button
         className={`${
           createdGame == null ? "bg-red-200" : "bg-red-100 text-gray-400"
-        } self-center px-8 py-2 mt-4 rounded-full flex`}
+        } self-center px-8 py-2 mt-7 rounded-full flex`}
         onClick={onCreate}
         disabled={createdGame != null}
       >
