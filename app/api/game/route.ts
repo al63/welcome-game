@@ -2,7 +2,7 @@ import { GameState, PlayerScores } from "@/app/util/GameTypes";
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
 import { Filter } from "mongodb";
-import { CreateGameAPIRequest, GetGameAPIResponse, PlayerStateMap } from "../models";
+import { CreateGameAPIRequest, CreateGameResponse, GetGameAPIResponse, PlayerStateMap } from "../models";
 import { generateGameId } from "@/app/api/utils/GameIdGenerator";
 import { drawPlans } from "@/app/api/utils/PlanDeck";
 import { PlayerState } from "@/app/util/PlayerTypes";
@@ -75,6 +75,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const req = (await request.json()) as CreateGameAPIRequest;
+    if (req.players == null) {
+      return NextResponse.json("Failed to create game", { status: 500 });
+    }
     const gameId = generateGameId();
     const seedDate: number = new Date().getMilliseconds();
     const shuffledDeck = shuffleWithSeedAndDrawOffset(seedDate, 1);
@@ -121,7 +124,7 @@ export async function POST(request: NextRequest) {
     if (!playerRes.acknowledged) {
       return NextResponse.json("Failed to create players", { status: 500 });
     }
-    return NextResponse.json({ gameId: gameId, players: [req.players] }, { status: 201 });
+    return NextResponse.json<CreateGameResponse>({ gameId, players: req.players }, { status: 201 });
   } catch (e) {
     return NextResponse.json(e, { status: 500 });
   }

@@ -3,6 +3,7 @@ import React from "react";
 
 export default function NewGame() {
   const [players, setPlayers] = React.useState<Array<string | null>>([null, null]);
+  const [createdGame, setCreatedGame] = React.useState();
 
   const onNameChange = (index: number, value: string) => {
     const updated = [...players];
@@ -23,13 +24,14 @@ export default function NewGame() {
   };
 
   const onCreate = async () => {
+    const playerIds = players.map((player, index) => player ?? `Player ${index + 1}`);
     const res = await fetch("/api/game", {
-      method: 'POST',
+      method: "POST",
       headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({players: players})
+      body: JSON.stringify({ players: playerIds }),
     });
     const json = await res.json();
     console.log(json);
