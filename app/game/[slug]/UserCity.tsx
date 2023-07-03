@@ -100,8 +100,8 @@ interface NeighborhoodProps {
 
 export function UserCity({ playerState, mini }: NeighborhoodProps) {
   return (
-    <div>
-      <h1 className="text-xl font-bold p-2">{`${playerState.playerId}'s City`}</h1>
+    <div className={mini ? "max-w-xs" : ""}>
+      <h1 className="text-xl font-bold p-2 truncate">{`${playerState.playerId}'s City: ${playerState.cityName}`}</h1>
       <UserNeighborhood
         config={ROW_ONE}
         houses={playerState.housesRowOne}

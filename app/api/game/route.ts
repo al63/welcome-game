@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
 import { Filter } from "mongodb";
 import { CreateGameAPIRequest, CreateGameResponse, GetGameAPIResponse, PlayerStateMap } from "../models";
-import { generateGameId } from "@/app/api/utils/GameIdGenerator";
+import { generateCityName, generateGameId } from "@/app/api/utils/GameIdGenerator";
 import { drawPlans } from "@/app/api/utils/PlanDeck";
 import { PlayerState } from "@/app/util/PlayerTypes";
 import { ActiveCards, drawCards, shuffleWithSeedAndDrawOffset } from "../utils/Deck";
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
       return {
         playerId: player,
         gameId: gameId,
-        cityName: generateGameId(),
+        cityName: generateCityName(),
         score: 0,
         turn: 1,
         housesRowOne: new Array(10).fill(null),
