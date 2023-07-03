@@ -2,7 +2,7 @@ import { GameCardType } from "./CardTypes";
 
 export interface House {
   value: number;
-  modifier: GameCardType;
+  modifier?: GameCardType;
   usedForPlan?: boolean;
 }
 
