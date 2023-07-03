@@ -1,4 +1,4 @@
-import { PlayerState, PlayerStates } from "@/app/util/PlayerTypes";
+import { PlayerStates } from "@/app/util/PlayerTypes";
 import { BIS_SCORES, ESTATE_MODIFIERS, PERMIT_REFUSAL_SCORES, POOL_SCORES, TEMP_SCORES } from "@/app/util/Scoring";
 import { computeScore } from "@/app/util/Scoring";
 import React from "react";
@@ -18,7 +18,7 @@ function SectionContainer({
 }) {
   const color = negative ? "bg-red-300" : "bg-blue-300";
   return (
-    <div className={`${color} p-2 m-2 flex flex-col items-center rounded-lg min-w-fit`}>
+    <div className={`${color} group relative p-2 m-2 flex flex-col items-center rounded-lg min-w-fit`}>
       <h1 className="text-gray-600 text-lg">{title}</h1>
       {children}
     </div>
