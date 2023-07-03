@@ -7,6 +7,13 @@ export default function Home() {
         <h1 className="m-8 italic text-5xl text-center">Welcome to Your Perfect Home</h1>
         <NewGame />
       </div>
+      <div className="w-full text-center py-4 bottom-0 bg-gray-400 text-white">
+        Made by{" "}
+        <a className="underline" href="https://alec-lee.com">
+          Alec
+        </a>{" "}
+        and Liz
+      </div>
     </div>
   );
 }
