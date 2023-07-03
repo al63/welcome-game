@@ -23,7 +23,7 @@ export function UserBoard({ playerStates, playerId, viewedPlayerId, cardState }:
           <CityPlans />
         </div>
       </div>
-      <div className="border-t m-2 pt-2 border-gray-500">
+      <div className="border-t pt-2 border-gray-500">
         <UserScoreSheet playerStates={playerStates} playerId={viewedPlayerId} />
       </div>
     </div>

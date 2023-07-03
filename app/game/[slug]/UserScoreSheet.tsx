@@ -18,7 +18,7 @@ function SectionContainer({
 }) {
   const color = negative ? "bg-red-300" : "bg-blue-300";
   return (
-    <div className={`${color} group relative p-2 m-2 flex flex-col items-center rounded-lg min-w-fit`}>
+    <div className={`${color} group relative p-2 flex flex-col items-center rounded-lg min-w-fit`}>
       <h1 className="text-gray-600 text-lg">{title}</h1>
       {children}
     </div>
@@ -173,7 +173,7 @@ export function UserScoreSheet({ playerStates, playerId }: UserScoreSheetProps) 
   return (
     <>
       <h1 className="text-xl">Scoring</h1>
-      <div className="flex items-end">
+      <div className="flex items-end gap-1">
         <Plans scores={playerState.completedPlans} />
         <Divider symbol="+" />
         <Parks scores={userScores.parks} />
