@@ -125,3 +125,61 @@ export function computeScore(playerId: string, playerStates: PlayerStates): User
     summation,
   };
 }
+
+interface EstateMap {
+  [size: number]: number[][];
+}
+
+// we need to check if all houses between two fences are built
+// check fence arrays, for fence = true, check all houses to the next fence = true
+// the edges of each street have fences by default, but aren't represented in the array
+// the return value will be a map of estate size to an array of arrays representing the start and end index of the estate
+function calculateEstates<T>(fenceRow: T[], houseRow: T[]): EstateMap {
+  const estateResult: EstateMap = {
+    1: [],
+    2: [],
+    3: [],
+    4: [],
+    5: [],
+    6: [],
+  };
+
+  let firstFenceIdx = -1;
+  let lastFenceIdx = -1;
+  for (let i = 0; i < fenceRow.length + 1; i++) {
+    lastFenceIdx++;
+
+    if (firstFenceIdx == -1 && lastFenceIdx == 0) {
+      if (checkValidEstate(houseRow, 0, 0)) {
+        estateResult[1].push([0, 0]);
+      }
+    } else if (firstFenceIdx == fenceRow.length - 1) {
+      if (checkValidEstate(houseRow, houseRow.length - 1, houseRow.length - 1)) {
+        estateResult[1].push([houseRow.length - 1, houseRow.length - 1]);
+      }
+    } else if (fenceRow[i]) {
+      if (checkValidEstate(houseRow, firstFenceIdx + 1, lastFenceIdx)) {
+        estateResult[lastFenceIdx - firstFenceIdx].push([firstFenceIdx + 1, lastFenceIdx]);
+      }
+    } else {
+      continue;
+    }
+    firstFenceIdx = lastFenceIdx;
+  }
+
+  return estateResult;
+}
+
+function checkValidEstate<T>(row: T[], start: number, end: number): boolean {
+  for (let i = start; i < end; i++) {
+    if (row[i] == null) {
+      return false;
+    }
+  }
+
+  if (end - start + 1 > 6) {
+    return false;
+  }
+
+  return true;
+}
