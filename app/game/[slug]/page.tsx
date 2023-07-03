@@ -1,6 +1,7 @@
 import { GameCard, GameCardType } from "@/app/util/CardTypes";
 import { UserBoard } from "./UserBoard";
 import { PlayersGrid } from "./PlayersGrid";
+import Game from "./Game";
 
 const dummy = {
   playerId: "bob",
@@ -52,16 +53,17 @@ const states = {
   [dummy.playerId]: dummy,
 };
 
-export default function Game({ params, searchParams }: { params: { slug: string }; searchParams: { player: string } }) {
+export default function GamePage({
+  params,
+  searchParams,
+}: {
+  params: { slug: string };
+  searchParams: { player: string };
+}) {
   const player = states[searchParams.player];
   if (player == null) {
     return <div>Game / Player combination not found.</div>;
   }
 
-  return (
-    <div className="w-full">
-      <UserBoard playerStates={states} cardState={dummyCards} playerId={player.playerId} />
-      <PlayersGrid />
-    </div>
-  );
+  return <Game playerStates={states} playerId={player.playerId} cardState={dummyCards} />;
 }

@@ -16,3 +16,8 @@ export interface PlanCard {
   difficulty: 1 | 2 | 3;
   requirements: SizeRequirements[];
 }
+
+export interface CardState {
+  revealedCardValues: GameCard[];
+  revealedCardModifiers: GameCardType[];
+}

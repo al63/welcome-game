@@ -3,15 +3,12 @@ import { PlayerStates } from "@/app/util/PlayerTypes";
 import { UserNeighborhood } from "./UserNeighborhood";
 import { UserScoreSheet } from "./UserScoreSheet";
 import { Card, UpcomingCards } from "./Card";
-import { GameCard, GameCardType } from "@/app/util/CardTypes";
+import { CardState, GameCard, GameCardType } from "@/app/util/CardTypes";
 
 interface Props {
   playerStates: PlayerStates;
   playerId: string;
-  cardState: {
-    revealedCardValues: GameCard[];
-    revealedCardModifiers: GameCardType[];
-  };
+  cardState: CardState;
 }
 
 export function UserBoard({ playerStates, playerId, cardState }: Props) {
