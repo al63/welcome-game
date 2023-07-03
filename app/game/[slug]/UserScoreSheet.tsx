@@ -171,22 +171,25 @@ export function UserScoreSheet({ playerStates, playerId }: UserScoreSheetProps) 
   }
 
   return (
-    <div className="flex items-end">
-      <Plans scores={playerState.completedPlans} />
-      <Divider symbol="+" />
-      <Parks scores={userScores.parks} />
-      <Divider symbol="+" />
-      <Pools count={userScores.pools.count} score={userScores.pools.score} />
-      <Divider symbol="+" />
-      <TempAgencies count={userScores.tempAgencies.count} score={userScores.tempAgencies.score} />
-      <Divider symbol="+" />
-      <Estates playerModifiers={playerState.estateModifiers} />
-      <Divider symbol="-" />
-      <BIS count={userScores.bis.count} score={userScores.bis.score}></BIS>
-      <Divider symbol="-" />
-      <PermitRefusals count={playerState.permitRefusals} score={userScores.permitRefusals} />
-      <Divider symbol="=" />
-      <div className="mb-20 ml-2 text-xl font-bold">{userScores.summation}</div>
-    </div>
+    <>
+      <h1 className="text-xl">Scoring</h1>
+      <div className="flex items-end">
+        <Plans scores={playerState.completedPlans} />
+        <Divider symbol="+" />
+        <Parks scores={userScores.parks} />
+        <Divider symbol="+" />
+        <Pools count={userScores.pools.count} score={userScores.pools.score} />
+        <Divider symbol="+" />
+        <TempAgencies count={userScores.tempAgencies.count} score={userScores.tempAgencies.score} />
+        <Divider symbol="+" />
+        <Estates playerModifiers={playerState.estateModifiers} />
+        <Divider symbol="-" />
+        <BIS count={userScores.bis.count} score={userScores.bis.score}></BIS>
+        <Divider symbol="-" />
+        <PermitRefusals count={playerState.permitRefusals} score={userScores.permitRefusals} />
+        <Divider symbol="=" />
+        <div className="mb-20 ml-2 text-xl font-bold">{userScores.summation}</div>
+      </div>
+    </>
   );
 }
