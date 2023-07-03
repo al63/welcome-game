@@ -15,6 +15,11 @@ export const ESTATE_MODIFIERS = [
 export const BIS_SCORES = [0, 1, 3, 6, 9, 12, 16, 20, 24, 28];
 export const PERMIT_REFUSAL_SCORES = [0, 0, 3, 5];
 
+export interface EstatesScore {
+  count: number;
+  value: number;
+}
+
 interface UserScore {
   plans: number;
   parks: number[];
@@ -26,7 +31,7 @@ interface UserScore {
     count: number;
     score: number;
   };
-  estates: number[];
+  estates: Array<EstatesScore>;
   bis: {
     count: number;
     score: number;
@@ -90,6 +95,11 @@ export function computeScore(playerId: string, playerStates: PlayerStates): User
   }
   const tempAgenciesScore = TEMP_SCORES[place] ?? 0;
 
+  const estatesScore = calculateEstatesScore(playerState);
+  const estatesScoreSum = estatesScore.reduce((accum, cur) => {
+    return accum + cur.value;
+  }, 0);
+
   const bis = houseRows.reduce((accum, cur) => accum + countType(cur, "BIS"), 0);
   const bisScore = BIS_SCORES[bis] ?? 0;
 
@@ -101,7 +111,8 @@ export function computeScore(playerId: string, playerStates: PlayerStates): User
     parkScores[1] +
     parkScores[2] +
     poolsScore +
-    tempAgenciesScore -
+    tempAgenciesScore +
+    estatesScoreSum -
     bisScore -
     permitRefusalsScore;
 
@@ -116,7 +127,7 @@ export function computeScore(playerId: string, playerStates: PlayerStates): User
       count: tempAgenciesCount,
       score: tempAgenciesScore,
     },
-    estates: [0, 0, 0, 0, 0, 0],
+    estates: estatesScore,
     bis: {
       count: bis,
       score: bisScore,
@@ -126,23 +137,26 @@ export function computeScore(playerId: string, playerStates: PlayerStates): User
   };
 }
 
-interface EstateMap {
-  [size: number]: number[][];
+function calculateEstatesScore(playerState: PlayerState): Array<EstatesScore> {
+  const one = getEstatesResult(playerState.fencesRowOne, playerState.housesRowOne);
+  const two = getEstatesResult(playerState.fencesRowTwo, playerState.housesRowTwo);
+  const three = getEstatesResult(playerState.fencesRowThree, playerState.housesRowThree);
+  return playerState.estateModifiers.map((modifierIndex, index) => {
+    const modifierValue = ESTATE_MODIFIERS[index][modifierIndex];
+    const count = one[index].length + two[index].length + three[index].length;
+    return {
+      count,
+      value: count * modifierValue,
+    };
+  });
 }
 
 // we need to check if all houses between two fences are built
 // check fence arrays, for fence = true, check all houses to the next fence = true
 // the edges of each street have fences by default, but aren't represented in the array
 // the return value will be a map of estate size to an array of arrays representing the start and end index of the estate
-function calculateEstates<T>(fenceRow: T[], houseRow: T[]): EstateMap {
-  const estateResult: EstateMap = {
-    1: [],
-    2: [],
-    3: [],
-    4: [],
-    5: [],
-    6: [],
-  };
+function getEstatesResult(fenceRow: boolean[], houseRow: Array<House | null>): number[][][] {
+  const estateResult: number[][][] = [[], [], [], [], [], []];
 
   let firstFenceIdx = -1;
   let lastFenceIdx = -1;
@@ -151,15 +165,15 @@ function calculateEstates<T>(fenceRow: T[], houseRow: T[]): EstateMap {
 
     if (firstFenceIdx == -1 && lastFenceIdx == 0) {
       if (checkValidEstate(houseRow, 0, 0)) {
-        estateResult[1].push([0, 0]);
+        estateResult[0].push([0, 0]);
       }
     } else if (firstFenceIdx == fenceRow.length - 1) {
       if (checkValidEstate(houseRow, houseRow.length - 1, houseRow.length - 1)) {
-        estateResult[1].push([houseRow.length - 1, houseRow.length - 1]);
+        estateResult[0].push([houseRow.length - 1, houseRow.length - 1]);
       }
     } else if (fenceRow[i]) {
       if (checkValidEstate(houseRow, firstFenceIdx + 1, lastFenceIdx)) {
-        estateResult[lastFenceIdx - firstFenceIdx].push([firstFenceIdx + 1, lastFenceIdx]);
+        estateResult[lastFenceIdx - firstFenceIdx - 1].push([firstFenceIdx + 1, lastFenceIdx]);
       }
     } else {
       continue;
@@ -171,7 +185,7 @@ function calculateEstates<T>(fenceRow: T[], houseRow: T[]): EstateMap {
 }
 
 function checkValidEstate<T>(row: T[], start: number, end: number): boolean {
-  for (let i = start; i < end; i++) {
+  for (let i = start; i <= end; i++) {
     if (row[i] == null) {
       return false;
     }

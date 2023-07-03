@@ -1,5 +1,12 @@
 import { PlayerStates } from "@/app/util/PlayerTypes";
-import { BIS_SCORES, ESTATE_MODIFIERS, PERMIT_REFUSAL_SCORES, POOL_SCORES, TEMP_SCORES } from "@/app/util/Scoring";
+import {
+  BIS_SCORES,
+  ESTATE_MODIFIERS,
+  EstatesScore,
+  PERMIT_REFUSAL_SCORES,
+  POOL_SCORES,
+  TEMP_SCORES,
+} from "@/app/util/Scoring";
 import { computeScore } from "@/app/util/Scoring";
 import React from "react";
 
@@ -100,7 +107,7 @@ function TempAgencies({ count, score }: { count: number; score: number }) {
   );
 }
 
-function Estates({ playerModifiers }: { playerModifiers: number[] }) {
+function Estates({ playerModifiers, score }: { playerModifiers: number[]; score: Array<EstatesScore> }) {
   return (
     <SectionContainer title="Estates">
       <div className="flex flex-row">
@@ -122,7 +129,7 @@ function Estates({ playerModifiers }: { playerModifiers: number[] }) {
                 })}
               </div>
               <div className="mt-2">
-                x<span className="underline decoration-dotted"> 0 </span>
+                x<span className="underline decoration-dotted">{score[index].count} </span>
               </div>
             </div>
           );
@@ -182,7 +189,7 @@ export function UserScoreSheet({ playerStates, playerId }: UserScoreSheetProps) 
         <Divider symbol="+" />
         <TempAgencies count={userScores.tempAgencies.count} score={userScores.tempAgencies.score} />
         <Divider symbol="+" />
-        <Estates playerModifiers={playerState.estateModifiers} />
+        <Estates playerModifiers={playerState.estateModifiers} score={userScores.estates} />
         <Divider symbol="-" />
         <BIS count={userScores.bis.count} score={userScores.bis.score}></BIS>
         <Divider symbol="-" />
