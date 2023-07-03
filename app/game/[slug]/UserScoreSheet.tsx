@@ -100,7 +100,7 @@ function TempAgencies({ count, score }: { count: number; score: number }) {
   );
 }
 
-function Estates() {
+function Estates({ playerModifiers }: { playerModifiers: number[] }) {
   return (
     <SectionContainer title="Estates">
       <div className="flex flex-row">
@@ -109,10 +109,14 @@ function Estates() {
             <div className="flex flex-col" key={index}>
               <div className="m-1 bg-violet-400 text-center">{index + 1}</div>
               <div className="flex-grow">
-                {modifiers.map((modifier) => {
+                {modifiers.map((modifier, modifierIndex) => {
                   return (
                     <div className="m-1" key={modifier}>
-                      <Value value={modifier} />
+                      <Value
+                        value={modifier}
+                        checked={playerModifiers[index] > modifierIndex}
+                        active={playerModifiers[index] === modifierIndex}
+                      />
                     </div>
                   );
                 })}
@@ -170,7 +174,7 @@ export function UserScoreSheet({ playerState }: { playerState: PlayerState }) {
       <Divider symbol="+" />
       <TempAgencies count={userScores.tempAgencies.count} score={userScores.tempAgencies.score} />
       <Divider symbol="+" />
-      <Estates />
+      <Estates playerModifiers={playerState.estateModifiers} />
       <Divider symbol="-" />
       <BIS count={userScores.bis.count} score={userScores.bis.score}></BIS>
       <Divider symbol="-" />
