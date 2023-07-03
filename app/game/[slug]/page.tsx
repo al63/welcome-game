@@ -50,7 +50,9 @@ dummy.housesRowOne[5] = {
 };
 
 const states = {
-  [dummy.playerId]: dummy,
+  [dummy.playerId]: {
+    ...dummy,
+  },
   bub: {
     ...dummy,
   },

@@ -82,7 +82,7 @@ function TempAgencies({ count, score }: { count: number; score: number }) {
   const agencies = [];
   for (let i = 0; i < 11; i++) {
     agencies.push(
-      <div className={`bg-orange-200 m-2 h-4 w-4 text-lg flex items-center justify-center rotate-45 font-bold`}>
+      <div className={`bg-orange-400 m-2 h-4 w-4 text-lg flex items-center justify-center rotate-45 font-bold`}>
         {count > i ? "+" : ""}
       </div>
     );

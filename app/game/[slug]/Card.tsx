@@ -31,7 +31,7 @@ function modifierColor(modifier: GameCardType): string {
   }
 }
 
-function modifierDisplayName(modifier: GameCardType): string {
+export function modifierDisplayName(modifier: GameCardType): string {
   switch (modifier) {
     case "POOL":
       return "Pool";
@@ -46,12 +46,6 @@ function modifierDisplayName(modifier: GameCardType): string {
     case "GARDEN":
       return "Garden";
   }
-}
-
-export function UpcomingCards({ upcoming }: { upcoming: GameCardType[] }) {
-  return (
-    <h3 className="italic text-xs">{`Upcoming: ${upcoming.map((type) => modifierDisplayName(type)).join(", ")}`}</h3>
-  );
 }
 
 export function Card(props: CardProps) {
