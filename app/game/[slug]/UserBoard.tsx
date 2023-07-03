@@ -15,16 +15,18 @@ interface Props {
 
 export function UserBoard({ playerState, cardState }: Props) {
   return (
-    <div>
+    <div className="m-2">
       <div className="flex">
-        <div className="flex flex-col">
-          <UserNeighborhood config={ROW_ONE} houses={playerState.housesRowOne} fences={playerState.fencesRowOne} />
-          <UserNeighborhood config={ROW_TWO} houses={playerState.housesRowTwo} fences={playerState.fencesRowTwo} />
-          <UserNeighborhood
-            config={ROW_THREE}
-            houses={playerState.housesRowThree}
-            fences={playerState.fencesRowThree}
-          />
+        <div className="flex flex-col items-start ml-2 mr-4">
+          <div>
+            <UserNeighborhood config={ROW_ONE} houses={playerState.housesRowOne} fences={playerState.fencesRowOne} />
+            <UserNeighborhood config={ROW_TWO} houses={playerState.housesRowTwo} fences={playerState.fencesRowTwo} />
+            <UserNeighborhood
+              config={ROW_THREE}
+              houses={playerState.housesRowThree}
+              fences={playerState.fencesRowThree}
+            />
+          </div>
         </div>
         <div>
           <UpcomingCards upcoming={cardState.revealedCardValues.map((card) => card.backingType)} />

@@ -4,6 +4,14 @@ import { House, PlayerState } from "./PlayerTypes";
 
 export const POOL_SCORES = [0, 3, 6, 9, 13, 17, 21, 26, 31, 36];
 export const TEMP_SCORES = [7, 4, 1];
+export const ESTATE_MODIFIERS = [
+  [1, 3],
+  [2, 3, 4],
+  [3, 4, 5, 6],
+  [4, 5, 6, 7, 8],
+  [5, 6, 7, 8, 10],
+  [6, 7, 8, 10, 12],
+];
 export const BIS_SCORES = [0, 1, 3, 6, 9, 12, 16, 20, 24, 28];
 export const PERMIT_REFUSAL_SCORES = [0, 0, 3, 5];
 
