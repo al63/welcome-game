@@ -149,7 +149,7 @@ function PermitRefusals({ count, score }: { count: number; score: number }) {
     <SectionContainer title="Refusals" negative>
       {PERMIT_REFUSAL_SCORES.map((s, index) => {
         return (
-          <div className="m-1" key={s}>
+          <div className="m-1" key={index}>
             <Value value={s} checked={count > index} active={count === index} />
           </div>
         );

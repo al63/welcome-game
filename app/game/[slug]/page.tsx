@@ -55,12 +55,15 @@ const states = {
   },
   bub: {
     ...dummy,
+    playerId: "bub",
   },
   bubbo: {
     ...dummy,
+    playerId: "bubbo",
   },
   bibby: {
     ...dummy,
+    playerId: "bibby",
   },
 };
 

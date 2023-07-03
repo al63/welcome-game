@@ -1,9 +1,7 @@
-import { ROW_ONE, ROW_TWO, ROW_THREE } from "@/app/util/Neighborhoods";
 import { PlayerStates } from "@/app/util/PlayerTypes";
 import { UserNeighborhood } from "./UserNeighborhood";
 import { UserScoreSheet } from "./UserScoreSheet";
-import { Card, UpcomingCards } from "./Card";
-import { CardState, GameCard, GameCardType } from "@/app/util/CardTypes";
+import { CardState } from "@/app/util/CardTypes";
 import { Cards } from "./Cards";
 
 interface Props {
