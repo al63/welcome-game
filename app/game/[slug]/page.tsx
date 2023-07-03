@@ -51,6 +51,15 @@ dummy.housesRowOne[5] = {
 
 const states = {
   [dummy.playerId]: dummy,
+  bub: {
+    ...dummy,
+  },
+  bubbo: {
+    ...dummy,
+  },
+  bibby: {
+    ...dummy,
+  },
 };
 
 export default function GamePage({

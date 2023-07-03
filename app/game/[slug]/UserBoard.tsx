@@ -14,18 +14,11 @@ interface Props {
 export function UserBoard({ playerStates, playerId, cardState }: Props) {
   const playerState = playerStates[playerId];
   return (
-    <div className="m-2">
+    <div>
+      <h1 className="text-xl p-2">{`${playerId}'s Neighborhood`}</h1>
       <div className="flex">
-        <div className="flex flex-col items-start ml-2 mr-4">
-          <div>
-            <UserNeighborhood config={ROW_ONE} houses={playerState.housesRowOne} fences={playerState.fencesRowOne} />
-            <UserNeighborhood config={ROW_TWO} houses={playerState.housesRowTwo} fences={playerState.fencesRowTwo} />
-            <UserNeighborhood
-              config={ROW_THREE}
-              houses={playerState.housesRowThree}
-              fences={playerState.fencesRowThree}
-            />
-          </div>
+        <div className="mr-4">
+          <UserNeighborhood playerState={playerState} />
         </div>
         <div>
           <UpcomingCards upcoming={cardState.revealedCardValues.map((card) => card.backingType)} />

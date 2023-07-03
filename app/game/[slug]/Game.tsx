@@ -13,7 +13,7 @@ interface GameProps {
 
 export default function Game({ playerStates, cardState, playerId }: GameProps) {
   return (
-    <div className="w-full">
+    <div className="w-full m-2">
       <UserBoard playerStates={playerStates} cardState={cardState} playerId={playerId} />
       <PlayersGrid playerStates={playerStates} />
     </div>

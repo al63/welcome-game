@@ -1,5 +1,5 @@
-import { Neighborhood } from "@/app/util/Neighborhoods";
-import { House } from "@/app/util/PlayerTypes";
+import { Neighborhood, ROW_ONE, ROW_THREE, ROW_TWO } from "@/app/util/Neighborhoods";
+import { House, PlayerState } from "@/app/util/PlayerTypes";
 import React from "react";
 
 interface ParksProgressProps {
@@ -24,11 +24,11 @@ function ParksProgress({ scores, count }: ParksProgressProps) {
   );
 }
 
-function House({ house }: { house: House }) {
+function House({ house, showModifiers }: { house: House; showModifiers: boolean }) {
   return (
     <div className="flex flex-col text-xs items-center">
       <div>{house.value}</div>
-      {house.modifier === "BIS" ? <div>BIS</div> : null}
+      {showModifiers && house.modifier === "BIS" ? <div>BIS</div> : null}
     </div>
   );
 }
@@ -43,18 +43,18 @@ function Cell({ house, pool }: CellProps) {
   return (
     <div className={`${occupied ? "bg-gray-100" : ""} border w-12 h-12 relative flex justify-center items-center`}>
       {pool ? <div className="bg-blue-500 w-2 h-2 top-1 right-1 absolute" /> : null}
-      {house != null ? <House house={house} /> : null}
+      {house != null ? <House house={house} showModifiers /> : null}
     </div>
   );
 }
 
-interface NeighborhoodProps {
+interface RowProps {
   config: Neighborhood;
   houses: Array<House | null>;
   fences: boolean[];
 }
 
-export function UserNeighborhood({ config, houses, fences }: NeighborhoodProps) {
+export function UserNeighborhoodRow({ config, houses, fences }: RowProps) {
   const numGardens = React.useMemo(() => {
     return houses.filter((house) => house?.modifier === "GARDEN").length;
   }, [houses]);
@@ -71,6 +71,44 @@ export function UserNeighborhood({ config, houses, fences }: NeighborhoodProps) 
           return <Cell key={index} house={house} pool={config.pools.includes(index)} />;
         })}
       </div>
+    </div>
+  );
+}
+
+function MiniCell({ house }: CellProps) {
+  const occupied = house != null;
+  return (
+    <div className={`${occupied ? "bg-gray-100" : ""} border w-6 h-6 relative flex justify-center items-center`}>
+      {house != null ? <House house={house} showModifiers={false} /> : null}
+    </div>
+  );
+}
+
+export function MiniUserNeighborhoodRow({ config, houses, fences }: RowProps) {
+  return (
+    <div className="flex flex-col items-end">
+      <div className="flex mb-2">
+        {houses.map((house, index) => {
+          return <MiniCell key={index} house={house} pool={config.pools.includes(index)} />;
+        })}
+      </div>
+    </div>
+  );
+}
+
+interface NeighborhoodProps {
+  playerState: PlayerState;
+  mini?: boolean;
+}
+
+export function UserNeighborhood({ playerState, mini }: NeighborhoodProps) {
+  const Component = mini ? MiniUserNeighborhoodRow : UserNeighborhoodRow;
+
+  return (
+    <div>
+      <Component config={ROW_ONE} houses={playerState.housesRowOne} fences={playerState.fencesRowOne} />
+      <Component config={ROW_TWO} houses={playerState.housesRowTwo} fences={playerState.fencesRowTwo} />
+      <Component config={ROW_THREE} houses={playerState.housesRowThree} fences={playerState.fencesRowThree} />
     </div>
   );
 }
