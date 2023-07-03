@@ -14,10 +14,10 @@ interface Props {
 export function UserBoard({ playerStates, playerId, viewedPlayerId, cardState }: Props) {
   const playerState = playerStates[viewedPlayerId];
   return (
-    <div className="bg-orange-100 inline-block p-4 rounded-lg drop-shadow-sm">
-      <h1 className="text-xl p-2">{`${viewedPlayerId}'s City`}</h1>
-      <div className="flex">
-        <div className="mr-4">
+    <div className="bg-orange-100 inline-block p-4 rounded-lg drop-shadow-sm min-w-fit">
+      <h1 className="text-xl font-bold p-2">{`${viewedPlayerId}'s City`}</h1>
+      <div className="flex justify-center">
+        <div className="mr-8">
           <UserCity playerState={playerState} />
         </div>
         <Cards cardState={cardState} />
