@@ -77,15 +77,17 @@ function UserNeighborhood({ config, houses, fences, mini }: RowProps) {
     <div className="flex flex-col items-end">
       {mini ? null : <ParksProgress scores={config.parkScores} count={numGardens} />}
       <div className="flex mb-2">
+        <Fence active mini={mini} />
         {houses.map((house, index) => {
           const fenceAfter = index < fences.length && fences[index];
           return (
             <div className="flex" key={index}>
               <Cell house={house} pool={config.pools.includes(index)} mini={mini} />
-              <Fence active={fenceAfter} mini={mini} />
+              {index < houses.length - 1 ? <Fence active={fenceAfter} mini={mini} /> : null}
             </div>
           );
         })}
+        <Fence active mini={mini} />
       </div>
     </div>
   );
