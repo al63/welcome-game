@@ -6,7 +6,7 @@ export interface House {
   usedForPlan?: boolean;
 }
 
-export interface Players {
+export interface PlayerStates {
   [playerId: string]: PlayerState;
 }
 

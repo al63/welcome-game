@@ -1,6 +1,6 @@
 import { GameCardType } from "./CardTypes";
 import { ROW_ONE, ROW_THREE, ROW_TWO } from "./Neighborhoods";
-import { House, PlayerState } from "./PlayerTypes";
+import { House, PlayerState, PlayerStates } from "./PlayerTypes";
 
 export const POOL_SCORES = [0, 3, 6, 9, 13, 17, 21, 26, 31, 36];
 export const TEMP_SCORES = [7, 4, 1];
@@ -41,8 +41,8 @@ function countType(row: Array<House | null>, type: GameCardType) {
   }, 0);
 }
 
-export function computeScore(playerId: string, playerStates: PlayerState[]): UserScore | null {
-  const playerState = playerStates.find((playerState) => playerState.playerId === playerId);
+export function computeScore(playerId: string, playerStates: PlayerStates): UserScore | null {
+  const playerState = playerStates[playerId];
   if (!playerState) {
     return null;
   }
@@ -58,7 +58,8 @@ export function computeScore(playerId: string, playerStates: PlayerState[]): Use
   const poolsScore = POOL_SCORES[pools];
 
   // pain ahead: have to compute the count of temp agencies for each player, and determine what our place is accounting for ties
-  const tempAgenciesByPlayer = playerStates
+  const playerStatesArray = Object.values(playerStates);
+  const tempAgenciesByPlayer = playerStatesArray
     .map((state) => {
       const rows = [state.housesRowOne, state.housesRowTwo, state.housesRowThree];
       const tempAgencies = rows.reduce((accum, cur) => accum + countType(cur, "TEMP"), 0);

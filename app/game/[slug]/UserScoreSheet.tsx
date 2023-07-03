@@ -1,4 +1,4 @@
-import { PlayerState } from "@/app/util/PlayerTypes";
+import { PlayerState, PlayerStates } from "@/app/util/PlayerTypes";
 import { BIS_SCORES, ESTATE_MODIFIERS, PERMIT_REFUSAL_SCORES, POOL_SCORES, TEMP_SCORES } from "@/app/util/Scoring";
 import { computeScore } from "@/app/util/Scoring";
 import React from "react";
@@ -158,9 +158,15 @@ function PermitRefusals({ count, score }: { count: number; score: number }) {
   );
 }
 
-export function UserScoreSheet({ playerState }: { playerState: PlayerState }) {
-  const userScores = React.useMemo(() => computeScore(playerState.playerId, [playerState]), [playerState]);
-  if (userScores == null) {
+interface UserScoreSheetProps {
+  playerStates: PlayerStates;
+  playerId: string;
+}
+
+export function UserScoreSheet({ playerStates, playerId }: UserScoreSheetProps) {
+  const playerState = playerStates[playerId];
+  const userScores = React.useMemo(() => computeScore(playerId, playerStates), [playerStates, playerId]);
+  if (userScores == null || playerState == null) {
     return null;
   }
 

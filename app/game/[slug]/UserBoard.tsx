@@ -1,12 +1,12 @@
 import { ROW_ONE, ROW_TWO, ROW_THREE } from "@/app/util/Neighborhoods";
-import { Players } from "@/app/util/PlayerTypes";
+import { PlayerStates } from "@/app/util/PlayerTypes";
 import { UserNeighborhood } from "./UserNeighborhood";
 import { UserScoreSheet } from "./UserScoreSheet";
 import { Card, UpcomingCards } from "./Card";
 import { GameCard, GameCardType } from "@/app/util/CardTypes";
 
 interface Props {
-  playerStates: Players;
+  playerStates: PlayerStates;
   playerId: string;
   cardState: {
     revealedCardValues: GameCard[];
@@ -44,7 +44,7 @@ export function UserBoard({ playerStates, playerId, cardState }: Props) {
           </div>
         </div>
       </div>
-      <UserScoreSheet playerState={playerState} />
+      <UserScoreSheet playerStates={playerStates} playerId={playerId} />
     </div>
   );
 }
