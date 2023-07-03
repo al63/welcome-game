@@ -53,8 +53,8 @@ function Cell({ house, pool, mini }: CellProps) {
   );
 }
 
-function Fence({ mini }: { mini: boolean }) {
-  return <div className={`border-2 border-black w-0 ${mini ? "h-6" : "h-12"}`} />;
+function Fence({ mini, active }: { mini: boolean; active: boolean }) {
+  return <div className={`border-2 ${active ? "border-black" : "border-transparent"} w-0 ${mini ? "h-6" : "h-12"}`} />;
 }
 
 interface RowProps {
@@ -81,8 +81,8 @@ function UserNeighborhood({ config, houses, fences, mini }: RowProps) {
           const fenceAfter = index < fences.length && fences[index];
           return (
             <div className="flex" key={index}>
-              {<Cell house={house} pool={config.pools.includes(index)} mini={mini} />}
-              {fenceAfter ? <Fence mini={mini} /> : null}
+              <Cell house={house} pool={config.pools.includes(index)} mini={mini} />
+              <Fence active={fenceAfter} mini={mini} />
             </div>
           );
         })}
