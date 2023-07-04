@@ -109,7 +109,7 @@ function TempAgencies({ count, score }: { count: number; score: number }) {
 
 function Estates({ playerModifiers, score }: { playerModifiers: number[]; score: Array<EstatesScore> }) {
   return (
-    <SectionContainer title="Estates">
+    <SectionContainer title="Real Estate">
       <div className="flex flex-row">
         {ESTATE_MODIFIERS.map((modifiers, index) => {
           return (

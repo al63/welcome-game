@@ -38,11 +38,11 @@ export function modifierDisplayName(modifier: GameCardType): string {
     case "FENCE":
       return "Fence";
     case "ESTATE":
-      return "Estate";
+      return "Real Estate";
     case "BIS":
       return "BIS";
     case "TEMP":
-      return "Temp";
+      return "Temp Agency";
     case "GARDEN":
       return "Garden";
   }

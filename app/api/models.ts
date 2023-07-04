@@ -33,13 +33,35 @@ export interface CreateTurnAPIRequest {
   completedPlans: number[];
 }
 
-interface T {
+interface BISAction {
+  house: House;
+  housePosition: number[];
+  bisHouse: House;
+  bisPosition: number[];
+  type: "bis";
+}
+
+interface FenceAction {
+  house: House;
+  housePosition: number[];
+  fence: number;
+  fencePosition: number[];
+  type: "fence";
+}
+
+interface StandardAction {
+  house: House;
+  houseRow: number;
+  type: "standard";
+}
+
+interface PermitRefusalAction {
+  type: "refusal";
+}
+
+interface REAL_FOR_SURE_CreateTurnAPIRequest {
   gameId: string;
   playerId: string;
   turn: number;
-  housePlayed: House | null;
-  houseRow: number | null;
-  fencePlaced: number | null;
-  fenceRow: number | null;
-  completedCityPlan: number | null;
+  action: StandardAction | FenceAction | BISAction | PermitRefusalAction;
 }
