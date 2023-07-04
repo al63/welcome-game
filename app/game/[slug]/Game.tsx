@@ -34,7 +34,7 @@ export default function Game({ initialPlayerStates, initialGameState, playerId }
             </div>
           </div>
         </div>
-        <PlayersGrid onSetViewedPlayer={setViewedPlayerId} viewedPlayerId={viewedPlayerId} />
+        <PlayersGrid onSetViewedPlayer={setViewedPlayerId} playerId={playerId} viewedPlayerId={viewedPlayerId} />
       </div>
     </GameStateMachineProvider>
   );
