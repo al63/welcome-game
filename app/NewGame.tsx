@@ -79,8 +79,8 @@ export default function NewGame() {
       })}
       <button
         className={classNames("self-center px-8 py-2 mt-7 rounded-full flex", {
-          "bg-red-200": !createdGame,
-          "bg-red-100 text-gray-400": !!createdGame,
+          "bg-red-200 hover:bg-red-300": !createdGame && !loading,
+          "bg-red-100 text-gray-400": !!createdGame || loading,
         })}
         onClick={onCreate}
         disabled={createdGame != null}

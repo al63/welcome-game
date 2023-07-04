@@ -15,12 +15,56 @@
  */
 
 import { PlayerStateMap } from "@/app/api/models";
-import { GameStateMachine } from "@/app/util/GameStateMachineTypes";
+import { ChooseAction, GameStateMachine, GameStateMachineAction } from "@/app/util/GameStateMachineTypes";
 import { GameState } from "@/app/util/GameTypes";
-import React, { useContext } from "react";
+import React, { useContext, useReducer } from "react";
 import { createContext } from "react";
 
+function reduceChooseAction(state: GameStateMachine, action: ChooseAction): GameStateMachine {
+  switch (action.cardType) {
+    case "POOL":
+    case "GARDEN":
+      return {
+        ...state,
+        step: {
+          type: "placeCard",
+          cardValue: action.cardValue,
+          cardType: action.cardType,
+        },
+      };
+    case "BIS":
+    case "ESTATE":
+    case "TEMP":
+    case "FENCE":
+      // TODO:
+      return {
+        ...state,
+        step: {
+          type: "choose",
+        },
+      };
+  }
+}
+
+function reducer(state: GameStateMachine, action: GameStateMachineAction): GameStateMachine {
+  switch (action.type) {
+    case "cancel": {
+      return {
+        ...state,
+        step: {
+          type: "choose",
+        },
+      };
+    }
+    case "choose":
+      return reduceChooseAction(state, action);
+    default:
+      return state;
+  }
+}
+
 const GameStateMachineContext = createContext<GameStateMachine | null>(null);
+const GameStateMachineDispatchContext = createContext<React.Dispatch<GameStateMachineAction> | null>(null);
 
 interface GameStateMachineProviderProps {
   playerId: string;
@@ -35,28 +79,35 @@ export function GameStateMachineProvider({
   initialPlayerStates,
   children,
 }: GameStateMachineProviderProps) {
-  const onUpdate = React.useCallback(() => {
-    return null;
-  }, []);
-
-  const [stateMachine, setStateMachine] = React.useState<GameStateMachine>({
+  const [state, dispatch] = useReducer(reducer, {
     playerId,
-    step: {
-      step: "choose",
-      onChosen: (cardValue, modifier) => onUpdate(),
-    },
     gameState: initialGameState,
     playerStates: initialPlayerStates,
+    step: {
+      type: "choose",
+    },
   });
 
-  return <GameStateMachineContext.Provider value={stateMachine}>{children}</GameStateMachineContext.Provider>;
+  return (
+    <GameStateMachineContext.Provider value={state}>
+      <GameStateMachineDispatchContext.Provider value={dispatch}>{children}</GameStateMachineDispatchContext.Provider>
+    </GameStateMachineContext.Provider>
+  );
 }
 
-export function useGameStateMachineContext(): GameStateMachine {
+export function useGameStateMachineContext() {
   const context = useContext(GameStateMachineContext);
   if (context == null) {
     throw "Using game state machine context without provider";
   }
 
+  return context;
+}
+
+export function useGameStateMachineDispatch() {
+  const context = useContext(GameStateMachineDispatchContext);
+  if (context == null) {
+    throw "Using game state machine dispatch context without provider";
+  }
   return context;
 }

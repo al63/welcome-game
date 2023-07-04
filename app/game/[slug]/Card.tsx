@@ -1,9 +1,11 @@
 import { GameCardType } from "@/app/util/CardTypes";
+import classNames from "classnames";
 import React from "react";
 
 interface NumberCardProps {
   value: number | null;
   backingModifier: GameCardType;
+  onClick: () => void;
   type: "number";
 }
 
@@ -76,7 +78,15 @@ export function Card(props: CardProps) {
   }
 
   return (
-    <div className="flex relative justify-center items-center m-1 rounded-md text-center w-20 h-28 border border-black bg-amber-50 text-lg">
+    <div
+      className={classNames(
+        "flex relative justify-center items-center m-1 rounded-md text-center w-20 h-28 border border-black bg-amber-50 text-lg",
+        {
+          "cursor-pointer hover:bg-amber-100": props.type === "number",
+        }
+      )}
+      onClick={props.type === "number" ? props.onClick : undefined}
+    >
       {content}
     </div>
   );

@@ -3,54 +3,46 @@ import { GameCardType } from "./CardTypes";
 import { GameState } from "./GameTypes";
 
 interface ChooseCardStep {
-  step: "choose";
-  onChosen: (cardValue: number, modifier: GameCardType) => void;
+  type: "choose";
 }
 
 interface BISStep {
-  step: "chooseBis";
-  onChosen: (cardValue: number, location: number[]) => void;
+  type: "chooseBis";
 }
 
 interface PlaceBISStep {
-  step: "placeBis";
+  type: "placeBis";
   duplicatedCardLocation: number[];
-  onChosen: (cardValue: number, location: number[]) => void;
 }
 
 interface TempAgencyStep {
-  step: "temp";
+  type: "temp";
   cardValue: number;
-  onChosen: (newValue: number) => void;
 }
 
 interface RealEstateStep {
-  step: "estate";
-  onChosen: (sizeIncreased: number) => void;
+  type: "estate";
 }
 
 interface FenceStep {
-  step: "fence";
-  onChosen: (willPlaceFence: boolean) => void;
+  type: "fence";
 }
 
 interface PlaceFenceStep {
-  step: "placeFence";
-  onChosen: (fenceLocation: number[]) => void;
+  type: "placeFence";
 }
 
 interface PlaceCardStep {
-  step: "placeCard";
+  type: "placeCard";
   cardValue: number;
-  cardModifier: GameCardType;
-  onChosen: (location: number[]) => void;
+  cardType: GameCardType;
 }
 
 interface WaitStep {
-  step: "wait";
+  type: "wait";
 }
 
-type GameStep =
+export type GameStep =
   | ChooseCardStep
   | BISStep
   | PlaceBISStep
@@ -67,3 +59,15 @@ export interface GameStateMachine {
   gameState: GameState;
   playerStates: PlayerStateMap;
 }
+
+export interface CancelAction {
+  type: "cancel";
+}
+
+export interface ChooseAction {
+  type: "choose";
+  cardValue: number;
+  cardType: GameCardType;
+}
+
+export type GameStateMachineAction = CancelAction | ChooseAction;
