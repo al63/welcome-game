@@ -7,15 +7,17 @@ import React from "react";
 import { EventLog } from "./EventLog";
 import { Turn } from "./Turn";
 import { GameState } from "@/app/util/GameTypes";
+import { useGameStateMachine } from "./useGameStateMachine";
 
 interface GameProps {
-  playerStates: PlayerStates;
+  initialPlayerStates: PlayerStates;
   playerId: string;
-  gameState: GameState;
+  initialGameState: GameState;
 }
 
-export default function Game({ playerStates, gameState, playerId }: GameProps) {
+export default function Game({ initialPlayerStates, initialGameState, playerId }: GameProps) {
   const [viewedPlayerId, setViewedPlayerId] = React.useState(playerId);
+  const { step, playerStates, gameState } = useGameStateMachine(initialGameState, initialPlayerStates);
 
   return (
     <div className="w-full m-2">

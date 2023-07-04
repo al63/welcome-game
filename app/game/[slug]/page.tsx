@@ -97,5 +97,5 @@ export default function GamePage({
     return <div>Game / Player combination not found.</div>;
   }
 
-  return <Game playerStates={states} playerId={player.playerId} gameState={gameState} />;
+  return <Game initialPlayerStates={states} playerId={player.playerId} initialGameState={gameState} />;
 }
