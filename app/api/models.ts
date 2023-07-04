@@ -37,13 +37,14 @@ export interface FenceAction {
 
 export interface EstateAction {
   house: House;
+  housePosition: number[];
   sizeIncreased: number;
   type: "estate";
 }
 
 export interface StandardAction {
   house: House;
-  houseRow: number;
+  housePosition: number[];
   type: "standard";
 }
 
@@ -55,5 +56,7 @@ export interface CreateTurnAPIRequest {
   gameId: string;
   playerId: string;
   turn: number;
-  action: StandardAction | FenceAction | BISAction | EstateAction | PermitRefusalAction;
+  action: TurnAction;
 }
+
+export type TurnAction = StandardAction | FenceAction | BISAction | EstateAction | PermitRefusalAction;
