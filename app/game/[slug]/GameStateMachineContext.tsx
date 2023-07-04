@@ -5,63 +5,16 @@
  *
  * 1) Decide what card to play
  * 2) Handle modifiers based on the card
- * 		- BIS: what to duplicate -> where to place duplicate
- * 		- TEMP AGENCY: how to modify the value
- *    - REAL ESTATE: what real estate to bump
- * 		- FENCE: to play a fence or not -> where to place fence
- *
  * 3) Handle placing the actual card on the board
  * 4) await other players to finish their turns
  */
 
 import { PlayerStateMap } from "@/app/api/models";
-import { ChooseAction, GameStateMachine, GameStateMachineAction } from "@/app/util/GameStateMachineTypes";
+import { GameStateMachine, GameStateMachineAction } from "@/app/util/GameStateMachineTypes";
 import { GameState } from "@/app/util/GameTypes";
 import React, { useContext, useReducer } from "react";
 import { createContext } from "react";
-
-function reduceChooseAction(state: GameStateMachine, action: ChooseAction): GameStateMachine {
-  switch (action.cardType) {
-    case "POOL":
-    case "GARDEN":
-      return {
-        ...state,
-        step: {
-          type: "placeCard",
-          cardValue: action.cardValue,
-          cardType: action.cardType,
-        },
-      };
-    case "BIS":
-    case "ESTATE":
-    case "TEMP":
-    case "FENCE":
-      // TODO:
-      return {
-        ...state,
-        step: {
-          type: "choose",
-        },
-      };
-  }
-}
-
-function reducer(state: GameStateMachine, action: GameStateMachineAction): GameStateMachine {
-  switch (action.type) {
-    case "cancel": {
-      return {
-        ...state,
-        step: {
-          type: "choose",
-        },
-      };
-    }
-    case "choose":
-      return reduceChooseAction(state, action);
-    default:
-      return state;
-  }
-}
+import { gameStateMachineReducer } from "./GameStateMachineReducer";
 
 const GameStateMachineContext = createContext<GameStateMachine | null>(null);
 const GameStateMachineDispatchContext = createContext<React.Dispatch<GameStateMachineAction> | null>(null);
@@ -79,7 +32,7 @@ export function GameStateMachineProvider({
   initialPlayerStates,
   children,
 }: GameStateMachineProviderProps) {
-  const [state, dispatch] = useReducer(reducer, {
+  const [state, dispatch] = useReducer(gameStateMachineReducer, {
     playerId,
     gameState: initialGameState,
     playerStates: initialPlayerStates,
