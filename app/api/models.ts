@@ -35,7 +35,7 @@ export interface FenceAction {
   type: "fence";
 }
 
-export interface RealEstateAction {
+export interface EstateAction {
   house: House;
   sizeIncreased: number;
   type: "estate";
@@ -55,5 +55,5 @@ export interface CreateTurnAPIRequest {
   gameId: string;
   playerId: string;
   turn: number;
-  action: StandardAction | FenceAction | BISAction | RealEstateAction | PermitRefusalAction;
+  action: StandardAction | FenceAction | BISAction | EstateAction | PermitRefusalAction;
 }
