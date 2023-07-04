@@ -4,7 +4,6 @@ import classNames from "classnames";
 import React from "react";
 import { useGameStateMachineContext } from "./GameStateMachineContext";
 import { useBuildableLocations } from "./useBuildableLocations";
-import build from "next/dist/build";
 
 interface ParksProgressProps {
   scores: number[];
@@ -18,8 +17,9 @@ function ParksProgress({ scores, count }: ParksProgressProps) {
         return (
           <div
             className={classNames("m-1 rounded-full text-center w-6", {
-              "bg-green-600": count >= index,
+              "bg-green-600 font-bold": count === index,
               "bg-green-300": count < index,
+              "bg-green-300 line-through text-gray-400": index < count,
             })}
             key={index}
           >

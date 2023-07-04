@@ -26,7 +26,7 @@ dummy.housesRowOne[1] = {
 
 dummy.housesRowOne[2] = {
   value: 5,
-  modifier: "TEMP",
+  modifier: "GARDEN",
   usedForPlan: true,
 };
 dummy.housesRowOne[3] = {
