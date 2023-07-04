@@ -24,7 +24,7 @@ function CancelButton() {
   );
 }
 
-function StepUI({ step, gameState }: { step: GameStep; gameState: GameState }) {
+function StepActions({ step, gameState }: { step: GameStep; gameState: GameState }) {
   switch (step.type) {
     case "placeCard":
       return <CancelButton />;
@@ -39,7 +39,7 @@ function StepUI({ step, gameState }: { step: GameStep; gameState: GameState }) {
   }
 }
 
-export function Turn() {
+export function Step() {
   const { step, gameState } = useGameStateMachineContext();
 
   return (
@@ -47,7 +47,7 @@ export function Turn() {
       <h1 className="text-xl font-bold mb-2">Turn {gameState.turn + 1}</h1>
       <p>{stepToInstruction(step)}</p>
       <div className="mt-2">
-        <StepUI step={step} gameState={gameState} />
+        <StepActions step={step} gameState={gameState} />
       </div>
     </div>
   );

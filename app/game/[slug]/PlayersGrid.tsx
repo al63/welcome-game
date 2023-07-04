@@ -1,5 +1,6 @@
 import { UserCity } from "./UserCity";
 import { useGameStateMachineContext } from "./GameStateMachineContext";
+import classNames from "classnames";
 
 interface PlayersGridProps {
   onSetViewedPlayer: (playerId: string) => void;
@@ -17,7 +18,10 @@ export function PlayersGrid({ onSetViewedPlayer, viewedPlayerId }: PlayersGridPr
           const border = viewedPlayerId === playerId ? "border-black" : "border-gray";
           return (
             <div
-              className={`${border} flex flex-col border m-2 p-2 items-center cursor-pointer`}
+              className={classNames("flex flex-col border m-2 p-2 items-center cursor-pointer", {
+                "border-black": viewedPlayerId === playerId,
+                "border-gray": viewedPlayerId !== playerId,
+              })}
               key={playerId}
               onClick={() => onSetViewedPlayer(playerId)}
             >

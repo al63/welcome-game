@@ -5,7 +5,7 @@ import { PlayersGrid } from "./PlayersGrid";
 import { PlayerStates } from "@/app/util/PlayerTypes";
 import React from "react";
 import { EventLog } from "./EventLog";
-import { Turn } from "./Turn";
+import { Step } from "./Step";
 import { GameState } from "@/app/util/GameTypes";
 import { GameStateMachineProvider } from "./GameStateMachineContext";
 
@@ -28,7 +28,7 @@ export default function Game({ initialPlayerStates, initialGameState, playerId }
         <div className="flex">
           <UserBoard viewedPlayerId={viewedPlayerId} />
           <div className="flex flex-col mx-4 mt-4">
-            <Turn />
+            <Step />
             <div className="mt-auto">
               <EventLog />
             </div>
