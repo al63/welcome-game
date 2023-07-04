@@ -40,8 +40,8 @@ function Value({ value, checked, active }: { value?: number; checked?: boolean; 
   return (
     <div
       className={`${active ? "font-bold" : ""} ${
-        checked ? "line-through" : ""
-      } flex items-center justify-center h-6 w-6 rounded-md text-sm text-black bg-white`}
+        checked ? "line-through text-gray-400" : "text-black"
+      } flex items-center justify-center h-6 w-6 rounded-md text-sm bg-white`}
     >
       {value}
     </div>
@@ -54,7 +54,7 @@ function Plans({ scores }: { scores: number[] }) {
       {scores.map((score, index) => {
         return (
           <div className="text-center" key={index}>
-            <div className="text-red-600 text-lg">{`n${index + 1}`}</div>
+            <div className="text-red-700 text-lg font-bold">n&deg;{index + 1}</div>
             <Score score={score} />
           </div>
         );

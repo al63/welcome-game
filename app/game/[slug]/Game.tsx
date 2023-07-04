@@ -3,19 +3,19 @@
 import { UserBoard } from "./UserBoard";
 import { PlayersGrid } from "./PlayersGrid";
 import { PlayerStates } from "@/app/util/PlayerTypes";
-import { CardState } from "@/app/util/CardTypes";
 import React from "react";
 import { EventLog } from "./EventLog";
 import { Turn } from "./Turn";
 import { Cards } from "./Cards";
+import { GameState } from "@/app/util/GameTypes";
 
 interface GameProps {
   playerStates: PlayerStates;
   playerId: string;
-  cardState: CardState;
+  gameState: GameState;
 }
 
-export default function Game({ playerStates, cardState, playerId }: GameProps) {
+export default function Game({ playerStates, gameState, playerId }: GameProps) {
   const [viewedPlayerId, setViewedPlayerId] = React.useState(playerId);
 
   return (
@@ -23,12 +23,12 @@ export default function Game({ playerStates, cardState, playerId }: GameProps) {
       <div className="flex">
         <UserBoard
           playerStates={playerStates}
-          cardState={cardState}
           playerId={playerId}
           viewedPlayerId={viewedPlayerId}
+          plans={gameState.plans}
         />
         <div className="flex flex-col mx-4 mt-4">
-          <Turn cardState={cardState} />
+          <Turn gameState={gameState} />
           <div className="mt-auto">
             <EventLog />
           </div>

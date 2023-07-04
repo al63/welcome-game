@@ -1,7 +1,6 @@
 import { GameCard, GameCardType } from "@/app/util/CardTypes";
-import { UserBoard } from "./UserBoard";
-import { PlayersGrid } from "./PlayersGrid";
 import Game from "./Game";
+import { drawPlans } from "@/app/api/utils/PlanDeck";
 
 const dummy = {
   playerId: "bob",
@@ -17,18 +16,6 @@ const dummy = {
   completedPlans: [0, 0, 0],
   estateModifiers: [1, 0, 2, 3, 4, 4],
   permitRefusals: 2,
-};
-
-const dummyRevealedCardValues: GameCard[] = [
-  { value: 8, backingType: "FENCE" },
-  { value: 3, backingType: "TEMP" },
-  { value: 7, backingType: "GARDEN" },
-];
-
-const dummyRevealedCardModifiers: GameCardType[] = ["FENCE", "ESTATE", "POOL"];
-const dummyCards = {
-  revealedCardValues: dummyRevealedCardValues,
-  revealedCardModifiers: dummyRevealedCardModifiers,
 };
 
 dummy.housesRowOne[1] = {
@@ -74,6 +61,29 @@ const states = {
   },
 };
 
+const dummyRevealedCardValues: GameCard[] = [
+  { value: 8, backingType: "FENCE" },
+  { value: 3, backingType: "TEMP" },
+  { value: 7, backingType: "GARDEN" },
+];
+const dummyRevealedCardModifiers: GameCardType[] = ["FENCE", "ESTATE", "POOL"];
+const gameState = {
+  id: "asdf",
+  seed: 123,
+  seedOffset: 0,
+  revealedCardModifiers: dummyRevealedCardModifiers,
+  revealedCardValues: dummyRevealedCardValues,
+  players: {
+    bub: null,
+    bob: null,
+    bubbo: null,
+    bibby: null,
+  },
+  plans: drawPlans(),
+  turn: 1,
+  active: true,
+};
+
 export default function GamePage({
   params,
   searchParams,
@@ -86,5 +96,5 @@ export default function GamePage({
     return <div>Game / Player combination not found.</div>;
   }
 
-  return <Game playerStates={states} playerId={player.playerId} cardState={dummyCards} />;
+  return <Game playerStates={states} playerId={player.playerId} gameState={gameState} />;
 }

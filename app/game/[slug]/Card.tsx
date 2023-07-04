@@ -53,7 +53,7 @@ export function Card(props: CardProps) {
   if (props.type === "number") {
     content = (
       <>
-        <h1 className="text-2xl">{props.value}</h1>
+        <h1 className="text-3xl">{props.value}</h1>
         <div
           className={`m-1 absolute top-0 right-0 rounded-sm w-3 h-3 border border-black ${modifierColor(
             props.backingModifier
@@ -76,7 +76,7 @@ export function Card(props: CardProps) {
   }
 
   return (
-    <div className="flex relative justify-center items-center m-1 rounded-md text-center w-16 h-24 border border-black bg-amber-50 text-lg">
+    <div className="flex relative justify-center items-center m-1 rounded-md text-center w-20 h-28 border border-black bg-amber-50 text-lg">
       {content}
     </div>
   );

@@ -1,17 +1,17 @@
 import { PlayerStates } from "@/app/util/PlayerTypes";
 import { UserCity } from "./UserCity";
 import { UserScoreSheet } from "./UserScoreSheet";
-import { CardState } from "@/app/util/CardTypes";
 import { CityPlans } from "./CityPlans";
+import { PlanCard } from "@/app/util/CardTypes";
 
 interface Props {
   playerStates: PlayerStates;
   playerId: string;
   viewedPlayerId: string;
-  cardState: CardState;
+  plans: Array<PlanCard>;
 }
 
-export function UserBoard({ playerStates, playerId, viewedPlayerId, cardState }: Props) {
+export function UserBoard({ playerStates, playerId, viewedPlayerId, plans }: Props) {
   const playerState = playerStates[viewedPlayerId];
   return (
     <div className="bg-orange-100 inline-block p-2 rounded-lg drop-shadow-sm min-w-fit">
@@ -20,7 +20,7 @@ export function UserBoard({ playerStates, playerId, viewedPlayerId, cardState }:
           <UserCity playerState={playerState} />
         </div>
         <div className="pl-4">
-          <CityPlans />
+          <CityPlans plans={plans} />
         </div>
       </div>
       <div className="border-t pt-2 border-gray-500">
