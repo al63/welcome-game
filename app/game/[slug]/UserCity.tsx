@@ -4,6 +4,7 @@ import classNames from "classnames";
 import React from "react";
 import { useGameStateMachineContext } from "./GameStateMachineContext";
 import { useBuildableLocations } from "./useBuildableLocations";
+import build from "next/dist/build";
 
 interface ParksProgressProps {
   scores: number[];
@@ -41,12 +42,13 @@ function House({ house, showModifiers }: { house: House; showModifiers: boolean 
 
 interface CellProps {
   house: House | null;
-  pool?: boolean;
   mini: boolean;
   buildable?: boolean;
+  pool?: boolean;
+  onClick?: () => void;
 }
 
-function Cell({ house, pool, mini, buildable }: CellProps) {
+function Cell({ house, pool, mini, buildable, onClick }: CellProps) {
   const occupied = house != null;
   return (
     <div
@@ -58,6 +60,7 @@ function Cell({ house, pool, mini, buildable }: CellProps) {
         "w-6 h-6": mini,
         "w-12 h-12": !mini,
       })}
+      onClick={onClick}
     >
       {pool && !mini ? <div className="bg-blue-500 w-2 h-2 top-1 right-1 absolute" /> : null}
       {house != null ? <House house={house} showModifiers={!mini} /> : null}
@@ -87,9 +90,10 @@ interface RowProps {
   fences: boolean[];
   mini: boolean;
   buildableLocations?: Set<number>;
+  onClick?: (index: number) => void;
 }
 
-function UserNeighborhood({ config, houses, fences, mini, buildableLocations }: RowProps) {
+function UserNeighborhood({ config, houses, fences, mini, buildableLocations, onClick }: RowProps) {
   const numGardens = React.useMemo(() => {
     return houses.filter((house) => house?.modifier === "GARDEN").length;
   }, [houses]);
@@ -105,13 +109,15 @@ function UserNeighborhood({ config, houses, fences, mini, buildableLocations }: 
         <Fence active mini={mini} />
         {houses.map((house, index) => {
           const fenceAfter = index < fences.length && fences[index];
+          const buildable = buildableLocations?.has(index);
           return (
             <div className="flex" key={index}>
               <Cell
                 house={house}
                 pool={config.pools.includes(index)}
                 mini={mini}
-                buildable={buildableLocations?.has(index)}
+                buildable={buildable}
+                onClick={() => onClick?.(index)}
               />
               {index < houses.length - 1 ? <Fence active={fenceAfter} mini={mini} /> : null}
             </div>
@@ -132,6 +138,12 @@ export function UserCity({ viewedPlayerId }: CityProps) {
   const viewedPlayerState = playerStates[viewedPlayerId];
   const buildableLocations = useBuildableLocations(step, viewedPlayerState, playerId);
 
+  const onClick = (row: number, column: number, columns?: Set<number>) => {
+    if (columns?.has(column)) {
+      buildableLocations?.onBuild([row, column]);
+    }
+  };
+
   return (
     <div>
       <h1 className="text-xl font-bold p-2 truncate">{`${viewedPlayerState.playerId}'s City: ${viewedPlayerState.cityName}`}</h1>
@@ -141,6 +153,7 @@ export function UserCity({ viewedPlayerId }: CityProps) {
         fences={viewedPlayerState.fencesRowOne}
         buildableLocations={buildableLocations?.housesRowOne}
         mini={false}
+        onClick={(index) => onClick(0, index, buildableLocations?.housesRowOne)}
       />
       <UserNeighborhood
         config={ROW_TWO}
@@ -148,6 +161,7 @@ export function UserCity({ viewedPlayerId }: CityProps) {
         fences={viewedPlayerState.fencesRowTwo}
         buildableLocations={buildableLocations?.housesRowTwo}
         mini={false}
+        onClick={(index) => onClick(1, index, buildableLocations?.housesRowTwo)}
       />
       <UserNeighborhood
         config={ROW_THREE}
@@ -155,6 +169,7 @@ export function UserCity({ viewedPlayerId }: CityProps) {
         fences={viewedPlayerState.fencesRowThree}
         buildableLocations={buildableLocations?.housesRowThree}
         mini={false}
+        onClick={(index) => onClick(2, index, buildableLocations?.housesRowThree)}
       />
     </div>
   );

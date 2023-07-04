@@ -5,13 +5,20 @@ import { modifierDisplayName } from "./Card";
 import { GameState } from "@/app/util/GameTypes";
 import { cancelAction } from "./GameStateMachineActions";
 
-function stepToInstruction(step: GameStep) {
+function StepInstructions({ step }: { step: GameStep }) {
   switch (step.type) {
     case "placeCard":
       return `Choose a location to place the ${step.cardValue} ${modifierDisplayName(step.cardType)} card`;
     case "choose":
-    default:
       return "Choose a card to play";
+    case "wait":
+      return (
+        <p>
+          Waiting for all other players to take their turn <p className="animate-pulse delay-1000 inline">...</p>
+        </p>
+      );
+    default:
+      return `oh no something bad happened on step: ${step.type}`;
   }
 }
 
@@ -29,13 +36,14 @@ function StepActions({ step, gameState }: { step: GameStep; gameState: GameState
     case "placeCard":
       return <CancelButton />;
     case "choose":
-    default:
       return (
         <Cards
           revealedCardModifiers={gameState.revealedCardModifiers}
           revealedCardValues={gameState.revealedCardValues}
         />
       );
+    default:
+      return null;
   }
 }
 
@@ -45,7 +53,7 @@ export function Step() {
   return (
     <div>
       <h1 className="text-xl font-bold mb-2">Turn {gameState.turn + 1}</h1>
-      <p>{stepToInstruction(step)}</p>
+      <StepInstructions step={step} />
       <div className="mt-2">
         <StepActions step={step} gameState={gameState} />
       </div>

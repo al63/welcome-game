@@ -1,6 +1,7 @@
 import { PlayerStateMap } from "../api/models";
 import { GameCardType } from "./CardTypes";
 import { GameState } from "./GameTypes";
+import { PlayerState } from "./PlayerTypes";
 
 interface ChooseCardStep {
   type: "choose";

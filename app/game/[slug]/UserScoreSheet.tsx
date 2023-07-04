@@ -82,7 +82,7 @@ function Pools({ score }: { score: number }) {
     <SectionContainer title="Pools">
       <div className="grid grid-cols-2 gap-1">
         {POOL_SCORES.map((s) => {
-          return <Value value={s} checked={score > s} active={score === s} key={score} />;
+          return <Value value={s} checked={score > s} active={score === s} key={s} />;
         })}
       </div>
     </SectionContainer>

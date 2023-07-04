@@ -52,6 +52,8 @@ export interface PermitRefusalAction {
   type: "refusal";
 }
 
+export type TurnAction = StandardAction | FenceAction | BISAction | EstateAction | PermitRefusalAction;
+
 export interface CreateTurnAPIRequest {
   gameId: string;
   playerId: string;
@@ -59,4 +61,6 @@ export interface CreateTurnAPIRequest {
   action: TurnAction;
 }
 
-export type TurnAction = StandardAction | FenceAction | BISAction | EstateAction | PermitRefusalAction;
+export interface CreateTurnAPIResponse {
+  playerState: PlayerState;
+}

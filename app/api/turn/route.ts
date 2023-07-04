@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     // update game state on completed plans / game end
     // if it was the last player, increment game state turn
-    return NextResponse.json({}, { status: 200 });
+    return NextResponse.json(newPlayerState, { status: 200 });
   } catch (e) {
     return NextResponse.json(e, { status: 500 });
   }

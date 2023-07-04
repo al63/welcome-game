@@ -17,5 +17,7 @@ export async function placeHouse(position: number[], step: PlaceCardStep): Promi
   // TODO: this action needs to POST to submit the turn
 
   // TODO: need to special case pools. if the placed card is a pool, only set the house modifier if the location is one with a pool.
+
+  // TODO: API we return the new player state, merge it in
   return { type: "placedCard" };
 }
