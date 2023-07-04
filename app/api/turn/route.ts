@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
-import { CreateGameResponse, CreateTurnAPIRequest } from "../models";
+import {
+  BISAction,
+  CreateGameResponse,
+  CreateTurnAPIRequest,
+  FenceAction,
+  PermitRefusalAction,
+  StandardAction,
+  RealEstateAction,
+} from "../models";
 import { Document, Filter, UpdateFilter } from "mongodb";
-import { PlayerState } from "@/app/util/PlayerTypes";
+import { House, PlayerState } from "@/app/util/PlayerTypes";
 import { GameState } from "@/app/util/GameTypes";
 
 // User takes a turn. This means either
@@ -33,21 +41,9 @@ export async function POST(request: NextRequest) {
     const client = await clientPromise;
     const db = client.db("wtypf");
 
-    const filter: Filter<Document> = { gameId: req.gameId, playerId: req.playerId };
-    const body: UpdateFilter<Document> = {
-      $set: {
-        turn: req.turn,
-        housesRowOne: req.housesRowOne,
-        housesRowTwo: req.housesRowTwo,
-        housesRowThree: req.housesRowThree,
-        fencesRowOne: req.fencesRowOne,
-        fencesRowTwo: req.fencesRowTwo,
-        fencesRowThree: req.fencesRowThree,
-        permitRefusals: req.permitRefusals,
-      },
-    };
-
-    // Get the GameState to validate that the turns are equal before updating
+    // Get the GameState to validate that
+    // (1) the game exists
+    // (2) the turns are equal before updating
     const query: Filter<GameState> = { id: req.gameId };
     const gameState = await db.collection<GameState>("game_states").findOne(query);
     if (!gameState) {
@@ -55,8 +51,16 @@ export async function POST(request: NextRequest) {
     }
 
     if (gameState.turn != req.turn) {
-        return NextResponse.json("Game state turn not equal to player state turn", { status: 400 });
+      return NextResponse.json("Game state turn not equal to player state turn", { status: 400 });
     }
+
+    // Build the update request body
+    const filter: Filter<Document> = { gameId: req.gameId, playerId: req.playerId };
+    const body: UpdateFilter<Document> = {
+      $set: {
+        turn: req.turn++,
+      },
+    };
 
     const res = await db.collection("player_states").updateOne(filter, body);
     if (res.matchedCount != 1) {
@@ -72,22 +76,58 @@ export async function POST(request: NextRequest) {
   }
 }
 
+function consolidateUpdate(action: StandardAction | FenceAction | BISAction | RealEstateAction | PermitRefusalAction) {
+  switch (action.type) {
+    case "standard":
+      break;
+    case "fence":
+      break;
+    case "bis":
+      break;
+    case "estate":
+      break;
+    case "refusal":
+      break;
+  }
+}
+
+function getupdatedRow(rowCol: number[][], house: House): Array<House> {
+  return [];
+}
+
 /*
 
-export interface PlayerState {
-  playerId: string;
+export interface CreateTurnAPIRequest {
   gameId: string;
-  score: number;
+  playerId: string;
   turn: number;
-  housesRowOne: Array<House | null>;
-  housesRowTwo: Array<House | null>;
-  housesRowThree: Array<House | null>;
-  fencesRowOne: boolean[];
-  fencesRowTwo: boolean[];
-  fencesRowThree: boolean[];
-  completedPlans: number[];
-  estateModifiers: number[];
-  permitRefusals: number;
+  action: StandardAction | FenceAction | BISAction | PermitRefusalAction;
+}
+
+interface BISAction {
+  house: House;
+  housePosition: number[];
+  bisHouse: House;
+  bisPosition: number[];
+  type: "bis";
+}
+
+interface FenceAction {
+  house: House;
+  housePosition: number[];
+  fence: number;
+  fencePosition: number[];
+  type: "fence";
+}
+
+interface StandardAction {
+  house: House;
+  houseRow: number;
+  type: "standard";
+}
+
+interface PermitRefusalAction {
+  type: "refusal";
 }
 
 */
