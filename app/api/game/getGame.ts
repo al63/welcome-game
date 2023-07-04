@@ -3,9 +3,9 @@ import { GameState } from "@/app/util/GameTypes";
 import { PlayerState } from "@/app/util/PlayerTypes";
 import clientPromise from "@/lib/mongodb";
 import { Filter } from "mongodb";
-import { GetGameAPIResponse, PlayerStateMap } from "../models";
+import { GetGameActionResponse, PlayerStateMap } from "../models";
 
-export async function getGameServerAction(id: string, player: string): Promise<GetGameAPIResponse | null> {
+export async function getGameServerAction(id: string, player: string): Promise<GetGameActionResponse | null> {
   try {
     const query: Filter<GameState> = { id };
 

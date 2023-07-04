@@ -114,7 +114,7 @@ const dummyRevealedCardValues: GameCard[] = [
   { value: 7, backingType: "GARDEN" },
 ];
 const dummyRevealedCardModifiers: GameCardType[] = ["FENCE", "ESTATE", "POOL"];
-const gameState = {
+const dummyGameState = {
   id: "asdf",
   seed: 123,
   seedOffset: 0,
@@ -138,16 +138,21 @@ export default async function GamePage({
   params: { slug: string };
   searchParams?: { player: string };
 }) {
-  let res = null;
-  if (searchParams?.player != null) {
-    res = await getGameServerAction(params.slug, searchParams?.player);
+  const playerId = searchParams?.player;
+  let res;
+
+  if (params.slug === "test") {
+    res = {
+      playerStates: dummyStates,
+      gameState: dummyGameState,
+    };
+  } else if (playerId != null) {
+    res = await getGameServerAction(params.slug, playerId);
   }
 
-  if (res == null || searchParams?.player == null) {
+  if (res == null || playerId == null) {
     return <div>Game / Player combination not found.</div>;
   }
 
-  return (
-    <Game initialPlayerStates={res.playerStates} playerId={searchParams.player} initialGameState={res.gameState} />
-  );
+  return <Game initialPlayerStates={res.playerStates} playerId={playerId} initialGameState={res.gameState} />;
 }

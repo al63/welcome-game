@@ -14,7 +14,7 @@ export interface PlayerStateMap {
   [playerId: string]: PlayerState;
 }
 
-export interface GetGameAPIResponse {
+export interface GetGameActionResponse {
   gameState: GameState;
   playerStates: PlayerStateMap;
 }

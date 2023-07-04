@@ -1,8 +1,7 @@
 import { GameState, PlayerScores } from "@/app/util/GameTypes";
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
-import { Filter } from "mongodb";
-import { CreateGameAPIRequest, CreateGameResponse, GetGameAPIResponse, PlayerStateMap } from "../models";
+import { CreateGameAPIRequest, CreateGameResponse } from "../models";
 import { generateCityName, generateGameId } from "@/app/api/utils/GameIdGenerator";
 import { drawPlans } from "@/app/api/utils/PlanDeck";
 import { PlayerState } from "@/app/util/PlayerTypes";
@@ -17,58 +16,6 @@ import { ActiveCards, drawCards, shuffleWithSeedAndDrawOffset } from "../utils/D
 // logic to detect objective completion
 // TODO: generate new seed if we havae to shuffle the deck partway thru the game
 // move scoring to the game state, server/api will calc
-
-// Grab the game state and all of the player boards provided that the requested player is in this session
-// ex: localhost:3000/api/game?id=bubgame&player=liz
-export async function GET(request: NextRequest) {
-  try {
-    const params = request.nextUrl.searchParams;
-    const id = params.get("id") ?? undefined;
-    const player = params.get("player");
-    const query: Filter<GameState> = { id };
-
-    if (!id || !player) {
-      return NextResponse.json("Missing parameters", { status: 400 });
-    }
-
-    // Grab game state
-    const client = await clientPromise;
-    const db = client.db("wtypf");
-    const gameState = await db.collection<GameState>("game_states").findOne(query);
-    if (!gameState) {
-      return NextResponse.json("Game not found", { status: 404 });
-    }
-
-    // validate requested player exists in the game
-    const players = Object.keys(gameState.players);
-    if (!players || !players.includes(player)) {
-      return NextResponse.json("Player not found", { status: 404 });
-    }
-
-    // Grab all player states associated with a game
-    const playerStates = db.collection<PlayerState>("player_states");
-    const playerStateQuery: Filter<PlayerState> = { gameId: id };
-    const playerStatesCursor = playerStates.find<PlayerState>(playerStateQuery);
-
-    const playerStatesMap: PlayerStateMap = {};
-    for await (const doc of playerStatesCursor) {
-      playerStatesMap[doc.playerId] = doc;
-    }
-
-    if (Object.keys(playerStatesMap).length === 0) {
-      return NextResponse.json("No player states found", { status: 500 });
-    }
-
-    const response: GetGameAPIResponse = {
-      gameState,
-      playerStates: playerStatesMap,
-    };
-
-    return NextResponse.json<GetGameAPIResponse>(response);
-  } catch (e) {
-    return NextResponse.json(e, { status: 500 });
-  }
-}
 
 // Create a new game + player states given a list of players
 export async function POST(request: NextRequest) {
