@@ -8,6 +8,7 @@ import {
   TEMP_SCORES,
 } from "@/app/util/Scoring";
 import { computeScore } from "@/app/util/Scoring";
+import classNames from "classnames";
 import React from "react";
 
 function Divider({ symbol }: { symbol: string }) {
@@ -39,9 +40,11 @@ function Score({ score }: { score: number }) {
 function Value({ value, checked, active }: { value?: number; checked?: boolean; active?: boolean }) {
   return (
     <div
-      className={`${active ? "font-bold" : ""} ${
-        checked ? "line-through text-gray-400" : "text-black"
-      } flex items-center justify-center h-6 w-6 rounded-md text-sm bg-white`}
+      className={classNames("flex items-center justify-center h-6 w-6 rounded-md text-sm bg-white", {
+        "font-bold": active,
+        "line-through text-gray-400": checked,
+        "text-black": !checked,
+      })}
     >
       {value}
     </div>
@@ -89,7 +92,7 @@ function TempAgencies({ count, score }: { count: number; score: number }) {
   const agencies = [];
   for (let i = 0; i < 11; i++) {
     agencies.push(
-      <div key={i} className={`bg-orange-400 m-2 h-4 w-4 text-lg flex items-center justify-center rotate-45 font-bold`}>
+      <div key={i} className="bg-orange-400 m-2 h-4 w-4 text-lg flex items-center justify-center rotate-45 font-bold">
         {count > i ? "+" : ""}
       </div>
     );
@@ -139,7 +142,7 @@ function Estates({ playerModifiers, score }: { playerModifiers: number[]; score:
   );
 }
 
-function BIS({ count, score }: { count: number; score: number }) {
+function BIS({ count }: { count: number }) {
   return (
     <SectionContainer title="BIS" negative>
       <div className="grid grid-cols-2 gap-1 min-w-fit">
@@ -151,7 +154,7 @@ function BIS({ count, score }: { count: number; score: number }) {
   );
 }
 
-function PermitRefusals({ count, score }: { count: number; score: number }) {
+function PermitRefusals({ count }: { count: number }) {
   return (
     <SectionContainer title="Refusals" negative>
       {PERMIT_REFUSAL_SCORES.map((s, index) => {
@@ -191,9 +194,9 @@ export function UserScoreSheet({ playerStates, playerId }: UserScoreSheetProps) 
         <Divider symbol="+" />
         <Estates playerModifiers={playerState.estateModifiers} score={userScores.estates} />
         <Divider symbol="-" />
-        <BIS count={userScores.bis.count} score={userScores.bis.score}></BIS>
+        <BIS count={userScores.bis.count} />
         <Divider symbol="-" />
-        <PermitRefusals count={playerState.permitRefusals} score={userScores.permitRefusals} />
+        <PermitRefusals count={playerState.permitRefusals} />
         <Divider symbol="=" />
         <div className="mb-20 ml-2 text-xl font-bold">{userScores.summation}</div>
       </div>

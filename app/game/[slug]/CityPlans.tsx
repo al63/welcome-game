@@ -1,5 +1,6 @@
 import { PlanCard } from "@/app/util/CardTypes";
 import { PlayerStates } from "@/app/util/PlayerTypes";
+import classNames from "classnames";
 import React from "react";
 
 function Requirement({ size, quantity }: { size: number; quantity: number }) {
@@ -31,13 +32,14 @@ function CityPlan({ plan, completed }: CityPlanProps) {
         ))}
       </div>
       <div className="flex items-center justify-around w-full">
-        {completed ? (
-          <div className="rounded-full bg-red-700 text-white w-6 h-6 flex items-center justify-center">{"\u2713"}</div>
-        ) : (
-          <div className="rounded-full bg-gray-700 text-gray-300 w-6 h-6 flex items-center justify-center">
-            {plan.firstValue}
-          </div>
-        )}
+        <div
+          className={classNames("rounded-full w-6 h-6 flex items-center justify-center", {
+            "bg-red-700 text-white": completed,
+            "bg-gray-700 text-gray-300": !completed,
+          })}
+        >
+          {completed ? "\u2713" : plan.firstValue}
+        </div>
         <div className="rounded-full bg-gray-300 text-gray-700 w-6 h-6 flex items-center justify-center">
           {plan.secondValue}
         </div>

@@ -3,6 +3,7 @@ import React from "react";
 import { CreateGameResponse } from "./api/models";
 import Link from "next/link";
 import { LoadingSpinner } from "./LoadingSpinner";
+import classNames from "classnames";
 
 export default function NewGame() {
   const [players, setPlayers] = React.useState<Array<string | null>>([null, null]);
@@ -77,9 +78,10 @@ export default function NewGame() {
         );
       })}
       <button
-        className={`${
-          createdGame == null ? "bg-red-200" : "bg-red-100 text-gray-400"
-        } self-center px-8 py-2 mt-7 rounded-full flex`}
+        className={classNames("self-center px-8 py-2 mt-7 rounded-full flex", {
+          "bg-red-200": !createdGame,
+          "bg-red-100 text-gray-400": !!createdGame,
+        })}
         onClick={onCreate}
         disabled={createdGame != null}
       >

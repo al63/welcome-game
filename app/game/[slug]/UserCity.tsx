@@ -1,5 +1,6 @@
 import { Neighborhood, ROW_ONE, ROW_THREE, ROW_TWO } from "@/app/util/Neighborhoods";
 import { House, PlayerState } from "@/app/util/PlayerTypes";
+import classNames from "classnames";
 import React from "react";
 
 interface ParksProgressProps {
@@ -13,7 +14,10 @@ function ParksProgress({ scores, count }: ParksProgressProps) {
       {scores.map((score, index) => {
         return (
           <div
-            className={`m-1 rounded-full text-center w-6 ${count >= index ? "bg-green-600" : "bg-green-300"}`}
+            className={classNames("m-1 rounded-full text-center w-6", {
+              "bg-green-600": count >= index,
+              "bg-green-300": count < index,
+            })}
             key={index}
           >
             {score}
@@ -43,9 +47,13 @@ function Cell({ house, pool, mini }: CellProps) {
   const occupied = house != null;
   return (
     <div
-      className={`${occupied ? "bg-gray-100" : "bg-white"} ${house?.usedForPlan ? "border-t-black border-t-2" : ""} ${
-        mini ? "w-6 h-6" : "w-12 h-12"
-      } border relative flex justify-center items-center`}
+      className={classNames("border relative flex justify-center items-center", {
+        "bg-gray-100": occupied,
+        "bg-white": !occupied,
+        "border-t-black border-t-2": house?.usedForPlan,
+        "w-6 h-6": mini,
+        "w-12 h-12": !mini,
+      })}
     >
       {pool && !mini ? <div className="bg-blue-500 w-2 h-2 top-1 right-1 absolute" /> : null}
       {house != null ? <House house={house} showModifiers={!mini} /> : null}
@@ -54,7 +62,19 @@ function Cell({ house, pool, mini }: CellProps) {
 }
 
 function Fence({ mini, active }: { mini: boolean; active: boolean }) {
-  return <div className={`border ${active ? "border-black" : "border-transparent"} w-0 ${mini ? "h-6" : "h-12"}`} />;
+  return (
+    <div
+      className={classNames(
+        {
+          "border-black": active,
+          "border-transparent": !active,
+          "h-6": mini,
+          "h-12": !mini,
+        },
+        "border w-0"
+      )}
+    />
+  );
 }
 
 interface RowProps {
