@@ -118,6 +118,7 @@ export async function POST(request: NextRequest) {
         completedPlans: [0, 0, 0],
         estateModifiers: new Array(6).fill(0),
         permitRefusals: 0,
+        lastEvent: "",
       };
     });
     const playerRes = await db.collection("player_states").insertMany(playersStateList);

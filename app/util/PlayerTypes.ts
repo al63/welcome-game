@@ -25,4 +25,5 @@ export interface PlayerState {
   completedPlans: number[];
   estateModifiers: number[];
   permitRefusals: number;
+  lastEvent: string;
 }

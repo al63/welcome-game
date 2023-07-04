@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
-import { CreateGameResponse, CreateTurnAPIRequest } from "../models";
+import {
+  BISAction,
+  CreateTurnAPIRequest,
+  FenceAction,
+  PermitRefusalAction,
+  StandardAction,
+  EstateAction,
+  TurnAction,
+} from "../models";
 import { Document, Filter, UpdateFilter } from "mongodb";
-import { PlayerState } from "@/app/util/PlayerTypes";
+import { House, PlayerState } from "@/app/util/PlayerTypes";
 import { GameState } from "@/app/util/GameTypes";
+import { getEstatesResult } from "@/app/util/Scoring";
 
 // User takes a turn. This means either
 // 1) playing a card
@@ -33,30 +42,32 @@ export async function POST(request: NextRequest) {
     const client = await clientPromise;
     const db = client.db("wtypf");
 
-    const filter: Filter<Document> = { gameId: req.gameId, playerId: req.playerId };
-    const body: UpdateFilter<Document> = {
-      $set: {
-        turn: req.turn,
-        housesRowOne: req.housesRowOne,
-        housesRowTwo: req.housesRowTwo,
-        housesRowThree: req.housesRowThree,
-        fencesRowOne: req.fencesRowOne,
-        fencesRowTwo: req.fencesRowTwo,
-        fencesRowThree: req.fencesRowThree,
-        permitRefusals: req.permitRefusals,
-      },
-    };
-
-    // Get the GameState to validate that the turns are equal before updating
-    const query: Filter<GameState> = { id: req.gameId };
-    const gameState = await db.collection<GameState>("game_states").findOne(query);
+    // Get the GameState to validate that
+    // (1) the game exists
+    // (2) the turns are equal before updating
+    const gameQuery: Filter<GameState> = { id: req.gameId };
+    const gameState = await db.collection<GameState>("game_states").findOne(gameQuery);
     if (!gameState) {
       return NextResponse.json("Game not found", { status: 404 });
     }
 
     if (gameState.turn != req.turn) {
-        return NextResponse.json("Game state turn not equal to player state turn", { status: 400 });
+      return NextResponse.json("Game state turn not equal to player state turn", { status: 400 });
     }
+
+    const playerQuery: Filter<PlayerState> = { gameId: req.gameId, playerId: req.playerId };
+    const playerState = await db.collection<PlayerState>("player_states").findOne(playerQuery);
+    if (!playerState) {
+      return NextResponse.json("Player not found", { status: 404 });
+    }
+    // Build the update request body
+    const newPlayerState = consolidateUpdate(req.action, playerState);
+    const filter: Filter<Document> = { gameId: req.gameId, playerId: req.playerId };
+    const body: UpdateFilter<Document> = {
+      $set: {
+        ...newPlayerState,
+      },
+    };
 
     const res = await db.collection("player_states").updateOne(filter, body);
     if (res.matchedCount != 1) {
@@ -66,28 +77,83 @@ export async function POST(request: NextRequest) {
       return NextResponse.json("Unable to update the player state", { status: 500 });
     }
 
+    // update game state on completed plans / game end
+    // if it was the last player, increment game state turn
     return NextResponse.json({}, { status: 200 });
   } catch (e) {
     return NextResponse.json(e, { status: 500 });
   }
 }
 
-/*
+function consolidateUpdate(action: TurnAction, playerState: PlayerState) {
+  const newPlayerState = {
+    ...playerState,
+  };
+  switch (action.type) {
+    case "refusal":
+      playerState.permitRefusals++;
+      playerState.lastEvent = playerState.playerId + " has no valid moves and has received a permit refusal.";
+      return playerState;
+    case "fence":
+      if (action.fencePosition[0] == 0) {
+        newPlayerState.fencesRowOne[action.fencePosition[1]] = true;
+      }
+      if (action.fencePosition[0] == 1) {
+        newPlayerState.fencesRowTwo[action.fencePosition[1]] = true;
+      }
+      if (action.fencePosition[0] == 2) {
+        newPlayerState.fencesRowThree[action.fencePosition[1]] = true;
+      }
+      break;
+    case "estate":
+      newPlayerState.estateModifiers[action.sizeIncreased]++;
+      break;
+    case "bis":
+      if (action.bisPosition[0] == 0) {
+        newPlayerState.housesRowOne[action.bisPosition[1]] = action.bisHouse;
+      }
+      if (action.bisPosition[0] == 1) {
+        newPlayerState.housesRowTwo[action.bisPosition[1]] = action.bisHouse;
+      }
+      if (action.bisPosition[0] == 2) {
+        newPlayerState.housesRowThree[action.bisPosition[1]] = action.bisHouse;
+      }
+      break;
+  }
 
-export interface PlayerState {
-  playerId: string;
-  gameId: string;
-  score: number;
-  turn: number;
-  housesRowOne: Array<House | null>;
-  housesRowTwo: Array<House | null>;
-  housesRowThree: Array<House | null>;
-  fencesRowOne: boolean[];
-  fencesRowTwo: boolean[];
-  fencesRowThree: boolean[];
-  completedPlans: number[];
-  estateModifiers: number[];
-  permitRefusals: number;
+  if (action.housePosition[0] == 0) {
+    newPlayerState.housesRowOne[action.housePosition[1]] = action.house;
+  }
+  if (action.housePosition[0] == 1) {
+    newPlayerState.housesRowTwo[action.housePosition[1]] = action.house;
+  }
+  if (action.housePosition[0] == 2) {
+    newPlayerState.housesRowThree[action.housePosition[1]] = action.house;
+  }
+
+  let lastEvent = "";
+  lastEvent = newPlayerState.playerId + " played " + action.house.value;
+  if (action.house.modifier) {
+    lastEvent += " " + action.house.modifier;
+  }
+  lastEvent += " on row " + action.housePosition[0] + " column " + action.housePosition[1];
+  if (action.type == "bis") {
+    lastEvent += " with the BIS on row" + action.bisPosition[0] + " column " + action.bisPosition[1];
+  }
+  newPlayerState.lastEvent = lastEvent;
+  newPlayerState.turn++;
+  return validateCityPlanCompletion(newPlayerState);
 }
 
-*/
+function validateCityPlanCompletion(playerState: PlayerState) {
+  const newPlayerState = {
+    ...playerState,
+  };
+
+  const estatesRowOne = getEstatesResult(newPlayerState.fencesRowOne, playerState.housesRowOne);
+  const estatesRowTwo = getEstatesResult(newPlayerState.fencesRowTwo, playerState.housesRowTwo);
+  const estatesRowThree = getEstatesResult(newPlayerState.fencesRowThree, playerState.housesRowThree);
+
+  // do this later fml
+  return newPlayerState;
+}

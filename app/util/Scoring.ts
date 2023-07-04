@@ -154,8 +154,8 @@ function calculateEstatesScore(playerState: PlayerState): Array<EstatesScore> {
 // we need to check if all houses between two fences are built
 // check fence arrays, for fence = true, check all houses to the next fence = true
 // the edges of each street have fences by default, but aren't represented in the array
-// the return value will be a map of estate size to an array of arrays representing the start and end index of the estate
-function getEstatesResult(fenceRow: boolean[], houseRow: Array<House | null>): number[][][] {
+// the return value will be an array of estate sizes containing an array of arrays representing the start and end index of the estate
+export function getEstatesResult(fenceRow: boolean[], houseRow: Array<House | null>): number[][][] {
   const estateResult: number[][][] = [[], [], [], [], [], []];
 
   let firstFenceIdx = -1;

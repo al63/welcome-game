@@ -19,21 +19,7 @@ export interface GetGameAPIResponse {
   playerStates: PlayerStateMap;
 }
 
-export interface CreateTurnAPIRequest {
-  gameId: string;
-  playerId: string;
-  turn: number;
-  housesRowOne: Array<House | null>;
-  housesRowTwo: Array<House | null>;
-  housesRowThree: Array<House | null>;
-  fencesRowOne: boolean[];
-  fencesRowTwo: boolean[];
-  fencesRowThree: boolean[];
-  permitRefusals: number;
-  completedPlans: number[];
-}
-
-interface BISAction {
+export interface BISAction {
   house: House;
   housePosition: number[];
   bisHouse: House;
@@ -41,7 +27,7 @@ interface BISAction {
   type: "bis";
 }
 
-interface FenceAction {
+export interface FenceAction {
   house: House;
   housePosition: number[];
   fence: number;
@@ -49,25 +35,28 @@ interface FenceAction {
   type: "fence";
 }
 
-interface RealEstateAction {
+export interface EstateAction {
   house: House;
+  housePosition: number[];
   sizeIncreased: number;
   type: "estate";
 }
 
-interface StandardAction {
+export interface StandardAction {
   house: House;
-  houseRow: number;
+  housePosition: number[];
   type: "standard";
 }
 
-interface PermitRefusalAction {
+export interface PermitRefusalAction {
   type: "refusal";
 }
 
-interface REAL_FOR_SURE_CreateTurnAPIRequest {
+export interface CreateTurnAPIRequest {
   gameId: string;
   playerId: string;
   turn: number;
-  action: StandardAction | FenceAction | BISAction | RealEstateAction | PermitRefusalAction;
+  action: TurnAction;
 }
+
+export type TurnAction = StandardAction | FenceAction | BISAction | EstateAction | PermitRefusalAction;

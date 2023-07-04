@@ -44,21 +44,25 @@ const states = {
     ...dummy,
     cityName: "The Cool Zone",
     completedPlans: [13, 0, 0],
+    lastEvent: "",
   },
   bub: {
     ...dummy,
     playerId: "bub",
     cityName: "BubTown, USA",
+    lastEvent: "",
   },
   bubbo: {
     ...dummy,
     playerId: "bubbo",
     cityName: "Bubbolubbo",
+    lastEvent: "",
   },
   bibby: {
     ...dummy,
     playerId: "bibby",
     cityName: "The Bibcrib",
+    lastEvent: "",
   },
 };
 
