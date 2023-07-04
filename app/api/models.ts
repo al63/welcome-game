@@ -49,6 +49,12 @@ interface FenceAction {
   type: "fence";
 }
 
+interface RealEstateAction {
+  house: House;
+  sizeIncreased: number;
+  type: "estate";
+}
+
 interface StandardAction {
   house: House;
   houseRow: number;
@@ -63,5 +69,5 @@ interface REAL_FOR_SURE_CreateTurnAPIRequest {
   gameId: string;
   playerId: string;
   turn: number;
-  action: StandardAction | FenceAction | BISAction | PermitRefusalAction;
+  action: StandardAction | FenceAction | BISAction | RealEstateAction | PermitRefusalAction;
 }

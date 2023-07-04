@@ -6,7 +6,6 @@ import { PlayerStates } from "@/app/util/PlayerTypes";
 import React from "react";
 import { EventLog } from "./EventLog";
 import { Turn } from "./Turn";
-import { Cards } from "./Cards";
 import { GameState } from "@/app/util/GameTypes";
 
 interface GameProps {
