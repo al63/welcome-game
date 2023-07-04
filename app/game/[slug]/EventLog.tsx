@@ -1,8 +1,28 @@
+const events = [
+  "[1] Bub played 7 GARDEN row 1 column 4",
+  "[1] Bob played 7 GARDEN row 2 column 3",
+  "[1] Bubbo played 7 BIS row 2 column 2",
+  "[1] Bibby played 7 ESTATE row 1 column 4, upgrading estates of size 3.",
+  "[2] Bub played 7 GARDEN row 1 column 4",
+  "[2] Bob played 7 GARDEN row 2 column 3",
+  "[2] Bubbo played 7 BIS row 2 column 2",
+  "[2] Bibby played 7 ESTATE row 1 column 4, upgrading estates of size 3.",
+];
+
 export function EventLog() {
   return (
-    <div>
+    <div className="m-2">
       <h1 className="text-lg">Event Log</h1>
-      <div className="mt-2 border-2 border-black p-4 w-96 rounded-md">&gt;&gt;&gt;TODO</div>
+      <div className="border-2 border-black w-full h-40 rounded-md overflow-scroll whitespace-normal">
+        {events.map((event, index) => {
+          return (
+            <div className="flex p-0.5" key={index}>
+              <pre>&gt;</pre>
+              <pre className="whitespace-normal">{event}</pre>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
