@@ -1,13 +1,14 @@
-import { PlayerStates } from "@/app/util/PlayerTypes";
 import { UserCity } from "./UserCity";
+import { useGameStateMachineContext } from "./GameStateMachineContext";
 
 interface PlayersGridProps {
-  playerStates: PlayerStates;
   onSetViewedPlayer: (playerId: string) => void;
   viewedPlayerId: string;
 }
 
-export function PlayersGrid({ playerStates, onSetViewedPlayer, viewedPlayerId }: PlayersGridProps) {
+export function PlayersGrid({ onSetViewedPlayer, viewedPlayerId }: PlayersGridProps) {
+  const { playerStates } = useGameStateMachineContext();
+
   return (
     <div className="my-4">
       <h1 className="text-xl p-2">All Cities</h1>
@@ -21,7 +22,7 @@ export function PlayersGrid({ playerStates, onSetViewedPlayer, viewedPlayerId }:
               onClick={() => onSetViewedPlayer(playerId)}
             >
               <h2 className="text-md font-semibold">{playerId}</h2>
-              <UserCity playerState={playerStates[playerId]} mini />
+              <UserCity playerId={playerId} mini />
             </div>
           );
         })}

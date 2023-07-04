@@ -1,11 +1,9 @@
 import { Cards } from "./Cards";
-import { GameState } from "@/app/util/GameTypes";
+import { useGameStateMachineContext } from "./GameStateMachineContext";
 
-interface TurnProps {
-  gameState: GameState;
-}
+export function Turn() {
+  const { gameState } = useGameStateMachineContext();
 
-export function Turn({ gameState }: TurnProps) {
   return (
     <div>
       <h1 className="text-xl font-bold mb-2">Turn 1</h1>

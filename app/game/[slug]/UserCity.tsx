@@ -2,6 +2,7 @@ import { Neighborhood, ROW_ONE, ROW_THREE, ROW_TWO } from "@/app/util/Neighborho
 import { House, PlayerState } from "@/app/util/PlayerTypes";
 import classNames from "classnames";
 import React from "react";
+import { useGameStateMachineContext } from "./GameStateMachineContext";
 
 interface ParksProgressProps {
   scores: number[];
@@ -114,11 +115,14 @@ function UserNeighborhood({ config, houses, fences, mini }: RowProps) {
 }
 
 interface NeighborhoodProps {
-  playerState: PlayerState;
+  playerId: string;
   mini?: boolean;
 }
 
-export function UserCity({ playerState, mini }: NeighborhoodProps) {
+export function UserCity({ playerId, mini }: NeighborhoodProps) {
+  const { playerStates } = useGameStateMachineContext();
+  const playerState = playerStates[playerId];
+
   return (
     <div className={mini ? "max-w-xs" : ""}>
       <h1 className="text-xl font-bold p-2 truncate">{`${playerState.playerId}'s City: ${playerState.cityName}`}</h1>

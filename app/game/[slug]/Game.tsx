@@ -7,7 +7,7 @@ import React from "react";
 import { EventLog } from "./EventLog";
 import { Turn } from "./Turn";
 import { GameState } from "@/app/util/GameTypes";
-import { useGameStateMachine } from "./useGameStateMachine";
+import { GameStateMachineProvider } from "./GameStateMachineContext";
 
 interface GameProps {
   initialPlayerStates: PlayerStates;
@@ -17,25 +17,25 @@ interface GameProps {
 
 export default function Game({ initialPlayerStates, initialGameState, playerId }: GameProps) {
   const [viewedPlayerId, setViewedPlayerId] = React.useState(playerId);
-  const { step, playerStates, gameState } = useGameStateMachine(initialGameState, initialPlayerStates);
 
   return (
-    <div className="w-full m-2">
-      <div className="flex">
-        <UserBoard
-          playerStates={playerStates}
-          playerId={playerId}
-          viewedPlayerId={viewedPlayerId}
-          plans={gameState.plans}
-        />
-        <div className="flex flex-col mx-4 mt-4">
-          <Turn gameState={gameState} />
-          <div className="mt-auto">
-            <EventLog />
+    <GameStateMachineProvider
+      playerId={playerId}
+      initialGameState={initialGameState}
+      initialPlayerStates={initialPlayerStates}
+    >
+      <div className="w-full m-2">
+        <div className="flex">
+          <UserBoard viewedPlayerId={viewedPlayerId} />
+          <div className="flex flex-col mx-4 mt-4">
+            <Turn />
+            <div className="mt-auto">
+              <EventLog />
+            </div>
           </div>
         </div>
+        <PlayersGrid onSetViewedPlayer={setViewedPlayerId} viewedPlayerId={viewedPlayerId} />
       </div>
-      <PlayersGrid playerStates={playerStates} onSetViewedPlayer={setViewedPlayerId} viewedPlayerId={viewedPlayerId} />
-    </div>
+    </GameStateMachineProvider>
   );
 }

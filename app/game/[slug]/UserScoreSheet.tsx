@@ -10,6 +10,7 @@ import {
 import { computeScore } from "@/app/util/Scoring";
 import classNames from "classnames";
 import React from "react";
+import { useGameStateMachineContext } from "./GameStateMachineContext";
 
 function Divider({ symbol }: { symbol: string }) {
   return <div className="mb-20 text-xl font-bold">{symbol}</div>;
@@ -169,11 +170,11 @@ function PermitRefusals({ count }: { count: number }) {
 }
 
 interface UserScoreSheetProps {
-  playerStates: PlayerStates;
   playerId: string;
 }
 
-export function UserScoreSheet({ playerStates, playerId }: UserScoreSheetProps) {
+export function UserScoreSheet({ playerId }: UserScoreSheetProps) {
+  const { playerStates } = useGameStateMachineContext();
   const playerState = playerStates[playerId];
   const userScores = React.useMemo(() => computeScore(playerId, playerStates), [playerStates, playerId]);
   if (userScores == null || playerState == null) {

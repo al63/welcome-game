@@ -1,7 +1,7 @@
 import { PlanCard } from "@/app/util/CardTypes";
-import { PlayerStates } from "@/app/util/PlayerTypes";
 import classNames from "classnames";
 import React from "react";
+import { useGameStateMachineContext } from "./GameStateMachineContext";
 
 function Requirement({ size, quantity }: { size: number; quantity: number }) {
   const cells = [];
@@ -48,12 +48,9 @@ function CityPlan({ plan, completed }: CityPlanProps) {
   );
 }
 
-interface CityPlansProps {
-  plans: Array<PlanCard>;
-  playerStates: PlayerStates;
-}
+export function CityPlans() {
+  const { playerStates, gameState } = useGameStateMachineContext();
 
-export function CityPlans({ plans, playerStates }: CityPlansProps) {
   // convert player states completed plans to booleans for if a plan has been completed at all
   const completedPlans = React.useMemo(() => {
     return Object.keys(playerStates).reduce<boolean[]>(
@@ -70,7 +67,7 @@ export function CityPlans({ plans, playerStates }: CityPlansProps) {
     <div className="flex flex-col">
       <h1 className="text-xl text-center">City Plans</h1>
       <div className="flex flex-grow self-center">
-        {plans.map((plan, index) => (
+        {gameState.plans.map((plan, index) => (
           <CityPlan plan={plan} completed={completedPlans[index]} key={index} />
         ))}
       </div>

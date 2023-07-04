@@ -1,22 +1,6 @@
-/**
- * Manages the state machine for a user playing a turn:
- *
- * Given the initial game state
- *
- * 1) Decide what card to play
- * 2) Handle modifiers based on the card
- * 		- BIS: what to duplicate -> where to place duplicate
- * 		- TEMP AGENCY: how to modify the value
- *    - REAL ESTATE: what real estate to bump
- * 		- FENCE: to play a fence or not -> where to place fence
- *
- * 3) Handle placing the actual card on the board
- * 4) await other players to finish their turns
- */
-
-import { PlayerStateMap } from "@/app/api/models";
-import { GameCardType } from "@/app/util/CardTypes";
-import { GameState } from "@/app/util/GameTypes";
+import { PlayerStateMap } from "../api/models";
+import { GameCardType } from "./CardTypes";
+import { GameState } from "./GameTypes";
 
 interface ChooseCardStep {
   step: "choose";
@@ -77,24 +61,9 @@ type GameStep =
   | PlaceCardStep
   | WaitStep;
 
-interface GameStateMachine {
+export interface GameStateMachine {
+  playerId: string;
   step: GameStep;
   gameState: GameState;
   playerStates: PlayerStateMap;
-}
-
-export function useGameStateMachine(
-  initialGameState: GameState,
-  initialPlayerStates: PlayerStateMap
-): GameStateMachine {
-  const step: ChooseCardStep = {
-    step: "choose",
-    onChosen: (cardValue, modifier) => null,
-  };
-
-  return {
-    step,
-    gameState: initialGameState,
-    playerStates: initialPlayerStates,
-  };
 }
