@@ -20,7 +20,7 @@ export function UserBoard({ playerStates, playerId, viewedPlayerId, plans }: Pro
           <UserCity playerState={playerState} />
         </div>
         <div className="pl-4">
-          <CityPlans plans={plans} />
+          <CityPlans playerStates={playerStates} plans={plans} />
         </div>
       </div>
       <div className="border-t pt-2 border-gray-500">

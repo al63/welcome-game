@@ -1,4 +1,6 @@
 import { PlanCard } from "@/app/util/CardTypes";
+import { PlayerStates } from "@/app/util/PlayerTypes";
+import React from "react";
 
 function Requirement({ size, quantity }: { size: number; quantity: number }) {
   const cells = [];
@@ -14,9 +16,14 @@ function Requirement({ size, quantity }: { size: number; quantity: number }) {
   );
 }
 
-function CityPlan({ plan }: { plan: PlanCard }) {
+interface CityPlanProps {
+  plan: PlanCard;
+  completed: boolean;
+}
+
+function CityPlan({ plan, completed }: CityPlanProps) {
   return (
-    <div className="m-1 flex flex-col justify-center items-start p-1 rounded-md text-center w-20 h-28 border border-black bg-amber-50 text-lg">
+    <div className="m-1 flex flex-col justify-center items-start p-1 rounded-md text-center w-20 h-32 border border-black bg-amber-50 text-lg">
       <div className="text-red-700 font-bold">n&deg;{plan.difficulty}</div>
       <div className="flex-grow">
         {plan.requirements.map((requirement, index) => (
@@ -24,9 +31,13 @@ function CityPlan({ plan }: { plan: PlanCard }) {
         ))}
       </div>
       <div className="flex items-center justify-around w-full">
-        <div className="rounded-full bg-gray-700 text-gray-300 w-6 h-6 flex items-center justify-center">
-          {plan.firstValue}
-        </div>
+        {completed ? (
+          <div className="rounded-full bg-red-700 text-white w-6 h-6 flex items-center justify-center">{"\u2713"}</div>
+        ) : (
+          <div className="rounded-full bg-gray-700 text-gray-300 w-6 h-6 flex items-center justify-center">
+            {plan.firstValue}
+          </div>
+        )}
         <div className="rounded-full bg-gray-300 text-gray-700 w-6 h-6 flex items-center justify-center">
           {plan.secondValue}
         </div>
@@ -37,15 +48,28 @@ function CityPlan({ plan }: { plan: PlanCard }) {
 
 interface CityPlansProps {
   plans: Array<PlanCard>;
+  playerStates: PlayerStates;
 }
 
-export function CityPlans({ plans }: CityPlansProps) {
+export function CityPlans({ plans, playerStates }: CityPlansProps) {
+  // convert player states completed plans to booleans for if a plan has been completed at all
+  const completedPlans = React.useMemo(() => {
+    return Object.keys(playerStates).reduce<boolean[]>(
+      (accum, playerId) => {
+        return playerStates[playerId].completedPlans
+          .map((plan) => plan > 0) // convert to bools
+          .map((completed, index) => completed || accum[index]); // combine with other players
+      },
+      [false, false, false]
+    );
+  }, [playerStates]);
+
   return (
-    <div>
-      <h1 className="text-xl">City Plans</h1>
-      <div className="flex">
+    <div className="flex flex-col">
+      <h1 className="text-xl text-center">City Plans</h1>
+      <div className="flex flex-grow self-center">
         {plans.map((plan, index) => (
-          <CityPlan plan={plan} key={index} />
+          <CityPlan plan={plan} completed={completedPlans[index]} key={index} />
         ))}
       </div>
     </div>

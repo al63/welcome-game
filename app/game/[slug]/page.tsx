@@ -43,6 +43,7 @@ const states = {
   [dummy.playerId]: {
     ...dummy,
     cityName: "The Cool Zone",
+    completedPlans: [13, 0, 0],
   },
   bub: {
     ...dummy,
