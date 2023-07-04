@@ -23,10 +23,7 @@ export interface EstatesScore {
 interface UserScore {
   plans: number;
   parks: number[];
-  pools: {
-    count: number;
-    score: number;
-  };
+  pools: number;
   tempAgencies: {
     count: number;
     score: number;
@@ -57,17 +54,25 @@ export function computeScore(playerId: string, playerStates: PlayerStates): User
   const houseRows = [playerState.housesRowOne, playerState.housesRowTwo, playerState.housesRowThree];
 
   const parks = houseRows.map((row) => countType(row, "GARDEN"));
-  const parkScores = [ROW_ONE.parkScores[parks[0]], ROW_TWO.parkScores[parks[1]], ROW_THREE.parkScores[parks[2]]];
+  // possible to have more parks than the score system accounts for
+  const parkScores = [
+    ROW_ONE.parkScores[parks[0]] ?? ROW_ONE.parkScores[ROW_ONE.parkScores.length - 1],
+    ROW_TWO.parkScores[parks[1] ?? ROW_TWO.parkScores[ROW_TWO.parkScores.length - 1]],
+    ROW_THREE.parkScores[parks[2] ?? ROW_THREE.parkScores[ROW_THREE.parkScores.length - 1]],
+  ];
 
   const pools = houseRows.reduce((accum, cur) => accum + countType(cur, "POOL"), 0);
-  const poolsScore = POOL_SCORES[pools];
+  const poolsScore = POOL_SCORES[pools] ?? POOL_SCORES[POOL_SCORES.length - 1];
 
   // pain ahead: have to compute the count of temp agencies for each player, and determine what our place is accounting for ties
   const playerStatesArray = Object.values(playerStates);
   const tempAgenciesByPlayer = playerStatesArray
     .map((state) => {
       const rows = [state.housesRowOne, state.housesRowTwo, state.housesRowThree];
-      const tempAgencies = rows.reduce((accum, cur) => accum + countType(cur, "TEMP"), 0);
+      const tempAgencies = Math.min(
+        rows.reduce((accum, cur) => accum + countType(cur, "TEMP"), 0),
+        11
+      );
       return {
         playerId: state.playerId,
         tempAgencies,
@@ -119,10 +124,7 @@ export function computeScore(playerId: string, playerStates: PlayerStates): User
   return {
     plans: plansScores,
     parks: parkScores,
-    pools: {
-      count: pools,
-      score: poolsScore,
-    },
+    pools: poolsScore,
     tempAgencies: {
       count: tempAgenciesCount,
       score: tempAgenciesScore,
@@ -154,8 +156,8 @@ function calculateEstatesScore(playerState: PlayerState): Array<EstatesScore> {
 // we need to check if all houses between two fences are built
 // check fence arrays, for fence = true, check all houses to the next fence = true
 // the edges of each street have fences by default, but aren't represented in the array
-// the return value will be an array of estate sizes containing an array of arrays representing the start and end index of the estate
-export function getEstatesResult(fenceRow: boolean[], houseRow: Array<House | null>): number[][][] {
+// the return value will be a map of estate size to an array of arrays representing the start and end index of the estate
+function getEstatesResult(fenceRow: boolean[], houseRow: Array<House | null>): number[][][] {
   const estateResult: number[][][] = [[], [], [], [], [], []];
 
   let firstFenceIdx = -1;

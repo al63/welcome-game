@@ -32,10 +32,11 @@ interface PlaceFenceStep {
   type: "placeFence";
 }
 
-interface PlaceCardStep {
+export interface PlaceCardStep {
   type: "placeCard";
   cardValue: number;
   cardType: GameCardType;
+  metadata?: object; // TODO: fill out with info about what modifiers were done
 }
 
 interface WaitStep {
@@ -64,10 +65,14 @@ export interface CancelAction {
   type: "cancel";
 }
 
-export interface ChooseAction {
-  type: "choose";
+export interface ChoseCardAction {
+  type: "choseCard";
   cardValue: number;
   cardType: GameCardType;
 }
 
-export type GameStateMachineAction = CancelAction | ChooseAction;
+export interface PlacedCardAction {
+  type: "placedCard";
+}
+
+export type GameStateMachineAction = CancelAction | ChoseCardAction | PlacedCardAction;

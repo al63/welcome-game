@@ -77,12 +77,12 @@ function Parks({ scores }: { scores: number[] }) {
   );
 }
 
-function Pools({ count, score }: { count: number; score: number }) {
+function Pools({ score }: { score: number }) {
   return (
     <SectionContainer title="Pools">
       <div className="grid grid-cols-2 gap-1">
-        {POOL_SCORES.map((score, index) => {
-          return <Value value={score} checked={count > index} active={count === index} key={score} />;
+        {POOL_SCORES.map((s) => {
+          return <Value value={s} checked={score > s} active={score === s} key={score} />;
         })}
       </div>
     </SectionContainer>
@@ -189,7 +189,7 @@ export function UserScoreSheet({ playerId }: UserScoreSheetProps) {
         <Divider symbol="+" />
         <Parks scores={userScores.parks} />
         <Divider symbol="+" />
-        <Pools count={userScores.pools.count} score={userScores.pools.score} />
+        <Pools score={userScores.pools} />
         <Divider symbol="+" />
         <TempAgencies count={userScores.tempAgencies.count} score={userScores.tempAgencies.score} />
         <Divider symbol="+" />

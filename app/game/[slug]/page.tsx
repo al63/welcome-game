@@ -20,13 +20,13 @@ const dummy = {
 
 dummy.housesRowOne[1] = {
   value: 4,
-  modifier: "GARDEN",
+  modifier: "TEMP",
   usedForPlan: true,
 };
 
 dummy.housesRowOne[2] = {
   value: 5,
-  modifier: "POOL",
+  modifier: "TEMP",
   usedForPlan: true,
 };
 dummy.housesRowOne[3] = {
@@ -34,9 +34,50 @@ dummy.housesRowOne[3] = {
   modifier: "TEMP",
   usedForPlan: true,
 };
+dummy.housesRowOne[4] = {
+  value: 6,
+  modifier: "TEMP",
+  usedForPlan: true,
+};
 dummy.housesRowOne[5] = {
   value: 6,
-  modifier: "BIS",
+  modifier: "TEMP",
+  usedForPlan: true,
+};
+dummy.housesRowOne[6] = {
+  value: 6,
+  modifier: "TEMP",
+  usedForPlan: true,
+};
+dummy.housesRowTwo[1] = {
+  value: 4,
+  modifier: "TEMP",
+  usedForPlan: true,
+};
+dummy.housesRowTwo[2] = {
+  value: 4,
+  modifier: "TEMP",
+  usedForPlan: true,
+};
+dummy.housesRowTwo[3] = {
+  value: 4,
+  modifier: "TEMP",
+  usedForPlan: true,
+};
+dummy.housesRowTwo[4] = {
+  value: 4,
+  modifier: "TEMP",
+  usedForPlan: true,
+};
+dummy.housesRowTwo[5] = {
+  value: 4,
+  modifier: "TEMP",
+  usedForPlan: true,
+};
+dummy.housesRowTwo[6] = {
+  value: 4,
+  modifier: "TEMP",
+  usedForPlan: true,
 };
 
 const states = {

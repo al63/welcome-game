@@ -1,4 +1,4 @@
-import { UserCity } from "./UserCity";
+import { MiniUserCity } from "./UserCity";
 import { useGameStateMachineContext } from "./GameStateMachineContext";
 import classNames from "classnames";
 import React from "react";
@@ -14,6 +14,7 @@ export function PlayersGrid({ onSetViewedPlayer, playerId, viewedPlayerId }: Pla
 
   React.useEffect(() => {
     if (step.type === "placeCard") {
+      // TODO: add others like fence that should go back to your own board
       onSetViewedPlayer(playerId);
     }
   }, [step.type, onSetViewedPlayer, playerId]);
@@ -33,7 +34,7 @@ export function PlayersGrid({ onSetViewedPlayer, playerId, viewedPlayerId }: Pla
               onClick={() => onSetViewedPlayer(p)}
             >
               <h2 className="text-md font-semibold">{p}</h2>
-              <UserCity playerId={p} mini />
+              <MiniUserCity playerId={p} />
             </div>
           );
         })}

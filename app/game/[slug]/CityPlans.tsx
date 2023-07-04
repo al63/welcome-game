@@ -6,7 +6,7 @@ import { useGameStateMachineContext } from "./GameStateMachineContext";
 function Requirement({ size, quantity }: { size: number; quantity: number }) {
   const cells = [];
   for (let i = 0; i < size; i++) {
-    cells.push(<div className="bg-white w-2 h-2 border border-gray-500" />);
+    cells.push(<div className="bg-white w-2 h-2 border border-gray-500" key={i} />);
   }
 
   return (

@@ -11,7 +11,7 @@ export function UserBoard({ viewedPlayerId }: Props) {
     <div className="bg-orange-100 inline-block p-2 rounded-lg drop-shadow-sm min-w-fit">
       <div className="flex">
         <div className="pr-4 border-r border-gray-500">
-          <UserCity playerId={viewedPlayerId} />
+          <UserCity viewedPlayerId={viewedPlayerId} />
         </div>
         <div className="pl-4">
           <CityPlans />

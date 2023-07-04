@@ -3,6 +3,7 @@ import { House } from "@/app/util/PlayerTypes";
 import classNames from "classnames";
 import React from "react";
 import { useGameStateMachineContext } from "./GameStateMachineContext";
+import { useBuildableLocations } from "./useBuildableLocations";
 
 interface ParksProgressProps {
   scores: number[];
@@ -42,15 +43,17 @@ interface CellProps {
   house: House | null;
   pool?: boolean;
   mini: boolean;
+  buildable?: boolean;
 }
 
-function Cell({ house, pool, mini }: CellProps) {
+function Cell({ house, pool, mini, buildable }: CellProps) {
   const occupied = house != null;
   return (
     <div
       className={classNames("border relative flex justify-center items-center", {
-        "bg-gray-100": occupied,
-        "bg-white": !occupied,
+        "bg-gray-100": occupied && !buildable,
+        "bg-white": !occupied && !buildable,
+        "bg-green-300 hover:bg-green-400 cursor-pointer": buildable,
         "border-t-black border-t-2": house?.usedForPlan,
         "w-6 h-6": mini,
         "w-12 h-12": !mini,
@@ -83,9 +86,10 @@ interface RowProps {
   houses: Array<House | null>;
   fences: boolean[];
   mini: boolean;
+  buildableLocations?: Set<number>;
 }
 
-function UserNeighborhood({ config, houses, fences, mini }: RowProps) {
+function UserNeighborhood({ config, houses, fences, mini, buildableLocations }: RowProps) {
   const numGardens = React.useMemo(() => {
     return houses.filter((house) => house?.modifier === "GARDEN").length;
   }, [houses]);
@@ -103,7 +107,12 @@ function UserNeighborhood({ config, houses, fences, mini }: RowProps) {
           const fenceAfter = index < fences.length && fences[index];
           return (
             <div className="flex" key={index}>
-              <Cell house={house} pool={config.pools.includes(index)} mini={mini} />
+              <Cell
+                house={house}
+                pool={config.pools.includes(index)}
+                mini={mini}
+                buildable={buildableLocations?.has(index)}
+              />
               {index < houses.length - 1 ? <Fence active={fenceAfter} mini={mini} /> : null}
             </div>
           );
@@ -114,35 +123,67 @@ function UserNeighborhood({ config, houses, fences, mini }: RowProps) {
   );
 }
 
-interface NeighborhoodProps {
-  playerId: string;
-  mini?: boolean;
+interface CityProps {
+  viewedPlayerId: string;
 }
 
-export function UserCity({ playerId, mini }: NeighborhoodProps) {
-  const { playerStates } = useGameStateMachineContext();
-  const playerState = playerStates[playerId];
+export function UserCity({ viewedPlayerId }: CityProps) {
+  const { step, playerId, playerStates } = useGameStateMachineContext();
+  const viewedPlayerState = playerStates[viewedPlayerId];
+  const buildableLocations = useBuildableLocations(step, viewedPlayerState, playerId);
 
   return (
-    <div className={mini ? "max-w-xs" : ""}>
-      <h1 className="text-xl font-bold p-2 truncate">{`${playerState.playerId}'s City: ${playerState.cityName}`}</h1>
+    <div>
+      <h1 className="text-xl font-bold p-2 truncate">{`${viewedPlayerState.playerId}'s City: ${viewedPlayerState.cityName}`}</h1>
       <UserNeighborhood
         config={ROW_ONE}
-        houses={playerState.housesRowOne}
-        fences={playerState.fencesRowOne}
-        mini={!!mini}
+        houses={viewedPlayerState.housesRowOne}
+        fences={viewedPlayerState.fencesRowOne}
+        buildableLocations={buildableLocations?.housesRowOne}
+        mini={false}
       />
       <UserNeighborhood
         config={ROW_TWO}
-        houses={playerState.housesRowTwo}
-        fences={playerState.fencesRowTwo}
-        mini={!!mini}
+        houses={viewedPlayerState.housesRowTwo}
+        fences={viewedPlayerState.fencesRowTwo}
+        buildableLocations={buildableLocations?.housesRowTwo}
+        mini={false}
       />
       <UserNeighborhood
         config={ROW_THREE}
-        houses={playerState.housesRowThree}
-        fences={playerState.fencesRowThree}
-        mini={!!mini}
+        houses={viewedPlayerState.housesRowThree}
+        fences={viewedPlayerState.fencesRowThree}
+        buildableLocations={buildableLocations?.housesRowThree}
+        mini={false}
+      />
+    </div>
+  );
+}
+
+export function MiniUserCity({ playerId }: { playerId: string }) {
+  const { playerStates } = useGameStateMachineContext();
+  const viewedPlayerState = playerStates[playerId];
+
+  return (
+    <div className="max-w-xs">
+      <h1 className="text-xl font-bold p-2 truncate">{`${viewedPlayerState.playerId}'s City: ${viewedPlayerState.cityName}`}</h1>
+      <UserNeighborhood
+        config={ROW_ONE}
+        houses={viewedPlayerState.housesRowOne}
+        fences={viewedPlayerState.fencesRowOne}
+        mini
+      />
+      <UserNeighborhood
+        config={ROW_TWO}
+        houses={viewedPlayerState.housesRowTwo}
+        fences={viewedPlayerState.fencesRowTwo}
+        mini
+      />
+      <UserNeighborhood
+        config={ROW_THREE}
+        houses={viewedPlayerState.housesRowThree}
+        fences={viewedPlayerState.fencesRowThree}
+        mini
       />
     </div>
   );

@@ -1,6 +1,6 @@
-import { ChooseAction, GameStateMachine, GameStateMachineAction } from "@/app/util/GameStateMachineTypes";
+import { ChoseCardAction, GameStateMachine, GameStateMachineAction } from "@/app/util/GameStateMachineTypes";
 
-function reduceChooseAction(state: GameStateMachine, action: ChooseAction): GameStateMachine {
+function reduceChoseAction(state: GameStateMachine, action: ChoseCardAction): GameStateMachine {
   switch (action.cardType) {
     case "POOL":
     case "GARDEN":
@@ -28,6 +28,14 @@ function reduceChooseAction(state: GameStateMachine, action: ChooseAction): Game
 
 export function gameStateMachineReducer(state: GameStateMachine, action: GameStateMachineAction): GameStateMachine {
   switch (action.type) {
+    case "placedCard": {
+      return {
+        ...state,
+        step: {
+          type: "wait",
+        },
+      };
+    }
     case "cancel": {
       return {
         ...state,
@@ -36,8 +44,8 @@ export function gameStateMachineReducer(state: GameStateMachine, action: GameSta
         },
       };
     }
-    case "choose":
-      return reduceChooseAction(state, action);
+    case "choseCard":
+      return reduceChoseAction(state, action);
     default:
       return state;
   }
