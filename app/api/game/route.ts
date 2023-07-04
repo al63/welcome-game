@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
       playerStates: playerStatesMap,
     };
 
-    return NextResponse.json(response);
+    return NextResponse.json<GetGameAPIResponse>(response);
   } catch (e) {
     return NextResponse.json(e, { status: 500 });
   }

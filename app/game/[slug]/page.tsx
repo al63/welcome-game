@@ -1,6 +1,7 @@
 import { GameCard, GameCardType } from "@/app/util/CardTypes";
 import Game from "./Game";
 import { drawPlans } from "@/app/api/utils/PlanDeck";
+import { getGameServerAction } from "@/app/api/game/getGame";
 
 const dummy = {
   playerId: "bob",
@@ -80,7 +81,7 @@ dummy.housesRowTwo[6] = {
   usedForPlan: true,
 };
 
-const states = {
+const dummyStates = {
   [dummy.playerId]: {
     ...dummy,
     cityName: "The Cool Zone",
@@ -130,17 +131,23 @@ const gameState = {
   active: true,
 };
 
-export default function GamePage({
+export default async function GamePage({
   params,
   searchParams,
 }: {
   params: { slug: string };
-  searchParams: { player: string };
+  searchParams?: { player: string };
 }) {
-  const player = states[searchParams.player];
-  if (player == null) {
+  let res = null;
+  if (searchParams?.player != null) {
+    res = await getGameServerAction(params.slug, searchParams?.player);
+  }
+
+  if (res == null || searchParams?.player == null) {
     return <div>Game / Player combination not found.</div>;
   }
 
-  return <Game initialPlayerStates={states} playerId={player.playerId} initialGameState={gameState} />;
+  return (
+    <Game initialPlayerStates={res.playerStates} playerId={searchParams.player} initialGameState={res.gameState} />
+  );
 }

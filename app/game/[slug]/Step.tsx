@@ -8,7 +8,14 @@ import { cancelAction } from "./GameStateMachineActions";
 function StepInstructions({ step }: { step: GameStep }) {
   switch (step.type) {
     case "placeCard":
-      return `Choose a location to place the ${step.cardValue} ${modifierDisplayName(step.cardType)} card`;
+      return (
+        <>
+          <p>{`Choose a location to place the ${step.cardValue} ${modifierDisplayName(step.cardType)} card.`}</p>
+          {step.cardType === "POOL" ? (
+            <p className="italic text-xs mt-2">Pools only count on locations with blue squares.</p>
+          ) : null}
+        </>
+      );
     case "choose":
       return "Choose a card to play";
     case "wait":
