@@ -140,9 +140,9 @@ interface CityProps {
 }
 
 export function UserCity({ viewedPlayerId }: CityProps) {
-  const { step, playerId, playerStates } = useGameStateMachineContext();
+  const { playerStates } = useGameStateMachineContext();
   const viewedPlayerState = playerStates[viewedPlayerId];
-  const buildable = useBuildableLocations(step, viewedPlayerState, playerId);
+  const buildable = useBuildableLocations(viewedPlayerId);
 
   const onClick = (row: number, column: number) => {
     buildable?.onChosen?.([row, column]);

@@ -1,4 +1,4 @@
-import { CreateTurnAPIRequest } from "@/app/api/models";
+import { TurnAction } from "@/app/api/models";
 import { GameCardType } from "@/app/util/CardTypes";
 import {
   BISStep,
@@ -40,7 +40,12 @@ export function chooseBIS(duplicatePosition: number[], duplicateValue: number, s
   };
 }
 
-export async function placeHouse(position: number[], step: PlaceCardStep): Promise<PlacedCardAction | SubmitAction> {
+export async function placeHouse(
+  gameState: GameState,
+  playerId: string,
+  position: number[],
+  step: PlaceCardStep
+): Promise<PlacedCardAction | SubmitAction> {
   // for BIS actions, the actual BIS type is applied to the subsequent BIS house, not this one
   let modifier = step.cardType !== "BIS" ? step.cardType : undefined;
   // for pool actions, we only want to count the pool if its a pool location
@@ -65,7 +70,22 @@ export async function placeHouse(position: number[], step: PlaceCardStep): Promi
     };
   }
 
-  return await submitTurn(null);
+  return await submitTurn(gameState, playerId, {
+    type: "standard",
+    house,
+    housePosition: position,
+  });
+}
+
+export async function submitBISTurn(
+  gameState: GameState,
+  playerid: string,
+  house: House,
+  housePosition: number[],
+  bisHouse: House,
+  bisPosition: number[]
+): Promise<SubmitAction> {
+  return { type: "submit" };
 }
 
 export async function submitEstateTurn(
@@ -78,7 +98,7 @@ export async function submitEstateTurn(
   return { type: "submit" };
 }
 
-export async function submitTurn(data: CreateTurnAPIRequest | null): Promise<SubmitAction> {
+export async function submitTurn(gameState: GameState, playerId: string, action: TurnAction): Promise<SubmitAction> {
   // TODO: this action needs to POST to submit the turn
   return { type: "submit" };
 }

@@ -1,7 +1,6 @@
-import { GameStep } from "@/app/util/GameStateMachineTypes";
-import { House, PlayerState } from "@/app/util/PlayerTypes";
-import { useGameStateMachineDispatch } from "./GameStateMachineContext";
-import { chooseBIS, placeHouse } from "./GameStateMachineActions";
+import { House } from "@/app/util/PlayerTypes";
+import { useGameStateMachineContext, useGameStateMachineDispatch } from "./GameStateMachineContext";
+import { chooseBIS, placeHouse, submitBISTurn } from "./GameStateMachineActions";
 
 export interface PendingInfo {
   column: number;
@@ -17,11 +16,15 @@ interface Buildable {
 /**
  * Introspects from the game step and player state which houses / fences are buildable or are pending being built.
  */
-export function useBuildableLocations(step: GameStep, playerState: PlayerState, playerId: string): Buildable | null {
+export function useBuildableLocations(viewedPlayerId: string): Buildable | null {
+  const { gameState, playerStates, step, playerId } = useGameStateMachineContext();
   const dispatch = useGameStateMachineDispatch();
-  if (playerState.playerId !== playerId) {
+
+  if (playerId !== viewedPlayerId) {
     return null;
   }
+
+  const playerState = playerStates[playerId];
 
   if (step.type === "placeCard") {
     return {
@@ -31,7 +34,7 @@ export function useBuildableLocations(step: GameStep, playerState: PlayerState, 
         findBuildableColumns(playerState.housesRowThree, step.cardValue),
       ],
       onChosen: async (position) => {
-        const res = await placeHouse(position, step);
+        const res = await placeHouse(gameState, playerId, position, step);
         dispatch(res);
       },
     };
@@ -64,6 +67,30 @@ export function useBuildableLocations(step: GameStep, playerState: PlayerState, 
       },
       pendingHouses,
     };
+  } else if (step.type === "placeBis") {
+    const pendingHouses: Array<Array<PendingInfo>> = [[], [], []];
+    pendingHouses[step.position[0]].push({ column: step.position[1], house: step.house });
+
+    const dupeLocation = step.duplicateLocation;
+    const row = [playerState.housesRowOne, playerState.housesRowTwo, playerState.housesRowThree][dupeLocation[0]];
+    const pendingPosition = dupeLocation[0] === step.position[0] ? step.position[1] : null;
+    const locations = findDuplicatesLocations(row, pendingPosition, dupeLocation[1]);
+
+    return {
+      buildableHouses: [
+        dupeLocation[0] === 0 ? locations : new Set(),
+        dupeLocation[0] === 1 ? locations : new Set(),
+        dupeLocation[0] === 2 ? locations : new Set(),
+      ],
+      pendingHouses,
+      onChosen: async (position: number[]) => {
+        const bisHouse: House = {
+          value: step.duplicateValue,
+          modifier: "BIS",
+        };
+        dispatch(await submitBISTurn(gameState, playerId, step.house, step.position, bisHouse, position));
+      },
+    };
   } else if (step.type === "estate") {
     const pendingHouses: Array<Array<PendingInfo>> = [[], [], []];
     pendingHouses[step.position[0]].push({ column: step.position[1], house: step.house });
@@ -73,6 +100,26 @@ export function useBuildableLocations(step: GameStep, playerState: PlayerState, 
   }
 
   return null;
+}
+
+function findDuplicatesLocations(row: Array<House | null>, pendingPosition: number | null, duplicatePosition: number) {
+  // we can either place to the left or right of the duplicate position, as long as there is nothing else there already
+
+  const leftAvailable =
+    duplicatePosition > 0 && row[duplicatePosition - 1] == null && pendingPosition !== duplicatePosition - 1;
+  const rightAvailable =
+    duplicatePosition < row.length - 1 &&
+    row[duplicatePosition + 1] == null &&
+    pendingPosition !== duplicatePosition + 1;
+
+  const set = new Set<number>();
+  if (leftAvailable) {
+    set.add(duplicatePosition - 1);
+  }
+  if (rightAvailable) {
+    set.add(duplicatePosition + 1);
+  }
+  return set;
 }
 
 function findDuplicableColumns(row: Array<House | null>, pendingPosition: number | null): Set<number> {
