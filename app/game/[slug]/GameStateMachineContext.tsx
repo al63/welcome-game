@@ -37,12 +37,15 @@ export function GameStateMachineProvider({
   initialPlayerStates,
   children,
 }: GameStateMachineProviderProps) {
+  // initial game state is either 1) choose a card, 2) waiting for other to choose a card (we refreshed), 3) game ended
+  // TODO: handle game completion
+  const startWaiting = initialPlayerStates[playerId].turn > initialGameState.turn;
   const [state, dispatch] = useReducer(gameStateMachineReducer, {
     playerId,
     gameState: initialGameState,
     playerStates: initialPlayerStates,
     step: {
-      type: "choose",
+      type: startWaiting ? "wait" : "choose",
     },
   });
 

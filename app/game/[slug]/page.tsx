@@ -3,6 +3,7 @@ import Game from "./components/Game";
 import { drawPlans } from "@/app/api/utils/PlanDeck";
 import { getGameServerAction } from "@/app/api/game/getGame";
 import { validateCityPlanCompletion } from "@/app/api/turn/route";
+import { GameState } from "@/app/util/GameTypes";
 
 const dummy = {
   playerId: "bob",
@@ -107,21 +108,22 @@ const dummyRevealedCardValues: GameCard[] = [
   { value: 7, backingType: "GARDEN" },
 ];
 const dummyRevealedCardModifiers: GameCardType[] = ["ESTATE", "FENCE", "BIS"];
-const dummyGameState = {
+const dummyGameState: GameState = {
   id: "asdf",
   seed: 123,
   seedOffset: 0,
   revealedCardModifiers: dummyRevealedCardModifiers,
   revealedCardValues: dummyRevealedCardValues,
   players: {
-    bub: null,
-    bob: null,
-    bubbo: null,
-    bibby: null,
+    bub: { score: 0, turn: 1 },
+    bob: { score: 0, turn: 1 },
+    bubbo: { score: 0, turn: 1 },
+    bibby: { score: 0, turn: 1 },
   },
   plans: drawPlans(),
   turn: 1,
-  active: true,
+  completed: false,
+  latestEventLog: [],
 };
 
 export default async function GamePage({
