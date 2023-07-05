@@ -34,7 +34,7 @@ function StepInstructions({ step }: { step: GameStep }) {
     case "wait":
       return (
         <p>
-          Waiting for all other players to take their turn <p className="animate-pulse delay-1000 inline">...</p>
+          Waiting for all other players to take their turn <span className="animate-pulse delay-1000 inline">...</span>
         </p>
       );
     default:
