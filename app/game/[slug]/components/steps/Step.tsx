@@ -67,7 +67,7 @@ export function Step() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold mb-2">Turn {gameState.turn + 1}</h1>
+      <h1 className="text-xl font-bold mb-2">Turn {gameState.turn}</h1>
       <StepInstructions step={step} />
       <div className="mt-2">
         <StepActions step={step} gameState={gameState} />
