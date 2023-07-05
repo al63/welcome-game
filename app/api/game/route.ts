@@ -41,7 +41,8 @@ export async function POST(request: NextRequest) {
       players: playerMap,
       plans: drawPlans(),
       turn: 1,
-      active: true,
+      completed: true,
+      eventLog: [["The game has begun -- good luck!"]],
     };
     const client = await clientPromise;
     const db = client.db("wtypf");

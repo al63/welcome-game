@@ -17,5 +17,6 @@ export interface GameState {
   players: PlayerMetadataMap;
   plans: Array<PlanCard>;
   turn: number;
-  active: boolean;
+  completed: boolean;
+  eventLog: string[][];
 }
