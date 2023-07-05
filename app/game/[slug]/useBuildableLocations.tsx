@@ -35,6 +35,20 @@ export function useBuildableLocations(step: GameStep, playerState: PlayerState, 
         dispatch(res);
       },
     };
+  } else if (step.type === "placeBis") {
+    const duplicableHouses = [
+      findDuplicableColumns(playerState.housesRowOne),
+      findDuplicableColumns(playerState.housesRowTwo),
+      findDuplicableColumns(playerState.housesRowThree),
+    ];
+
+    duplicableHouses[step.position[0]].add(step.position[1]);
+    return {
+      buildableHouses: duplicableHouses,
+      onBuild: async (position) => {
+        return null;
+      },
+    };
   } else if (step.type === "estate" || step.type === "chooseBis") {
     const pendingHouses: Array<Array<PendingInfo>> = [[], [], []];
     pendingHouses[step.position[0]].push({ column: step.position[1], house: step.house });
@@ -44,6 +58,12 @@ export function useBuildableLocations(step: GameStep, playerState: PlayerState, 
   }
 
   return null;
+}
+
+function findDuplicableColumns(row: Array<House | null>): Set<number> {
+  return new Set(
+    row.map((house, index) => (house != null ? index : null)).filter((house): house is number => house != null)
+  );
 }
 
 function findBuildableColumns(row: Array<House | null>, value: number): Set<number> {

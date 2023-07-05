@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { CreateGameResponse } from "./api/models";
-import Link from "next/link";
 import { LoadingSpinner } from "./LoadingSpinner";
 import classNames from "classnames";
 
@@ -98,9 +97,9 @@ export default function NewGame() {
               return (
                 <li className="m-2" key={player}>
                   <span>{player}: </span>
-                  <Link className="text-blue-500 underline" href={path}>
+                  <a className="text-blue-500 underline" href={path}>
                     {link}
-                  </Link>
+                  </a>
                 </li>
               );
             })}
