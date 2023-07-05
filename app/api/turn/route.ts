@@ -335,7 +335,6 @@ function updateGameState(currentPlayerState: PlayerState, gameState: GameState, 
   });
   // Advance the GameState turn if all players have taken the current GameState turn and the game isn't over
   if (!newGameState.completed) {
-    newGameState.players[currentPlayerState.playerId]["turn"]++;
     if (advanceTurn) {
       currentTurnLog.push("[" + currentTurn + "] " + "All players have taken their turn!");
       currentTurnLog.push("Turn " + nextTurn + " has begun.");
