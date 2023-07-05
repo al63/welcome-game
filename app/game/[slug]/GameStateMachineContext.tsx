@@ -15,6 +15,7 @@ import { GameState } from "@/app/util/GameTypes";
 import React, { useContext, useReducer } from "react";
 import { createContext } from "react";
 import { gameStateMachineReducer } from "./GameStateMachineReducer";
+import { useCheckTurnCompletion } from "./useCheckTurnCompletion";
 
 const GameStateMachineContext = createContext<GameStateMachine | null>(null);
 
@@ -58,6 +59,8 @@ export function GameStateMachineProvider({
       }
     };
   }, [dispatch]);
+
+  useCheckTurnCompletion(state);
 
   return (
     <GameStateMachineContext.Provider value={state}>
