@@ -79,13 +79,19 @@ export async function placeHouse(
 
 export async function submitBISTurn(
   gameState: GameState,
-  playerid: string,
+  playerId: string,
   house: House,
   housePosition: number[],
   bisHouse: House,
   bisPosition: number[]
 ): Promise<SubmitAction> {
-  return { type: "submit" };
+  return await submitTurn(gameState, playerId, {
+    type: "bis",
+    house,
+    housePosition,
+    bisHouse,
+    bisPosition,
+  });
 }
 
 export async function submitEstateTurn(
@@ -95,10 +101,34 @@ export async function submitEstateTurn(
   housePosition: number[],
   sizeIncreased: number
 ): Promise<SubmitAction> {
-  return { type: "submit" };
+  return await submitTurn(gameState, playerId, {
+    type: "estate",
+    house,
+    housePosition,
+    sizeIncreased,
+  });
 }
 
 export async function submitTurn(gameState: GameState, playerId: string, action: TurnAction): Promise<SubmitAction> {
-  // TODO: this action needs to POST to submit the turn
+  try {
+    const res = await fetch("/api/turn", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        gameId: gameState.id,
+        playerId,
+        turn: gameState.turn,
+        action,
+      }),
+    });
+    const json = await res.json();
+    console.log(json);
+  } catch (e) {
+    alert("Error creating game");
+  }
+
   return { type: "submit" };
 }
