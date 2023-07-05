@@ -75,8 +75,8 @@ export async function POST(request: NextRequest) {
 
     // if it was the last player, increment game state turn
     return NextResponse.json(newPlayerState, { status: 200 });
-  } catch (e) {
-    return NextResponse.json(e, { status: 500 });
+  } catch (e: any) {
+    return NextResponse.json({ error: e.toString() }, { status: 500 });
   }
 }
 
@@ -240,5 +240,5 @@ export function validateCityPlanCompletion(playerState: PlayerState, plans: Plan
 }
 
 // function updateGameState(playerState: PlayerState, gameState: GameState): GameState {
-  
+
 // }
