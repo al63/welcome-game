@@ -18,5 +18,5 @@ export interface GameState {
   plans: Array<PlanCard>;
   turn: number;
   completed: boolean;
-  eventLog: string[][];
+  latestEventLog: string[];
 }

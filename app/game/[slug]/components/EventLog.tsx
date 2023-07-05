@@ -1,3 +1,5 @@
+import { useGameStateMachineContext } from "../GameStateMachineContext";
+
 const events = [
   "[1] Bub played 7 GARDEN row 1 column 4",
   "[1] Bob played 7 GARDEN row 2 column 3",
@@ -10,11 +12,13 @@ const events = [
 ];
 
 export function EventLog() {
+  const { gameState } = useGameStateMachineContext();
+
   return (
     <div className="m-2">
       <h1 className="text-lg">Event Log</h1>
       <div className="border-2 border-black w-full h-40 rounded-md overflow-scroll whitespace-normal">
-        {events.map((event, index) => {
+        {gameState.latestEventLog.map((event, index) => {
           return (
             <div className="flex p-0.5" key={index}>
               <pre>&gt;</pre>

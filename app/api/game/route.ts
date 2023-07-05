@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       plans: drawPlans(),
       turn: 1,
       completed: false,
-      eventLog: [["The game has begun -- good luck!"]],
+      latestEventLog: ["The game has begun -- good luck!"],
     };
     const client = await clientPromise;
     const db = client.db("wtypf");

@@ -140,12 +140,15 @@ function consolidateUpdate(action: TurnAction, playerState: PlayerState, plans: 
     newPlayerState.housesRowThree[action.housePosition[1]] = action.house;
   }
 
-  let lastEvent = "";
-  lastEvent = newPlayerState.playerId + " played " + action.house.value;
+  let lastEvent = "[" + playerState.turn + "] ";
+  lastEvent += newPlayerState.playerId + " played " + action.house.value;
   if (action.house.modifier) {
     lastEvent += " " + action.house.modifier;
   }
   lastEvent += " on row " + action.housePosition[0] + " column " + action.housePosition[1];
+  if (action.type == "estate") {
+    lastEvent += ", upgrading the value of estates size " + action.sizeIncreased;
+  }
   if (action.type == "bis") {
     lastEvent += " with the BIS on row" + action.bisPosition[0] + " column " + action.bisPosition[1];
   }
@@ -261,7 +264,7 @@ function updateGameState(playerState: PlayerState, gameState: GameState): GameSt
     ...gameState,
   };
   const currentTurn = gameState.turn;
-  const currentTurnLog = gameState.eventLog[currentTurn] || [];
+  const currentTurnLog = [];
   currentTurnLog.push(playerState.lastEvent);
 
   // Update the completed plans for the GameState so that players can determine if
@@ -269,7 +272,9 @@ function updateGameState(playerState: PlayerState, gameState: GameState): GameSt
   playerState.completedPlans.forEach((_, idx) => {
     if (gameState.plans[idx].completed != true && playerState.completedPlans[idx] > 0) {
       newGameState.plans[idx].completed = true;
-      currentTurnLog.push(playerState.playerId + " is the first to complete City Plan " + idx + "!");
+      currentTurnLog.push(
+        "[" + currentTurn + "] " + playerState.playerId + " is the first to complete City Plan " + idx + "!"
+      );
     }
   });
 
@@ -280,13 +285,13 @@ function updateGameState(playerState: PlayerState, gameState: GameState): GameSt
 
   if (planEndCondition) {
     newGameState.completed = true;
-    currentTurnLog.push(playerState.playerId + " has completed all city plans!");
+    currentTurnLog.push("[" + currentTurn + "] " + playerState.playerId + " has completed all city plans!");
   }
 
   // determine if a player has ended the game via using all of their permit refusals (idx 3)
   if (playerState.permitRefusals == 3) {
     newGameState.completed = true;
-    currentTurnLog.push(playerState.playerId + " has used all of their permit refusals!");
+    currentTurnLog.push("[" + currentTurn + "] " + playerState.playerId + " has used all of their permit refusals!");
   }
 
   // Advance the GameState turn if all players have taken the current GameState turn and the game isn't over
@@ -297,14 +302,14 @@ function updateGameState(playerState: PlayerState, gameState: GameState): GameSt
       return newGameState.players[e].turn == nextTurn;
     });
     if (advanceTurn) {
-      const newTurnEventLog: string[] = ["All players have taken their turn!", "Turn " + nextTurn + " has begun."];
+      currentTurnLog.push("[" + currentTurn + "] " + "All players have taken their turn!");
+      currentTurnLog.push("Turn " + nextTurn + " has begun.");
       newGameState.turn++;
-      newGameState.eventLog[nextTurn] = newTurnEventLog;
     }
   } else {
     currentTurnLog.push("The game is over! Calculating scores...");
   }
 
-  newGameState.eventLog[currentTurn] = currentTurnLog;
+  newGameState.latestEventLog = currentTurnLog;
   return newGameState;
 }
