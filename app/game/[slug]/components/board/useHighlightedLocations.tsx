@@ -1,6 +1,6 @@
 import { House } from "@/app/util/PlayerTypes";
-import { useGameStateMachineContext, useGameStateMachineDispatch } from "./GameStateMachineContext";
-import { chooseBIS, placeHouse, submitBISTurn } from "./GameStateMachineActions";
+import { useGameStateMachineContext, useGameStateMachineDispatch } from "../../GameStateMachineContext";
+import { chooseBIS, placeHouse, submitBISTurn } from "../../GameStateMachineActions";
 
 export interface PendingInfo {
   column: number;
@@ -8,15 +8,19 @@ export interface PendingInfo {
 }
 
 interface Buildable {
-  buildableHouses?: Array<Set<number>>;
+  highlightedColumns?: Array<Set<number>>;
   pendingHouses?: Array<Array<PendingInfo>>;
   onChosen?: (position: number[]) => void;
 }
 
 /**
- * Introspects from the game step and player state which houses / fences are buildable or are pending being built.
+ * Rendering of the city board interaction is *complicated*
+ *
+ * Need to be able to highlight clickable locations for various states. We also
+ * need to be able to ephemerally remember what the "pending" houses are
+ * (ex: user picks a BIS card, and wants to BIS the house they just placed)
  */
-export function useBuildableLocations(viewedPlayerId: string): Buildable | null {
+export function useHighlightedLocations(viewedPlayerId: string): Buildable | null {
   const { gameState, playerStates, step, playerId } = useGameStateMachineContext();
   const dispatch = useGameStateMachineDispatch();
 
@@ -28,7 +32,7 @@ export function useBuildableLocations(viewedPlayerId: string): Buildable | null 
 
   if (step.type === "placeCard") {
     return {
-      buildableHouses: [
+      highlightedColumns: [
         findBuildableColumns(playerState.housesRowOne, step.cardValue),
         findBuildableColumns(playerState.housesRowTwo, step.cardValue),
         findBuildableColumns(playerState.housesRowThree, step.cardValue),
@@ -48,7 +52,7 @@ export function useBuildableLocations(viewedPlayerId: string): Buildable | null 
     pendingHouses[step.position[0]].push({ column: step.position[1], house: step.house });
 
     return {
-      buildableHouses: duplicableHouses,
+      highlightedColumns: duplicableHouses,
       onChosen: async (position) => {
         let dupedValue;
         if (position[0] === step.position[0] && position[1] === step.position[1]) {
@@ -77,7 +81,7 @@ export function useBuildableLocations(viewedPlayerId: string): Buildable | null 
     const locations = findDuplicatesLocations(row, pendingPosition, dupeLocation[1]);
 
     return {
-      buildableHouses: [
+      highlightedColumns: [
         dupeLocation[0] === 0 ? locations : new Set(),
         dupeLocation[0] === 1 ? locations : new Set(),
         dupeLocation[0] === 2 ? locations : new Set(),

@@ -3,7 +3,7 @@ import { House } from "@/app/util/PlayerTypes";
 import classNames from "classnames";
 import React from "react";
 import { useGameStateMachineContext } from "../../GameStateMachineContext";
-import { PendingInfo, useBuildableLocations } from "../../useBuildableLocations";
+import { PendingInfo, useHighlightedLocations } from "./useHighlightedLocations";
 
 interface ParksProgressProps {
   scores: number[];
@@ -43,22 +43,22 @@ function House({ house, showModifiers }: { house: House; showModifiers: boolean 
 interface CellProps {
   house: House | null;
   mini: boolean;
-  buildable?: boolean;
+  highlighted?: boolean;
   pool?: boolean;
   onClick?: () => void;
   pendingHouse?: PendingInfo;
 }
 
-function Cell({ house, pool, mini, buildable, onClick, pendingHouse }: CellProps) {
+function Cell({ house, pool, mini, highlighted, onClick, pendingHouse }: CellProps) {
   const renderedHouse = house || pendingHouse?.house;
   const occupied = renderedHouse != null;
 
   return (
     <div
       className={classNames("border relative flex justify-center items-center", {
-        "bg-gray-100": occupied && !buildable,
-        "bg-white": !occupied && !buildable,
-        "bg-green-300 hover:bg-green-400 cursor-pointer": buildable,
+        "bg-gray-100": occupied && !highlighted,
+        "bg-white": !occupied && !highlighted,
+        "bg-green-300 hover:bg-green-400 cursor-pointer": highlighted,
         "border-t-black border-t-2": house?.usedForPlan,
         "w-6 h-6": mini,
         "w-12 h-12": !mini,
@@ -92,12 +92,12 @@ interface RowProps {
   houses: Array<House | null>;
   fences: boolean[];
   mini: boolean;
-  buildableLocations?: Set<number>;
-  onBuild?: (index: number) => void;
+  highlightedColumns?: Set<number>;
+  onClick?: (column: number) => void;
   pendingHouses?: Array<PendingInfo>;
 }
 
-function UserNeighborhood({ config, houses, fences, mini, buildableLocations, onBuild, pendingHouses }: RowProps) {
+function UserNeighborhood({ config, houses, fences, mini, highlightedColumns, onClick, pendingHouses }: RowProps) {
   const numGardens = React.useMemo(() => {
     return houses.filter((house) => house?.modifier === "GARDEN").length;
   }, [houses]);
@@ -113,7 +113,7 @@ function UserNeighborhood({ config, houses, fences, mini, buildableLocations, on
         <Fence active mini={mini} />
         {houses.map((house, index) => {
           const fenceAfter = index < fences.length && fences[index];
-          const buildable = buildableLocations?.has(index);
+          const highlighted = highlightedColumns?.has(index);
           const pendingHouse = pendingHouses?.find((pending) => pending.column === index);
           return (
             <div className="flex" key={index}>
@@ -121,8 +121,8 @@ function UserNeighborhood({ config, houses, fences, mini, buildableLocations, on
                 house={house}
                 pool={config.pools.includes(index)}
                 mini={mini}
-                buildable={buildable}
-                onClick={buildable ? () => onBuild?.(index) : undefined}
+                highlighted={highlighted}
+                onClick={highlighted ? () => onClick?.(index) : undefined}
                 pendingHouse={pendingHouse}
               />
               {index < houses.length - 1 ? <Fence active={fenceAfter} mini={mini} /> : null}
@@ -142,10 +142,10 @@ interface CityProps {
 export function UserCity({ viewedPlayerId }: CityProps) {
   const { playerStates } = useGameStateMachineContext();
   const viewedPlayerState = playerStates[viewedPlayerId];
-  const buildable = useBuildableLocations(viewedPlayerId);
+  const highlighted = useHighlightedLocations(viewedPlayerId);
 
   const onClick = (row: number, column: number) => {
-    buildable?.onChosen?.([row, column]);
+    highlighted?.onChosen?.([row, column]);
   };
 
   return (
@@ -155,28 +155,28 @@ export function UserCity({ viewedPlayerId }: CityProps) {
         config={ROW_ONE}
         houses={viewedPlayerState.housesRowOne}
         fences={viewedPlayerState.fencesRowOne}
-        buildableLocations={buildable?.buildableHouses?.[0]}
+        highlightedColumns={highlighted?.highlightedColumns?.[0]}
         mini={false}
-        onBuild={(index) => onClick(0, index)}
-        pendingHouses={buildable?.pendingHouses?.[0]}
+        onClick={(column) => onClick(0, column)}
+        pendingHouses={highlighted?.pendingHouses?.[0]}
       />
       <UserNeighborhood
         config={ROW_TWO}
         houses={viewedPlayerState.housesRowTwo}
         fences={viewedPlayerState.fencesRowTwo}
-        buildableLocations={buildable?.buildableHouses?.[1]}
+        highlightedColumns={highlighted?.highlightedColumns?.[1]}
         mini={false}
-        onBuild={(index) => onClick(1, index)}
-        pendingHouses={buildable?.pendingHouses?.[1]}
+        onClick={(column) => onClick(1, column)}
+        pendingHouses={highlighted?.pendingHouses?.[1]}
       />
       <UserNeighborhood
         config={ROW_THREE}
         houses={viewedPlayerState.housesRowThree}
         fences={viewedPlayerState.fencesRowThree}
-        buildableLocations={buildable?.buildableHouses?.[2]}
+        highlightedColumns={highlighted?.highlightedColumns?.[2]}
         mini={false}
-        onBuild={(index) => onClick(2, index)}
-        pendingHouses={buildable?.pendingHouses?.[2]}
+        onClick={(column) => onClick(2, column)}
+        pendingHouses={highlighted?.pendingHouses?.[2]}
       />
     </div>
   );
