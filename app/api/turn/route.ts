@@ -181,6 +181,10 @@ export function validateCityPlanCompletion(playerState: PlayerState, plans: Plan
     plan.requirements.forEach(function (req) {
       // look at each size of estates
       const estatesBucket = combined[req.size];
+      if (!estatesBucket) {
+        planCompleted = false;
+        return;
+      }
       // filter out arrays already being used for plans
       const availableEstates = estatesBucket.filter(function (e) {
         return !e.usedForPlan;
@@ -240,5 +244,5 @@ export function validateCityPlanCompletion(playerState: PlayerState, plans: Plan
 }
 
 // function updateGameState(playerState: PlayerState, gameState: GameState): GameState {
-
+//   return null;
 // }
