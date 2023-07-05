@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       players: playerMap,
       plans: drawPlans(),
       turn: 1,
-      completed: true,
+      completed: false,
       eventLog: [["The game has begun -- good luck!"]],
     };
     const client = await clientPromise;

@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
 
     // update game state on completed plans / game end
     const newGameState = updateGameState(newPlayerState, gameState);
-    const gameFilter: Filter<Document> = { gameId: newGameState.id };
+    const gameFilter: Filter<Document> = { id: gameState.id };
     const gameBody: UpdateFilter<Document> = {
       $set: {
         ...newGameState,
@@ -261,7 +261,7 @@ function updateGameState(playerState: PlayerState, gameState: GameState): GameSt
     ...gameState,
   };
   const currentTurn = gameState.turn;
-  const currentTurnLog = gameState.eventLog[currentTurn];
+  const currentTurnLog = gameState.eventLog[currentTurn] || [];
   currentTurnLog.push(playerState.lastEvent);
 
   // Update the completed plans for the GameState so that players can determine if
@@ -274,7 +274,7 @@ function updateGameState(playerState: PlayerState, gameState: GameState): GameSt
   });
 
   // determine if a player has ended the game via completing every single plan
-  const planEndCondition = playerState.completedPlans.filter(function (val) {
+  const planEndCondition = playerState.completedPlans.every(function (val) {
     return val > 0;
   });
 
@@ -293,7 +293,7 @@ function updateGameState(playerState: PlayerState, gameState: GameState): GameSt
   if (!newGameState.completed) {
     const nextTurn = gameState.turn + 1;
     newGameState.players[playerState.playerId]["turn"]++;
-    const advanceTurn = Object.keys(newGameState.players).filter(function (e) {
+    const advanceTurn = Object.keys(newGameState.players).every(function (e) {
       return newGameState.players[e].turn == nextTurn;
     });
     if (advanceTurn) {
