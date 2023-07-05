@@ -156,6 +156,7 @@ export async function submitTurn(
 
       dispatch({ type: "submitted", playerState: json.playerState });
     } catch (e) {
+      console.log(e);
       dispatch({ type: "error" });
     }
   };
@@ -163,18 +164,25 @@ export async function submitTurn(
 
 export async function poll(gameId: string, turn: number) {
   return async (dispatch: React.Dispatch<GameStateMachineAction>) => {
-    const res = await fetch(`/api/poll?gameId=${gameId}&turn=${turn}`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    });
+    try {
+      const res = await fetch(`/api/poll?gameId=${gameId}&turn=${turn}`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
 
-    const json = (await res.json()) as PollTurnAPIResponse;
-    // TODO: handle error(s)
-    if (json.result === "RESUME") {
-      dispatch({ type: "resume", gameState: json.gameState, playerStates: json.playerStates });
+      const json = (await res.json()) as PollTurnAPIResponse;
+      if (!res.ok || json.result === "ERROR") {
+        console.log(json);
+        dispatch({ type: "error" });
+      } else if (json.result === "RESUME") {
+        dispatch({ type: "resume", gameState: json.gameState, playerStates: json.playerStates });
+      }
+    } catch (e) {
+      console.log(e);
+      dispatch({ type: "error" });
     }
   };
 }
