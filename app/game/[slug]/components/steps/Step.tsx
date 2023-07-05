@@ -5,22 +5,27 @@ import { modifierDisplayName } from "./Card";
 import { GameState } from "@/app/util/GameTypes";
 import { TempAgencyModifier } from "./TempAgencyModifier";
 import { CancelButton } from "./CancelButton";
+import { RealEstateModifier } from "./RealEstateModifier";
 
 function StepInstructions({ step }: { step: GameStep }) {
   switch (step.type) {
+    case "estate":
+      return "Increase the value for estates of size:";
     case "temp":
-      return "Choose what value to modify the selected card to";
+      return "Choose what value to modify the selected card to:";
     case "placeCard":
       return (
         <>
-          <p>{`Choose a location to place the ${step.cardValue} ${modifierDisplayName(step.cardType)} card.`}</p>
+          <p>{`Choose a location on your board to place the ${step.cardValue} ${modifierDisplayName(
+            step.cardType
+          )} card.`}</p>
           {step.cardType === "POOL" ? (
             <p className="italic text-xs mt-2">Pools only count on locations with blue squares.</p>
           ) : null}
         </>
       );
     case "choose":
-      return "Choose a card to play";
+      return "Choose a card to play:";
     case "wait":
       return (
         <p>
@@ -34,6 +39,8 @@ function StepInstructions({ step }: { step: GameStep }) {
 
 function StepActions({ step, gameState }: { step: GameStep; gameState: GameState }) {
   switch (step.type) {
+    case "estate":
+      return <RealEstateModifier value={step.cardValue} />;
     case "temp":
       return <TempAgencyModifier value={step.cardValue} />;
     case "placeCard":

@@ -4,6 +4,7 @@ import {
   ChoseCardAction,
   PlaceCardStep,
   PlacedCardAction,
+  RealEstateModifierChosenAction,
   TempAgencyModifierChosenAction,
 } from "@/app/util/GameStateMachineTypes";
 
@@ -19,8 +20,12 @@ export function cancelAction(): CancelAction {
   return { type: "cancel" };
 }
 
-export function chooseTempAgencyModifier(value: number): TempAgencyModifierChosenAction {
-  return { type: "tempAgencyModifierChosen", value };
+export function chooseTempAgencyModifier(cardValue: number): TempAgencyModifierChosenAction {
+  return { type: "tempAgencyModifierChosen", cardValue };
+}
+
+export function chooseRealEstateModifier(cardValue: number, sizeIncreased: number): RealEstateModifierChosenAction {
+  return { type: "estateModifierChosen", cardValue, sizeIncreased };
 }
 
 export async function placeHouse(position: number[], step: PlaceCardStep): Promise<PlacedCardAction> {

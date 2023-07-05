@@ -23,6 +23,7 @@ interface TempAgencyStep {
 
 interface RealEstateStep {
   type: "estate";
+  cardValue: number;
 }
 
 interface FenceStep {
@@ -33,12 +34,20 @@ interface PlaceFenceStep {
   type: "placeFence";
 }
 
-export interface PlaceCardStep {
+interface PlaceCardStepCommon {
   type: "placeCard";
   cardValue: number;
-  cardType: GameCardType;
-  metadata?: object; // TODO: fill out with info about what modifiers were done
+  cardType: Extract<GameCardType, "GARDEN" | "POOL" | "TEMP">;
 }
+
+interface PlaceCardStepEstate {
+  type: "placeCard";
+  cardValue: number;
+  cardType: Extract<GameCardType, "ESTATE">;
+  sizeIncreased: number;
+}
+
+export type PlaceCardStep = PlaceCardStepCommon | PlaceCardStepEstate;
 
 interface WaitStep {
   type: "wait";
@@ -68,7 +77,13 @@ export interface CancelAction {
 
 export interface TempAgencyModifierChosenAction {
   type: "tempAgencyModifierChosen";
-  value: number;
+  cardValue: number;
+}
+
+export interface RealEstateModifierChosenAction {
+  type: "estateModifierChosen";
+  cardValue: number;
+  sizeIncreased: number;
 }
 
 export interface ChoseCardAction {
@@ -81,4 +96,9 @@ export interface PlacedCardAction {
   type: "placedCard";
 }
 
-export type GameStateMachineAction = CancelAction | TempAgencyModifierChosenAction | ChoseCardAction | PlacedCardAction;
+export type GameStateMachineAction =
+  | CancelAction
+  | TempAgencyModifierChosenAction
+  | RealEstateModifierChosenAction
+  | ChoseCardAction
+  | PlacedCardAction;

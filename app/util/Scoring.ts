@@ -139,7 +139,7 @@ export function computeScore(playerId: string, playerStates: PlayerStates): User
   };
 }
 
-function calculateEstatesScore(playerState: PlayerState): Array<EstatesScore> {
+export function calculateEstatesScore(playerState: PlayerState): Array<EstatesScore> {
   const one = getEstatesResult(playerState.fencesRowOne, playerState.housesRowOne);
   const two = getEstatesResult(playerState.fencesRowTwo, playerState.housesRowTwo);
   const three = getEstatesResult(playerState.fencesRowThree, playerState.housesRowThree);

@@ -20,8 +20,15 @@ function reduceChoseAction(state: GameStateMachine, action: ChoseCardAction): Ga
           cardValue: action.cardValue,
         },
       };
-    case "BIS":
     case "ESTATE":
+      return {
+        ...state,
+        step: {
+          type: "estate",
+          cardValue: action.cardValue,
+        },
+      };
+    case "BIS":
     case "FENCE":
       // TODO:
       return {
@@ -35,12 +42,23 @@ function reduceChoseAction(state: GameStateMachine, action: ChoseCardAction): Ga
 
 export function gameStateMachineReducer(state: GameStateMachine, action: GameStateMachineAction): GameStateMachine {
   switch (action.type) {
+    case "estateModifierChosen": {
+      return {
+        ...state,
+        step: {
+          type: "placeCard",
+          cardValue: action.cardValue,
+          cardType: "ESTATE",
+          sizeIncreased: action.sizeIncreased,
+        },
+      };
+    }
     case "tempAgencyModifierChosen": {
       return {
         ...state,
         step: {
           type: "placeCard",
-          cardValue: action.value,
+          cardValue: action.cardValue,
           cardType: "TEMP",
         },
       };

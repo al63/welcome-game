@@ -11,12 +11,12 @@ export function TempAgencyModifier({ value }: { value: number }) {
     for (let i = value - 2; i <= value + 2; i++) {
       if (i >= 0 && i <= 17) {
         res.push(
-          <div
+          <button
             onClick={() => dispatch(chooseTempAgencyModifier(i))}
             className="text-2xl px-2 mr-1 rounded-lg bg-orange-300 hover:bg-orange-400 cursor-pointer"
           >
             {i}
-          </div>
+          </button>
         );
       }
     }
