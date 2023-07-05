@@ -15,4 +15,5 @@ export interface PlanCard {
   secondValue: number;
   difficulty: 1 | 2 | 3;
   requirements: SizeRequirements[];
+  completed?: boolean;
 }

@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
-import {
-  BISAction,
-  CreateTurnAPIRequest,
-  FenceAction,
-  PermitRefusalAction,
-  StandardAction,
-  EstateAction,
-  TurnAction,
-} from "../models";
+import { CreateTurnAPIRequest, TurnAction } from "../models";
 import { Document, Filter, UpdateFilter } from "mongodb";
 import { House, PlayerState } from "@/app/util/PlayerTypes";
 import { GameState } from "@/app/util/GameTypes";
 import { getEstatesResult } from "@/app/util/Scoring";
+import { PlanCard } from "@/app/util/CardTypes";
 
 // User takes a turn. This means either
 // 1) playing a card
@@ -60,8 +53,8 @@ export async function POST(request: NextRequest) {
     if (!playerState) {
       return NextResponse.json("Player not found", { status: 404 });
     }
-    // Build the update request body
-    const newPlayerState = consolidateUpdate(req.action, playerState);
+    // Build the update request body for the player
+    const newPlayerState = consolidateUpdate(req.action, playerState, gameState.plans);
     const filter: Filter<Document> = { gameId: req.gameId, playerId: req.playerId };
     const body: UpdateFilter<Document> = {
       $set: {
@@ -78,6 +71,8 @@ export async function POST(request: NextRequest) {
     }
 
     // update game state on completed plans / game end
+    // const newGameState = updateGameState(newPlayerState, gameState);
+
     // if it was the last player, increment game state turn
     return NextResponse.json(newPlayerState, { status: 200 });
   } catch (e) {
@@ -85,7 +80,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function consolidateUpdate(action: TurnAction, playerState: PlayerState) {
+function consolidateUpdate(action: TurnAction, playerState: PlayerState, plans: PlanCard[]) {
   const newPlayerState = {
     ...playerState,
   };
@@ -142,10 +137,10 @@ function consolidateUpdate(action: TurnAction, playerState: PlayerState) {
   }
   newPlayerState.lastEvent = lastEvent;
   newPlayerState.turn++;
-  return validateCityPlanCompletion(newPlayerState);
+  return validateCityPlanCompletion(newPlayerState, plans);
 }
 
-function validateCityPlanCompletion(playerState: PlayerState) {
+export function validateCityPlanCompletion(playerState: PlayerState, plans: PlanCard[]): PlayerState {
   const newPlayerState = {
     ...playerState,
   };
@@ -154,6 +149,96 @@ function validateCityPlanCompletion(playerState: PlayerState) {
   const estatesRowTwo = getEstatesResult(newPlayerState.fencesRowTwo, playerState.housesRowTwo);
   const estatesRowThree = getEstatesResult(newPlayerState.fencesRowThree, playerState.housesRowThree);
 
-  // do this later fml
+  // take our estate result, and merge them all together with additional row info
+  // combined goes from size -> {row, columns, usedForPlan}[]
+  const combined = Array(6)
+    .fill(null)
+    .map((_, index) => {
+      return [
+        ...estatesRowOne[index].map((res) => {
+          return {
+            ...res,
+            row: 0,
+          };
+        }),
+        ...estatesRowTwo[index].map((res) => {
+          return {
+            ...res,
+            row: 1,
+          };
+        }),
+        ...estatesRowThree[index].map((res) => {
+          return {
+            ...res,
+            row: 2,
+          };
+        }),
+      ];
+    });
+
+  plans.forEach(function (plan, idx) {
+    let planCompleted = true;
+    plan.requirements.forEach(function (req) {
+      // look at each size of estates
+      const estatesBucket = combined[req.size];
+      // filter out arrays already being used for plans
+      const availableEstates = estatesBucket.filter(function (e) {
+        return !e.usedForPlan;
+      });
+      // check the length of this array to determine if there's even enough houses that meet the criteria of the plan
+      if (availableEstates.length < req.quantity) {
+        planCompleted = false;
+      }
+    });
+    // update house rows to be used for plans
+    if (planCompleted) {
+      plan.requirements.forEach(function (req) {
+        // look at each size of estates
+        const estatesBucket = combined[req.size];
+        // filter out arrays already being used for plans
+        const availableEstates = estatesBucket.filter(function (e) {
+          return !e.usedForPlan;
+        });
+        // for each requirement, start marking houses as used for a plan up to the quantity of the requirement
+        for (let i = 0; i <= req.quantity; i++) {
+          const estate = availableEstates[i];
+          for (let j = estate.columns[0]; j < estate.columns[1]; j++) {
+            switch (req.size) {
+              case 0:
+                const colRowOne = newPlayerState.housesRowOne[j];
+                if (colRowOne != null) {
+                  colRowOne.usedForPlan = true;
+                }
+                break;
+              case 1:
+                const colRowTwo = newPlayerState.housesRowTwo[j];
+                if (colRowTwo != null) {
+                  colRowTwo.usedForPlan = true;
+                }
+                break;
+              case 2:
+                const colRowThree = newPlayerState.housesRowThree[j];
+                if (colRowThree != null) {
+                  colRowThree.usedForPlan = true;
+                }
+                break;
+            }
+          }
+          availableEstates[i].usedForPlan = true;
+        }
+      });
+
+      if (plan.completed) {
+        newPlayerState.completedPlans[idx] = plan.secondValue;
+      } else {
+        newPlayerState.completedPlans[idx] = plan.firstValue;
+      }
+    }
+  });
+
   return newPlayerState;
 }
+
+// function updateGameState(playerState: PlayerState, gameState: GameState): GameState {
+  
+// }

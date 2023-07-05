@@ -2,6 +2,7 @@ import { GameCard, GameCardType } from "@/app/util/CardTypes";
 import Game from "./Game";
 import { drawPlans } from "@/app/api/utils/PlanDeck";
 import { getGameServerAction } from "@/app/api/game/getGame";
+import { validateCityPlanCompletion } from "@/app/api/turn/route";
 
 const dummy = {
   playerId: "bob",
@@ -47,6 +48,11 @@ dummy.housesRowOne[5] = {
 dummy.housesRowOne[6] = {
   value: 6,
   modifier: "TEMP",
+};
+dummy.housesRowOne[9] = {
+  value: 10,
+  modifier: "FENCE",
+  usedForPlan: false,
 };
 dummy.housesRowTwo[1] = {
   value: 4,
@@ -138,6 +144,7 @@ export default async function GamePage({
       playerStates: dummyStates,
       gameState: dummyGameState,
     };
+    validateCityPlanCompletion(dummyStates.bub, dummyGameState.plans);
   } else if (playerId != null) {
     res = await getGameServerAction(params.slug, playerId);
   }

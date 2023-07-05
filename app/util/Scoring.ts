@@ -156,9 +156,19 @@ export function calculateEstatesScore(playerState: PlayerState): Array<EstatesSc
 // we need to check if all houses between two fences are built
 // check fence arrays, for fence = true, check all houses to the next fence = true
 // the edges of each street have fences by default, but aren't represented in the array
-// the return value will be a map of estate size to an array of arrays representing the start and end index of the estate
-function getEstatesResult(fenceRow: boolean[], houseRow: Array<House | null>): number[][][] {
-  const estateResult: number[][][] = [[], [], [], [], [], []];
+// the return value will be an array of estate size to an array of arrays representing the start and end index of the estate
+// example
+// [[[0,0],[1,1],[2,2]]], [[],[[0,1],[2,3],[4,5]]]
+// [0][0] returns an array of estates of size 1
+// [1][0] returns an array of estates of size 2
+// [0][0][0] returns the first house position of an estate of size 1
+
+interface EstatesResult {
+  columns: number[];
+  usedForPlan: boolean;
+}
+export function getEstatesResult(fenceRow: boolean[], houseRow: Array<House | null>): EstatesResult[][] {
+  const estateResult: EstatesResult[][] = [[], [], [], [], [], []];
 
   let firstFenceIdx = -1;
   let lastFenceIdx = -1;
@@ -166,16 +176,28 @@ function getEstatesResult(fenceRow: boolean[], houseRow: Array<House | null>): n
     lastFenceIdx++;
 
     if (firstFenceIdx == -1 && lastFenceIdx == 0) {
-      if (checkValidEstate(houseRow, 0, 0)) {
-        estateResult[0].push([0, 0]);
+      const res = checkValidEstate(houseRow, 0, 0);
+      if (res.isValid) {
+        estateResult[0].push({
+          columns: [0, 0],
+          usedForPlan: res.usedInPlan,
+        });
       }
     } else if (firstFenceIdx == fenceRow.length - 1) {
-      if (checkValidEstate(houseRow, houseRow.length - 1, houseRow.length - 1)) {
-        estateResult[0].push([houseRow.length - 1, houseRow.length - 1]);
+      const res = checkValidEstate(houseRow, houseRow.length - 1, houseRow.length - 1);
+      if (res.isValid) {
+        estateResult[0].push({
+          columns: [houseRow.length - 1, houseRow.length - 1],
+          usedForPlan: res.usedInPlan,
+        });
       }
     } else if (fenceRow[i]) {
-      if (checkValidEstate(houseRow, firstFenceIdx + 1, lastFenceIdx)) {
-        estateResult[lastFenceIdx - firstFenceIdx - 1].push([firstFenceIdx + 1, lastFenceIdx]);
+      const res = checkValidEstate(houseRow, firstFenceIdx + 1, lastFenceIdx);
+      if (res.isValid) {
+        estateResult[lastFenceIdx - firstFenceIdx - 1].push({
+          columns: [firstFenceIdx + 1, lastFenceIdx],
+          usedForPlan: res.usedInPlan,
+        });
       }
     } else {
       continue;
@@ -186,16 +208,24 @@ function getEstatesResult(fenceRow: boolean[], houseRow: Array<House | null>): n
   return estateResult;
 }
 
-function checkValidEstate<T>(row: T[], start: number, end: number): boolean {
+interface Validator {
+  isValid: boolean;
+  usedInPlan: boolean;
+}
+
+function checkValidEstate(row: Array<House | null>, start: number, end: number): Validator {
+  let usedInPlan = false;
   for (let i = start; i <= end; i++) {
     if (row[i] == null) {
-      return false;
+      return { isValid: false, usedInPlan };
+    } else {
+      usedInPlan = usedInPlan || (row[i]?.usedForPlan ?? false);
     }
   }
 
   if (end - start + 1 > 6) {
-    return false;
+    return { isValid: false, usedInPlan };
   }
 
-  return true;
+  return { isValid: true, usedInPlan };
 }

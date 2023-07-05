@@ -21,6 +21,8 @@ const ADJECTIVES = [
   "Unique",
   "Vibrant",
   "Wise",
+  "Smelly",
+  "Tiny",
   "Youthful",
   "Zealous",
   "Adorable",
@@ -99,6 +101,7 @@ const ADJECTIVES = [
   "Gentle",
   "Honest",
   "Imaginative",
+  "Useless",
 ];
 
 const COLORS = [
