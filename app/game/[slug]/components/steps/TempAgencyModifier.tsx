@@ -14,6 +14,7 @@ export function TempAgencyModifier({ value }: { value: number }) {
           <button
             onClick={() => dispatch(chooseTempAgencyModifier(i))}
             className="text-2xl px-2 mr-1 rounded-lg bg-orange-300 hover:bg-orange-400 cursor-pointer"
+            key={i}
           >
             {i}
           </button>
