@@ -179,12 +179,9 @@ export function validateCityPlanCompletion(playerState: PlayerState, plans: Plan
   plans.forEach(function (plan, idx) {
     let planCompleted = true;
     plan.requirements.forEach(function (req) {
+      const size = req.size - 1;
       // look at each size of estates
-      const estatesBucket = combined[req.size];
-      if (!estatesBucket) {
-        planCompleted = false;
-        return;
-      }
+      const estatesBucket = combined[size];
       // filter out arrays already being used for plans
       const availableEstates = estatesBucket.filter(function (e) {
         return !e.usedForPlan;
@@ -198,7 +195,7 @@ export function validateCityPlanCompletion(playerState: PlayerState, plans: Plan
     if (planCompleted) {
       plan.requirements.forEach(function (req) {
         // look at each size of estates
-        const estatesBucket = combined[req.size];
+        const estatesBucket = combined[size];
         // filter out arrays already being used for plans
         const availableEstates = estatesBucket.filter(function (e) {
           return !e.usedForPlan;
@@ -207,7 +204,7 @@ export function validateCityPlanCompletion(playerState: PlayerState, plans: Plan
         for (let i = 0; i <= req.quantity; i++) {
           const estate = availableEstates[i];
           for (let j = estate.columns[0]; j < estate.columns[1]; j++) {
-            switch (req.size) {
+            switch (size) {
               case 0:
                 const colRowOne = newPlayerState.housesRowOne[j];
                 if (colRowOne != null) {
