@@ -15,7 +15,7 @@ export function useCheckTurnCompletion(
       }
 
       console.log("poll API here");
-      dispatch(poll(state.gameState.id, state.gameState.turn + 1));
+      dispatch(await poll(state.gameState.id, state.gameState.turn + 1));
       checkId = window.setTimeout(check, 5000);
     }
 
@@ -24,5 +24,5 @@ export function useCheckTurnCompletion(
       clearTimeout(id);
       clearTimeout(checkId);
     };
-  }, [state.step]);
+  }, [state.step, state.gameState.id, state.gameState.turn, dispatch]);
 }
