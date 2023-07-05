@@ -11,6 +11,8 @@ import { PlaceFence } from "./PlaceFence";
 
 function StepInstructions({ step }: { step: GameStep }) {
   switch (step.type) {
+    case "error":
+      return "Something went horribly wrong - try refreshing your browser";
     case "fence":
       return "Choose on your board the location to place the fence";
     case "placeBis":

@@ -1,7 +1,7 @@
 import { PlayerStateMap } from "../api/models";
 import { GameCardType } from "./CardTypes";
 import { GameState } from "./GameTypes";
-import { House } from "./PlayerTypes";
+import { House, PlayerState } from "./PlayerTypes";
 
 interface ChooseCardStep {
   type: "choose";
@@ -21,6 +21,10 @@ export interface PlaceCardStep {
 
 interface WaitStep {
   type: "wait";
+}
+
+interface ErrorStep {
+  type: "error";
 }
 
 export interface RealEstateStep {
@@ -57,7 +61,8 @@ export type GameStep =
   | RealEstateStep
   | FenceStep
   | PlaceCardStep
-  | WaitStep;
+  | WaitStep
+  | ErrorStep;
 
 export interface GameStateMachine {
   playerId: string;
@@ -96,8 +101,17 @@ export interface PlacedCardAction {
   house: House;
 }
 
-export interface SubmitAction {
-  type: "submit";
+export interface SubmitStartAction {
+  type: "submitting";
+}
+
+export interface SubmitCompleteAction {
+  type: "submitted";
+  playerState: PlayerState;
+}
+
+export interface ErrorAction {
+  type: "error";
 }
 
 export type GameStateMachineAction =
@@ -106,4 +120,6 @@ export type GameStateMachineAction =
   | ChoseCardAction
   | PlacedCardAction
   | ChoseBISAction
-  | SubmitAction;
+  | SubmitStartAction
+  | SubmitCompleteAction
+  | ErrorAction;

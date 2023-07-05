@@ -1,10 +1,11 @@
-import { TurnAction } from "@/app/api/models";
+import { CreateTurnAPIResponse, TurnAction } from "@/app/api/models";
 import { GameCardType } from "@/app/util/CardTypes";
 import {
   BISStep,
   CancelAction,
   ChoseBISAction,
   ChoseCardAction,
+  GameStateMachineAction,
   PlaceCardStep,
   PlacedCardAction,
   SubmitAction,
@@ -13,6 +14,7 @@ import {
 import { GameState } from "@/app/util/GameTypes";
 import { ROW_ONE, ROW_THREE, ROW_TWO } from "@/app/util/Neighborhoods";
 import { House } from "@/app/util/PlayerTypes";
+import { GameStateMachineThunk } from "./GameStateMachineContext";
 
 export function chooseCard(cardValue: number, cardType: GameCardType): ChoseCardAction {
   return {
@@ -45,7 +47,7 @@ export async function placeHouse(
   playerId: string,
   position: number[],
   step: PlaceCardStep
-): Promise<PlacedCardAction | SubmitAction> {
+): Promise<PlacedCardAction | GameStateMachineThunk> {
   // for BIS actions, the actual BIS type is applied to the subsequent BIS house, not this one
   let modifier = step.cardType !== "BIS" ? step.cardType : undefined;
   // for pool actions, we only want to count the pool if its a pool location
@@ -84,7 +86,7 @@ export async function submitBISTurn(
   housePosition: number[],
   bisHouse: House,
   bisPosition: number[]
-): Promise<SubmitAction> {
+): Promise<GameStateMachineThunk> {
   return await submitTurn(gameState, playerId, {
     type: "bis",
     house,
@@ -100,7 +102,7 @@ export async function submitEstateTurn(
   house: House,
   housePosition: number[],
   sizeIncreased: number
-): Promise<SubmitAction> {
+): Promise<GameStateMachineThunk> {
   return await submitTurn(gameState, playerId, {
     type: "estate",
     house,
@@ -124,26 +126,38 @@ export async function submitFenceTurn(
   });
 }
 
-export async function submitTurn(gameState: GameState, playerId: string, action: TurnAction): Promise<SubmitAction> {
-  try {
-    const res = await fetch("/api/turn", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        gameId: gameState.id,
-        playerId,
-        turn: gameState.turn,
-        action,
-      }),
-    });
-    const json = await res.json();
-    console.log(json);
-  } catch (e) {
-    alert("Error creating game");
-  }
+export async function submitTurn(
+  gameState: GameState,
+  playerId: string,
+  action: TurnAction
+): Promise<GameStateMachineThunk> {
+  return async (dispatch: React.Dispatch<GameStateMachineAction>) => {
+    dispatch({ type: "submitting" });
+    try {
+      const res = await fetch("/api/turn", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          gameId: gameState.id,
+          playerId,
+          turn: gameState.turn,
+          action,
+        }),
+      });
 
-  return { type: "submit" };
+      const json = (await res.json()) as CreateTurnAPIResponse;
+      if (!res.ok) {
+        console.log(json);
+        dispatch({ type: "error" });
+        return;
+      }
+
+      dispatch({ type: "submitted", playerState: json.playerState });
+    } catch (e) {
+      dispatch({ type: "error" });
+    }
+  };
 }

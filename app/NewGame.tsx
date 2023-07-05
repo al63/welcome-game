@@ -43,7 +43,12 @@ export default function NewGame() {
         body: JSON.stringify({ players: playerIds }),
       });
       const json = (await res.json()) as CreateGameResponse;
-      setCreatedGame(json);
+      if (!res.ok) {
+        console.log(json);
+        alert("Error creating game");
+      } else {
+        setCreatedGame(json);
+      }
     } catch (e) {
       alert("Error creating game");
     }

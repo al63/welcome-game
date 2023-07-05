@@ -94,10 +94,23 @@ export function gameStateMachineReducer(state: GameStateMachine, action: GameSta
     }
     case "choseCard":
       return reduceChoseAction(state, action);
-    case "submit":
+    case "submitting":
       return {
         ...state,
         step: { type: "wait" },
+      };
+    case "submitted":
+      return {
+        ...state,
+        playerStates: {
+          ...state.playerStates,
+          [state.playerId]: action.playerState,
+        },
+      };
+    case "error":
+      return {
+        ...state,
+        step: { type: "error" },
       };
     default:
       return state;

@@ -17,7 +17,12 @@ import { createContext } from "react";
 import { gameStateMachineReducer } from "./GameStateMachineReducer";
 
 const GameStateMachineContext = createContext<GameStateMachine | null>(null);
-const GameStateMachineDispatchContext = createContext<React.Dispatch<GameStateMachineAction> | null>(null);
+
+export type GameStateMachineThunk = (dispatch: React.Dispatch<GameStateMachineAction>) => void;
+
+const GameStateMachineDispatchContext = createContext<
+  ((action: GameStateMachineAction | GameStateMachineThunk) => void) | null
+>(null);
 
 interface GameStateMachineProviderProps {
   playerId: string;
@@ -41,9 +46,21 @@ export function GameStateMachineProvider({
     },
   });
 
+  const dispatchWithThunk = React.useMemo(() => {
+    return (action: GameStateMachineAction | ((dispatch: React.Dispatch<GameStateMachineAction>) => void)) => {
+      if (typeof action === "function") {
+        action(dispatch);
+      } else {
+        dispatch(action);
+      }
+    };
+  }, [dispatch]);
+
   return (
     <GameStateMachineContext.Provider value={state}>
-      <GameStateMachineDispatchContext.Provider value={dispatch}>{children}</GameStateMachineDispatchContext.Provider>
+      <GameStateMachineDispatchContext.Provider value={dispatchWithThunk}>
+        {children}
+      </GameStateMachineDispatchContext.Provider>
     </GameStateMachineContext.Provider>
   );
 }
