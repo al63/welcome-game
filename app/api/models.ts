@@ -63,8 +63,3 @@ export interface CreateTurnAPIRequest {
 export interface CreateTurnAPIResponse {
   playerState: PlayerState;
 }
-
-export interface PollTurnAPIRequest {
-  gameId: string;
-  turn: number;
-}
