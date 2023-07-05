@@ -43,7 +43,7 @@ interface PlaceBISStep {
   duplicateLocation: number[];
 }
 
-interface FenceStep {
+export interface FenceStep {
   type: "fence";
   position: number[];
   house: House;

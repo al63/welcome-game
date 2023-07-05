@@ -75,9 +75,10 @@ interface FenceProps {
   mini: boolean;
   active: boolean;
   highlighted?: boolean;
+  onClick?: () => void;
 }
 
-function Fence({ mini, active, highlighted }: FenceProps) {
+function Fence({ mini, active, highlighted, onClick }: FenceProps) {
   return (
     <div
       className={classNames(
@@ -91,7 +92,10 @@ function Fence({ mini, active, highlighted }: FenceProps) {
       )}
     >
       {highlighted ? (
-        <div className="absolute h-12 w-3 -left-1.5 z-10 bg-green-300 hover:bg-green-400 cursor-pointer" />
+        <div
+          className="absolute h-12 w-3 -left-1.5 z-10 bg-green-300 hover:bg-green-400 cursor-pointer"
+          onClick={onClick}
+        />
       ) : null}
     </div>
   );
@@ -103,7 +107,8 @@ interface RowProps {
   fences: boolean[];
   mini: boolean;
   highlightedColumns?: Set<number>;
-  onClick?: (column: number) => void;
+  onHouseClick?: (column: number) => void;
+  onFenceClick?: (column: number) => void;
   pendingHouses?: Array<PendingInfo>;
   highlightedFences?: Set<number>;
 }
@@ -114,7 +119,8 @@ function UserNeighborhood({
   fences,
   mini,
   highlightedColumns,
-  onClick,
+  onHouseClick,
+  onFenceClick,
   pendingHouses,
   highlightedFences,
 }: RowProps) {
@@ -143,11 +149,16 @@ function UserNeighborhood({
                 pool={config.pools.includes(index)}
                 mini={mini}
                 highlighted={highlighted}
-                onClick={highlighted ? () => onClick?.(index) : undefined}
+                onClick={highlighted ? () => onHouseClick?.(index) : undefined}
                 pendingHouse={pendingHouse}
               />
               {index < houses.length - 1 ? (
-                <Fence active={fenceAfter} mini={mini} highlighted={highlightedFence} />
+                <Fence
+                  active={fenceAfter}
+                  mini={mini}
+                  highlighted={highlightedFence}
+                  onClick={highlightedFence ? () => onFenceClick?.(index) : undefined}
+                />
               ) : null}
             </div>
           );
@@ -167,8 +178,12 @@ export function UserCity({ viewedPlayerId }: CityProps) {
   const viewedPlayerState = playerStates[viewedPlayerId];
   const highlighted = useHighlightedLocations(viewedPlayerId);
 
-  const onClick = (row: number, column: number) => {
-    highlighted?.onChosen?.([row, column]);
+  const onHouseClick = (row: number, column: number) => {
+    highlighted?.onColumnChosen?.([row, column]);
+  };
+
+  const onFenceClick = (row: number, column: number) => {
+    highlighted?.onFenceChosen?.([row, column]);
   };
 
   return (
@@ -181,7 +196,8 @@ export function UserCity({ viewedPlayerId }: CityProps) {
         highlightedColumns={highlighted?.highlightedColumns?.[0]}
         highlightedFences={highlighted?.highlightedFences?.[0]}
         mini={false}
-        onClick={(column) => onClick(0, column)}
+        onHouseClick={(column) => onHouseClick(0, column)}
+        onFenceClick={(column) => onFenceClick(0, column)}
         pendingHouses={highlighted?.pendingHouses?.[0]}
       />
       <UserNeighborhood
@@ -191,7 +207,8 @@ export function UserCity({ viewedPlayerId }: CityProps) {
         highlightedColumns={highlighted?.highlightedColumns?.[1]}
         highlightedFences={highlighted?.highlightedFences?.[1]}
         mini={false}
-        onClick={(column) => onClick(1, column)}
+        onHouseClick={(column) => onHouseClick(1, column)}
+        onFenceClick={(column) => onFenceClick(1, column)}
         pendingHouses={highlighted?.pendingHouses?.[1]}
       />
       <UserNeighborhood
@@ -201,7 +218,8 @@ export function UserCity({ viewedPlayerId }: CityProps) {
         highlightedColumns={highlighted?.highlightedColumns?.[2]}
         highlightedFences={highlighted?.highlightedFences?.[2]}
         mini={false}
-        onClick={(column) => onClick(2, column)}
+        onHouseClick={(column) => onHouseClick(2, column)}
+        onFenceClick={(column) => onFenceClick(2, column)}
         pendingHouses={highlighted?.pendingHouses?.[2]}
       />
     </div>

@@ -109,6 +109,21 @@ export async function submitEstateTurn(
   });
 }
 
+export async function submitFenceTurn(
+  gameState: GameState,
+  playerId: string,
+  house: House,
+  housePosition: number[],
+  fencePosition: number[]
+) {
+  return await submitTurn(gameState, playerId, {
+    type: "fence",
+    house,
+    housePosition,
+    fencePosition,
+  });
+}
+
 export async function submitTurn(gameState: GameState, playerId: string, action: TurnAction): Promise<SubmitAction> {
   try {
     const res = await fetch("/api/turn", {

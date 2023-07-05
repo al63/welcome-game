@@ -1,6 +1,6 @@
 import { House } from "@/app/util/PlayerTypes";
 import { useGameStateMachineContext, useGameStateMachineDispatch } from "../../GameStateMachineContext";
-import { chooseBIS, placeHouse, submitBISTurn } from "../../GameStateMachineActions";
+import { chooseBIS, placeHouse, submitBISTurn, submitFenceTurn } from "../../GameStateMachineActions";
 
 export interface PendingInfo {
   column: number;
@@ -11,7 +11,8 @@ interface Buildable {
   highlightedColumns?: Array<Set<number>>;
   highlightedFences?: Array<Set<number>>;
   pendingHouses?: Array<Array<PendingInfo>>;
-  onChosen?: (position: number[]) => void;
+  onColumnChosen?: (position: number[]) => void;
+  onFenceChosen?: (position: number[]) => void;
 }
 
 /**
@@ -38,7 +39,7 @@ export function useHighlightedLocations(viewedPlayerId: string): Buildable | nul
         findBuildableColumns(playerState.housesRowTwo, step.cardValue),
         findBuildableColumns(playerState.housesRowThree, step.cardValue),
       ],
-      onChosen: async (position) => {
+      onColumnChosen: async (position) => {
         const res = await placeHouse(gameState, playerId, position, step);
         dispatch(res);
       },
@@ -54,7 +55,7 @@ export function useHighlightedLocations(viewedPlayerId: string): Buildable | nul
 
     return {
       highlightedColumns: duplicableHouses,
-      onChosen: async (position) => {
+      onColumnChosen: async (position) => {
         let dupedValue;
         if (position[0] === step.position[0] && position[1] === step.position[1]) {
           // duping pending house
@@ -88,7 +89,7 @@ export function useHighlightedLocations(viewedPlayerId: string): Buildable | nul
         dupeLocation[0] === 2 ? locations : new Set(),
       ],
       pendingHouses,
-      onChosen: async (position: number[]) => {
+      onColumnChosen: async (position: number[]) => {
         const bisHouse: House = {
           value: step.duplicateValue,
           modifier: "BIS",
@@ -103,12 +104,17 @@ export function useHighlightedLocations(viewedPlayerId: string): Buildable | nul
       pendingHouses,
     };
   } else if (step.type === "fence") {
+    const pendingHouses: Array<Array<PendingInfo>> = [[], [], []];
+    pendingHouses[step.position[0]].push({ column: step.position[1], house: step.house });
     return {
       highlightedFences: [
         findBuildableFences(playerState.fencesRowOne, playerState.housesRowOne),
         findBuildableFences(playerState.fencesRowTwo, playerState.housesRowTwo),
         findBuildableFences(playerState.fencesRowThree, playerState.housesRowThree),
       ],
+      pendingHouses,
+      onFenceChosen: async (position: number[]) =>
+        dispatch(await submitFenceTurn(gameState, playerId, step.house, step.position, position)),
     };
   }
 

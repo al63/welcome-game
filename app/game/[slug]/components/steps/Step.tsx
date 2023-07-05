@@ -7,6 +7,7 @@ import { TempAgencyModifier } from "./TempAgencyModifier";
 import { CancelButton } from "./CancelButton";
 import { RealEstateModifier } from "./RealEstateModifier";
 import { ChooseBIS } from "./ChooseBIS";
+import { PlaceFence } from "./PlaceFence";
 
 function StepInstructions({ step }: { step: GameStep }) {
   switch (step.type) {
@@ -46,6 +47,8 @@ function StepInstructions({ step }: { step: GameStep }) {
 
 function StepActions({ step, gameState, playerId }: { step: GameStep; gameState: GameState; playerId: string }) {
   switch (step.type) {
+    case "fence":
+      return <PlaceFence gameState={gameState} playerId={playerId} step={step} />;
     case "chooseBis":
       return <ChooseBIS gameState={gameState} playerId={playerId} step={step} />;
     case "estate":

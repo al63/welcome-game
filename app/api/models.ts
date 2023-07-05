@@ -30,7 +30,6 @@ export interface BISAction {
 export interface FenceAction {
   house: House;
   housePosition: number[];
-  fence: number;
   fencePosition: number[];
   type: "fence";
 }
