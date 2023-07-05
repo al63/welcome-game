@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
 import { CreateTurnAPIRequest, PlayerStateMap, TurnAction } from "../models";
-import { Document, Filter, UpdateFilter } from "mongodb";
-import { House, PlayerState, PlayerStates } from "@/app/util/PlayerTypes";
+import { Db, Document, Filter, UpdateFilter } from "mongodb";
+import { PlayerState, PlayerStates } from "@/app/util/PlayerTypes";
 import { GameState, PlayerMetadataMap } from "@/app/util/GameTypes";
 import { computeScore, getEstatesResult } from "@/app/util/Scoring";
 import { PlanCard } from "@/app/util/CardTypes";
@@ -74,20 +74,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json("Unable to update the player state", { status: 500 });
     }
 
-    // Grab all player states associated with a game for score calculation
-    // this is totally inefficient but yolo
-    const playerStates = db.collection<PlayerState>("player_states");
-    const playerStateQuery: Filter<PlayerState> = { gameId: gameState.id };
-    const playerStatesCursor = playerStates.find<PlayerState>(playerStateQuery);
-
-    const playerStatesMap: PlayerStateMap = {};
-    for await (const doc of playerStatesCursor) {
-      delete (doc as any)["_id"];
-      playerStatesMap[doc.playerId] = doc;
-    }
-
     // update game state on completed plans / game end
-    const newGameState = updateGameState(newPlayerState, gameState, playerStatesMap);
+    const newGameState = await updateGameState(db, newPlayerState, gameState);
     const gameFilter: Filter<Document> = { id: gameState.id };
     const gameBody: UpdateFilter<Document> = {
       $set: {
@@ -273,7 +261,7 @@ export function validateCityPlanCompletion(playerState: PlayerState, plans: Plan
   return newPlayerState;
 }
 
-function updateGameState(currentPlayerState: PlayerState, gameState: GameState, playerStates: PlayerStates): GameState {
+async function updateGameState(db: Db, currentPlayerState: PlayerState, gameState: GameState): Promise<GameState> {
   const newGameState = {
     ...gameState,
   };
@@ -345,7 +333,7 @@ function updateGameState(currentPlayerState: PlayerState, gameState: GameState, 
       let winningPlayer = "";
       let winningPlayerScore = 0;
       currentTurnLog.push("The game is over! Calculating scores...");
-      const finalPlayersResult = calculateFinalScores(playerStates, newGameState.players);
+      const finalPlayersResult = await calculateFinalScores(db, newGameState.players);
       newGameState.players = finalPlayersResult;
       Object.keys(finalPlayersResult).forEach((player, _) => {
         if (finalPlayersResult[player].score > winningPlayerScore) {
@@ -354,9 +342,7 @@ function updateGameState(currentPlayerState: PlayerState, gameState: GameState, 
         }
         currentTurnLog.push(player + ": " + finalPlayersResult[player].score);
       });
-      currentTurnLog.push(
-        "Congratulations to " + winningPlayer + " of the " + playerStates[winningPlayer].cityName + "!"
-      );
+      currentTurnLog.push("Congratulations to " + winningPlayer + "!");
     } else {
       currentTurnLog.push("The game is ending! Waiting for all players to finish...");
     }
@@ -366,13 +352,22 @@ function updateGameState(currentPlayerState: PlayerState, gameState: GameState, 
   return newGameState;
 }
 
-function calculateFinalScores(playersMap: PlayerStates, currPlayerMap: PlayerMetadataMap): PlayerMetadataMap {
+async function calculateFinalScores(db: Db, currPlayerMap: PlayerMetadataMap): Promise<PlayerMetadataMap> {
+  const playerStates = db.collection<PlayerState>("player_states");
+  const playerStateQuery: Filter<PlayerState> = { gameId: currPlayerMap.gameId };
+  const playerStatesCursor = playerStates.find<PlayerState>(playerStateQuery);
+
+  const playerStatesMap: PlayerStateMap = {};
+  for await (const doc of playerStatesCursor) {
+    delete (doc as any)["_id"];
+    playerStatesMap[doc.playerId] = doc;
+  }
   const newPlayerMetadataState = {
     ...currPlayerMap,
   };
 
-  Object.keys(playersMap).forEach((playerId, _) => {
-    const userScore = computeScore(playerId, playersMap);
+  Object.keys(playerStatesMap).forEach((playerId, _) => {
+    const userScore = computeScore(playerId, playerStatesMap);
     newPlayerMetadataState[playerId].score = userScore?.summation || 0;
   });
 

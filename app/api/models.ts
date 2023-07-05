@@ -1,5 +1,5 @@
 import { GameState } from "../util/GameTypes";
-import { House, PlayerState } from "../util/PlayerTypes";
+import { House, PlayerState, PlayerStates } from "../util/PlayerTypes";
 
 export interface CreateGameAPIRequest {
   players?: string[];
@@ -67,6 +67,7 @@ export interface CreateTurnAPIResponse {
 interface ResumePollResponse {
   result: "RESUME";
   gameState: GameState;
+  playerStates: PlayerStateMap;
 }
 
 interface WaitPollResponse {
