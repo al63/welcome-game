@@ -3,9 +3,14 @@ import { House, PlayerState } from "@/app/util/PlayerTypes";
 import { useGameStateMachineDispatch } from "./GameStateMachineContext";
 import { placeHouse } from "./GameStateMachineActions";
 
+export interface PendingInfo {
+  column: number;
+  house: House;
+}
+
 interface Buildable {
   buildableHouses?: Array<Set<number>>;
-  pendingHouses?: Array<Set<number>>;
+  pendingHouses?: Array<Array<PendingInfo>>;
   onBuild?: (position: number[]) => void;
 }
 
@@ -30,9 +35,9 @@ export function useBuildableLocations(step: GameStep, playerState: PlayerState, 
         dispatch(res);
       },
     };
-  } else if (step.type === "estate") {
-    const pendingHouses = [new Set<number>(), new Set<number>(), new Set<number>()];
-    pendingHouses[step.position[0]].add(step.position[1]);
+  } else if (step.type === "estate" || step.type === "chooseBis") {
+    const pendingHouses: Array<Array<PendingInfo>> = [[], [], []];
+    pendingHouses[step.position[0]].push({ column: step.position[1], house: step.house });
     return {
       pendingHouses,
     };

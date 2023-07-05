@@ -2,7 +2,7 @@ import { chooseCard } from "../../GameStateMachineActions";
 import { useGameStateMachineDispatch } from "../../GameStateMachineContext";
 import { CancelButton } from "./CancelButton";
 
-export function ChooseBIS({ value }: { value: number }) {
+export function ChooseBIS() {
   const dispatch = useGameStateMachineDispatch();
   return (
     <div>

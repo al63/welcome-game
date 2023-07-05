@@ -43,7 +43,7 @@ function StepInstructions({ step }: { step: GameStep }) {
 function StepActions({ step, gameState }: { step: GameStep; gameState: GameState }) {
   switch (step.type) {
     case "chooseBis":
-      return <ChooseBIS value={step.cardValue} />;
+      return <ChooseBIS />;
     case "estate":
       return <RealEstateModifier step={step} />;
     case "temp":

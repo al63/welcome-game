@@ -3,7 +3,7 @@ import { House } from "@/app/util/PlayerTypes";
 import classNames from "classnames";
 import React from "react";
 import { useGameStateMachineContext } from "../../GameStateMachineContext";
-import { useBuildableLocations } from "../../useBuildableLocations";
+import { PendingInfo, useBuildableLocations } from "../../useBuildableLocations";
 
 interface ParksProgressProps {
   scores: number[];
@@ -46,18 +46,20 @@ interface CellProps {
   buildable?: boolean;
   pool?: boolean;
   onClick?: () => void;
-  pendingHouse?: boolean;
+  pendingHouse?: PendingInfo;
 }
 
 function Cell({ house, pool, mini, buildable, onClick, pendingHouse }: CellProps) {
   const occupied = house != null;
+  const renderedHouse = house || pendingHouse?.house;
+
   return (
     <div
       className={classNames("border relative flex justify-center items-center", {
         "bg-gray-100": occupied && !buildable,
         "bg-white": !occupied && !buildable,
         "bg-green-300 hover:bg-green-400 cursor-pointer": buildable,
-        "bg-green-400": pendingHouse,
+        "bg-green-100": pendingHouse,
         "border-t-black border-t-2": house?.usedForPlan,
         "w-6 h-6": mini,
         "w-12 h-12": !mini,
@@ -65,7 +67,7 @@ function Cell({ house, pool, mini, buildable, onClick, pendingHouse }: CellProps
       onClick={onClick}
     >
       {pool && !mini ? <div className="bg-blue-500 w-2 h-2 top-1 right-1 absolute" /> : null}
-      {house != null ? <House house={house} showModifiers={!mini} /> : null}
+      {renderedHouse != null ? <House house={renderedHouse} showModifiers={!mini} /> : null}
     </div>
   );
 }
@@ -93,7 +95,7 @@ interface RowProps {
   mini: boolean;
   buildableLocations?: Set<number>;
   onBuild?: (index: number) => void;
-  pendingHouses?: Set<number>;
+  pendingHouses?: Array<PendingInfo>;
 }
 
 function UserNeighborhood({ config, houses, fences, mini, buildableLocations, onBuild, pendingHouses }: RowProps) {
@@ -113,7 +115,7 @@ function UserNeighborhood({ config, houses, fences, mini, buildableLocations, on
         {houses.map((house, index) => {
           const fenceAfter = index < fences.length && fences[index];
           const buildable = buildableLocations?.has(index);
-          const pendingHouse = pendingHouses?.has(index);
+          const pendingHouse = pendingHouses?.find((pending) => pending.column === index);
           return (
             <div className="flex" key={index}>
               <Cell
