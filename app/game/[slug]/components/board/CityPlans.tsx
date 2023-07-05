@@ -1,7 +1,7 @@
 import { PlanCard } from "@/app/util/CardTypes";
 import classNames from "classnames";
 import React from "react";
-import { useGameStateMachineContext } from "./GameStateMachineContext";
+import { useGameStateMachineContext } from "../../GameStateMachineContext";
 
 function Requirement({ size, quantity }: { size: number; quantity: number }) {
   const cells = [];

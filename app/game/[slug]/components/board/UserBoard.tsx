@@ -1,5 +1,5 @@
 import { UserCity } from "./UserCity";
-import { UserScoreSheet } from "./UserScoreSheet";
+import { UserScoreSheet } from "../UserScoreSheet";
 import { CityPlans } from "./CityPlans";
 
 interface Props {

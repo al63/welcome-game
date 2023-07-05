@@ -1,11 +1,11 @@
 "use client";
 
-import { UserBoard } from "./UserBoard";
-import { PlayersGrid } from "./PlayersGrid";
+import { UserBoard } from "./components/board/UserBoard";
+import { PlayersGrid } from "./components/PlayersGrid";
 import { PlayerStates } from "@/app/util/PlayerTypes";
 import React from "react";
-import { EventLog } from "./EventLog";
-import { Step } from "./Step";
+import { EventLog } from "./components/EventLog";
+import { Step } from "./components/steps/Step";
 import { GameState } from "@/app/util/GameTypes";
 import { GameStateMachineProvider } from "./GameStateMachineContext";
 

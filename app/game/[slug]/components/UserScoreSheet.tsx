@@ -10,7 +10,7 @@ import {
 import { computeScore } from "@/app/util/Scoring";
 import classNames from "classnames";
 import React from "react";
-import { useGameStateMachineContext } from "./GameStateMachineContext";
+import { useGameStateMachineContext } from "../GameStateMachineContext";
 
 function Divider({ symbol }: { symbol: string }) {
   return <div className="mb-20 text-xl font-bold">{symbol}</div>;

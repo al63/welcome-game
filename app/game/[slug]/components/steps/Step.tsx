@@ -1,10 +1,10 @@
 import { GameStep } from "@/app/util/GameStateMachineTypes";
 import { Cards } from "./Cards";
-import { useGameStateMachineContext, useGameStateMachineDispatch } from "./GameStateMachineContext";
+import { useGameStateMachineContext } from "../../GameStateMachineContext";
 import { modifierDisplayName } from "./Card";
 import { GameState } from "@/app/util/GameTypes";
-import { cancelAction } from "./GameStateMachineActions";
 import { TempAgencyModifier } from "./TempAgencyModifier";
+import { CancelButton } from "./CancelButton";
 
 function StepInstructions({ step }: { step: GameStep }) {
   switch (step.type) {
@@ -30,15 +30,6 @@ function StepInstructions({ step }: { step: GameStep }) {
     default:
       return `oh no something bad happened on step: ${step.type}`;
   }
-}
-
-function CancelButton() {
-  const dispatch = useGameStateMachineDispatch();
-  return (
-    <button className="px-8 py-2 rounded-full bg-red-200 hover:bg-red-300" onClick={() => dispatch(cancelAction())}>
-      Cancel
-    </button>
-  );
 }
 
 function StepActions({ step, gameState }: { step: GameStep; gameState: GameState }) {

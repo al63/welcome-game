@@ -1,7 +1,7 @@
 import { GameCard, GameCardType } from "@/app/util/CardTypes";
 import { Card, modifierDisplayName } from "./Card";
-import { useGameStateMachineDispatch } from "./GameStateMachineContext";
-import { chooseCard } from "./GameStateMachineActions";
+import { useGameStateMachineDispatch } from "../../GameStateMachineContext";
+import { chooseCard } from "../../GameStateMachineActions";
 
 interface CardsProps {
   revealedCardValues: Array<GameCard>;

@@ -1,6 +1,7 @@
 import React from "react";
-import { useGameStateMachineDispatch } from "./GameStateMachineContext";
-import { chooseTempAgencyModifier } from "./GameStateMachineActions";
+import { useGameStateMachineDispatch } from "../../GameStateMachineContext";
+import { chooseTempAgencyModifier } from "../../GameStateMachineActions";
+import { CancelButton } from "./CancelButton";
 
 export function TempAgencyModifier({ value }: { value: number }) {
   const dispatch = useGameStateMachineDispatch();
@@ -23,5 +24,10 @@ export function TempAgencyModifier({ value }: { value: number }) {
     return res;
   }, [dispatch, value]);
 
-  return <div className="flex">{options}</div>;
+  return (
+    <div className="flex flex-col items-start">
+      <div className="flex mb-2">{options}</div>
+      <CancelButton />
+    </div>
+  );
 }

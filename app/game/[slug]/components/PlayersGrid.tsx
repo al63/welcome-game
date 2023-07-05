@@ -1,5 +1,5 @@
-import { MiniUserCity } from "./UserCity";
-import { useGameStateMachineContext } from "./GameStateMachineContext";
+import { MiniUserCity } from "./board/UserCity";
+import { useGameStateMachineContext } from "../GameStateMachineContext";
 import classNames from "classnames";
 import React from "react";
 

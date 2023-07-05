@@ -2,8 +2,8 @@ import { Neighborhood, ROW_ONE, ROW_THREE, ROW_TWO } from "@/app/util/Neighborho
 import { House } from "@/app/util/PlayerTypes";
 import classNames from "classnames";
 import React from "react";
-import { useGameStateMachineContext } from "./GameStateMachineContext";
-import { useBuildableLocations } from "./useBuildableLocations";
+import { useGameStateMachineContext } from "../../GameStateMachineContext";
+import { useBuildableLocations } from "../../useBuildableLocations";
 
 interface ParksProgressProps {
   scores: number[];
@@ -33,7 +33,7 @@ function ParksProgress({ scores, count }: ParksProgressProps) {
 
 function House({ house, showModifiers }: { house: House; showModifiers: boolean }) {
   return (
-    <div className="flex flex-col text-xs items-center">
+    <div className="flex flex-col text-sm items-center">
       <div>{house.value}</div>
       {showModifiers && house.modifier === "BIS" ? <div>BIS</div> : null}
     </div>
