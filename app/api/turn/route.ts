@@ -194,6 +194,7 @@ export function validateCityPlanCompletion(playerState: PlayerState, plans: Plan
     // update house rows to be used for plans
     if (planCompleted) {
       plan.requirements.forEach(function (req) {
+        const size = req.size - 1;
         // look at each size of estates
         const estatesBucket = combined[size];
         // filter out arrays already being used for plans

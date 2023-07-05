@@ -1,4 +1,4 @@
-import { GameState, PlayerScores } from "@/app/util/GameTypes";
+import { GameState, PlayerMetadataMap } from "@/app/util/GameTypes";
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
 import { CreateGameAPIRequest, CreateGameResponse } from "../models";
@@ -25,19 +25,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json("Failed to create game", { status: 500 });
     }
     const gameId = generateGameId();
-    const seedDate: number = new Date().getMilliseconds();
+    const seedDate: number = new Date().getTime();
     const shuffledDeck = shuffleWithSeedAndDrawOffset(seedDate, 1);
     const activeCards: ActiveCards = drawCards(shuffledDeck);
+    const playerMap: PlayerMetadataMap = Object.assign(
+      {},
+      ...req.players.map((id) => ({ [id]: { score: 0, turn: 1 } }))
+    );
     const gameObj: GameState = {
       id: gameId,
       seed: seedDate,
       seedOffset: 1,
       revealedCardValues: activeCards.revealedNumbers,
       revealedCardModifiers: activeCards.revealedModifiers.map((gameCard) => gameCard.backingType),
-      players: req.players.reduce<PlayerScores>((accum, cur) => {
-        accum[cur] = 0;
-        return accum;
-      }, {}),
+      players: playerMap,
       plans: drawPlans(),
       turn: 1,
       active: true,
