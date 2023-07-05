@@ -49,11 +49,6 @@ dummy.housesRowOne[6] = {
   value: 6,
   modifier: "TEMP",
 };
-dummy.housesRowOne[9] = {
-  value: 10,
-  modifier: "FENCE",
-  usedForPlan: false,
-};
 dummy.housesRowTwo[1] = {
   value: 2,
   modifier: "TEMP",

@@ -46,9 +46,21 @@ export function useHighlightedLocations(viewedPlayerId: string): Buildable | nul
     };
   } else if (step.type === "chooseBis") {
     const duplicableHouses = [
-      findDuplicableColumns(playerState.housesRowOne, step.position[0] === 0 ? step.position[1] : null),
-      findDuplicableColumns(playerState.housesRowTwo, step.position[0] === 1 ? step.position[1] : null),
-      findDuplicableColumns(playerState.housesRowThree, step.position[0] === 2 ? step.position[1] : null),
+      findDuplicableColumns(
+        playerState.housesRowOne,
+        playerState.fencesRowOne,
+        step.position[0] === 0 ? step.position[1] : null
+      ),
+      findDuplicableColumns(
+        playerState.housesRowTwo,
+        playerState.fencesRowTwo,
+        step.position[0] === 1 ? step.position[1] : null
+      ),
+      findDuplicableColumns(
+        playerState.housesRowThree,
+        playerState.fencesRowThree,
+        step.position[0] === 2 ? step.position[1] : null
+      ),
     ];
     const pendingHouses: Array<Array<PendingInfo>> = [[], [], []];
     pendingHouses[step.position[0]].push({ column: step.position[1], house: step.house });
@@ -79,8 +91,9 @@ export function useHighlightedLocations(viewedPlayerId: string): Buildable | nul
 
     const dupeLocation = step.duplicateLocation;
     const row = [playerState.housesRowOne, playerState.housesRowTwo, playerState.housesRowThree][dupeLocation[0]];
+    const fences = [playerState.fencesRowOne, playerState.fencesRowTwo, playerState.fencesRowThree][dupeLocation[0]];
     const pendingPosition = dupeLocation[0] === step.position[0] ? step.position[1] : null;
-    const locations = findDuplicatesLocations(row, pendingPosition, dupeLocation[1]);
+    const locations = findDuplicatesLocations(row, fences, pendingPosition, dupeLocation[1]);
 
     return {
       highlightedColumns: [
@@ -145,15 +158,31 @@ function findBuildableFences(fences: boolean[], houses: Array<House | null>) {
   return set;
 }
 
-function findDuplicatesLocations(row: Array<House | null>, pendingPosition: number | null, duplicatePosition: number) {
-  // we can either place to the left or right of the duplicate position, as long as there is nothing else there already
+function findDuplicatesLocations(
+  row: Array<House | null>,
+  fences: boolean[],
+  pendingPosition: number | null,
+  duplicatePosition: number
+) {
+  // we can either place to the left or right of the duplicate position if:
+  //  1) the house is empty
+  //  2) no fence is in the way
+
+  if (fences.length + 1 !== row.length) {
+    throw "unexpected fence / house length combination";
+  }
 
   const leftAvailable =
-    duplicatePosition > 0 && row[duplicatePosition - 1] == null && pendingPosition !== duplicatePosition - 1;
+    duplicatePosition > 0 &&
+    row[duplicatePosition - 1] == null &&
+    pendingPosition !== duplicatePosition - 1 &&
+    !fences[duplicatePosition - 1];
+
   const rightAvailable =
     duplicatePosition < row.length - 1 &&
     row[duplicatePosition + 1] == null &&
-    pendingPosition !== duplicatePosition + 1;
+    pendingPosition !== duplicatePosition + 1 &&
+    !fences[duplicatePosition];
 
   const set = new Set<number>();
   if (leftAvailable) {
@@ -165,15 +194,25 @@ function findDuplicatesLocations(row: Array<House | null>, pendingPosition: numb
   return set;
 }
 
-function findDuplicableColumns(row: Array<House | null>, pendingPosition: number | null): Set<number> {
+function findDuplicableColumns(
+  row: Array<House | null>,
+  fences: boolean[],
+  pendingPosition: number | null
+): Set<number> {
   // TODO: you aren't actually allowed to place the dupe house if a fence is in between: <15> | <15 BIS> is not allowed
+  // For the BIS action, we can duplicate any house if:
+  //  1) There is an adjacent empty space.
+  //  2) Said adjacent empty space isn't cut off by a fence
 
-  // look for any house that has an adjacent empty location
+  if (fences.length + 1 !== row.length) {
+    throw "unexpected fence / house length combination";
+  }
+
   const set = new Set<number>();
   for (let i = 0; i < row.length; i++) {
     if (row[i] != null || pendingPosition === i) {
-      const leftAvailable = i > 0 && row[i - 1] == null && pendingPosition !== i - 1;
-      const rightAvailable = i < row.length - 1 && row[i + 1] == null && pendingPosition !== i + 1;
+      const leftAvailable = i > 0 && row[i - 1] == null && pendingPosition !== i - 1 && !fences[i - 1];
+      const rightAvailable = i < row.length - 1 && row[i + 1] == null && pendingPosition !== i + 1 && !fences[i];
       if (leftAvailable || rightAvailable) {
         set.add(i);
       }
