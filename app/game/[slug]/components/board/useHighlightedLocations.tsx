@@ -9,6 +9,7 @@ export interface PendingInfo {
 
 interface Buildable {
   highlightedColumns?: Array<Set<number>>;
+  highlightedFences?: Array<Set<number>>;
   pendingHouses?: Array<Array<PendingInfo>>;
   onChosen?: (position: number[]) => void;
 }
@@ -101,9 +102,41 @@ export function useHighlightedLocations(viewedPlayerId: string): Buildable | nul
     return {
       pendingHouses,
     };
+  } else if (step.type === "fence") {
+    return {
+      highlightedFences: [
+        findBuildableFences(playerState.fencesRowOne, playerState.housesRowOne),
+        findBuildableFences(playerState.fencesRowTwo, playerState.housesRowTwo),
+        findBuildableFences(playerState.fencesRowThree, playerState.housesRowThree),
+      ],
+    };
   }
 
   return null;
+}
+
+function findBuildableFences(fences: boolean[], houses: Array<House | null>) {
+  // house of index i is right before fence of index i: house[0] fence[0] house[1] fence[1] house[2]
+  // there is an implied ending fence and implied starting fence, so fence length is 1 less
+  if (fences.length + 1 !== houses.length) {
+    throw "unexpected fence / house length combination";
+  }
+
+  // A fence is placeable at index i if:
+  // 1) fences[i] === false
+  // 2) this doesn't cut through a completed plan: houses[i].usedForPlan === false is good enough
+  // 3) this doesn't separate a house from it's BIS
+  const set = new Set<number>();
+  for (let i = 0; i < fences.length; i++) {
+    const fencePlaced = !!fences[i];
+    const splitsPlan = !!houses[i]?.usedForPlan;
+    const splitsBIS = houses[i] != null && houses[i + 1] != null && houses[i]?.value === houses[i + 1]?.value;
+    if (!fencePlaced && !splitsPlan && !splitsBIS) {
+      set.add(i);
+    }
+  }
+
+  return set;
 }
 
 function findDuplicatesLocations(row: Array<House | null>, pendingPosition: number | null, duplicatePosition: number) {
@@ -127,6 +160,8 @@ function findDuplicatesLocations(row: Array<House | null>, pendingPosition: numb
 }
 
 function findDuplicableColumns(row: Array<House | null>, pendingPosition: number | null): Set<number> {
+  // TODO: you aren't actually allowed to place the dupe house if a fence is in between: <15> | <15 BIS> is not allowed
+
   // look for any house that has an adjacent empty location
   const set = new Set<number>();
   for (let i = 0; i < row.length; i++) {

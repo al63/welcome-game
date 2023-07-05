@@ -33,29 +33,28 @@ function reduceChoseAction(state: GameStateMachine, action: ChoseCardAction): Ga
 }
 
 function reducePlacedCardAction(state: GameStateMachine, action: PlacedCardAction): GameStateMachine {
+  let type: "chooseBis" | "estate" | "fence";
+
   switch (action.followUp) {
     case "BIS":
-      return {
-        ...state,
-        step: {
-          type: "chooseBis",
-          house: action.house,
-          position: action.position,
-        },
-      };
+      type = "chooseBis";
+      break;
     case "ESTATE":
-      return {
-        ...state,
-        step: {
-          type: "estate",
-          house: action.house,
-          position: action.position,
-        },
-      };
+      type = "estate";
+      break;
     case "FENCE":
-      // TODO:
-      return state;
+      type = "fence";
+      break;
   }
+
+  return {
+    ...state,
+    step: {
+      type,
+      house: action.house,
+      position: action.position,
+    },
+  };
 }
 
 export function gameStateMachineReducer(state: GameStateMachine, action: GameStateMachineAction): GameStateMachine {

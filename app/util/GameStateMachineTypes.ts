@@ -12,14 +12,6 @@ interface TempAgencyStep {
   cardValue: number;
 }
 
-interface FenceStep {
-  type: "fence";
-}
-
-interface PlaceFenceStep {
-  type: "placeFence";
-}
-
 export interface PlaceCardStep {
   type: "placeCard";
   cardValue: number;
@@ -30,6 +22,7 @@ export interface PlaceCardStep {
 interface WaitStep {
   type: "wait";
 }
+
 export interface RealEstateStep {
   type: "estate";
   position: number[];
@@ -50,6 +43,12 @@ interface PlaceBISStep {
   duplicateLocation: number[];
 }
 
+interface FenceStep {
+  type: "fence";
+  position: number[];
+  house: House;
+}
+
 export type GameStep =
   | ChooseCardStep
   | BISStep
@@ -57,7 +56,6 @@ export type GameStep =
   | TempAgencyStep
   | RealEstateStep
   | FenceStep
-  | PlaceFenceStep
   | PlaceCardStep
   | WaitStep;
 

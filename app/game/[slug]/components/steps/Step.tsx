@@ -10,14 +10,16 @@ import { ChooseBIS } from "./ChooseBIS";
 
 function StepInstructions({ step }: { step: GameStep }) {
   switch (step.type) {
+    case "fence":
+      return "Choose on your board the location to place the fence";
     case "placeBis":
-      return "Choose on your board the location of the duplicated house.";
+      return "Choose on your board the location to place the duplicated house";
     case "chooseBis":
       return "Choose a house on your board duplicate with the BIS effect";
     case "estate":
       return "Increase the value for estates of size:";
     case "temp":
-      return "Choose what value to modify the selected card to:";
+      return "Modify the selected card with a Temp Agency to:";
     case "placeCard":
       return (
         <>
@@ -38,7 +40,7 @@ function StepInstructions({ step }: { step: GameStep }) {
         </p>
       );
     default:
-      return `oh no something bad happened on step: ${step.type}`;
+      throw "unhandled step in instrutions";
   }
 }
 

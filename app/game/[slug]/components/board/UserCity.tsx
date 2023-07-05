@@ -71,13 +71,20 @@ function Cell({ house, pool, mini, highlighted, onClick, pendingHouse }: CellPro
   );
 }
 
-function Fence({ mini, active }: { mini: boolean; active: boolean }) {
+interface FenceProps {
+  mini: boolean;
+  active: boolean;
+  highlighted?: boolean;
+}
+
+function Fence({ mini, active, highlighted }: FenceProps) {
   return (
     <div
       className={classNames(
         {
-          "border-black": active,
-          "border-transparent": !active,
+          "border-black": active && !highlighted,
+          "border-transparent": !active && !highlighted,
+          "border-green-300 hover:bg-green-400 cursor-pointer": highlighted,
           "h-6": mini,
           "h-12": !mini,
         },
@@ -95,9 +102,19 @@ interface RowProps {
   highlightedColumns?: Set<number>;
   onClick?: (column: number) => void;
   pendingHouses?: Array<PendingInfo>;
+  highlightedFences?: Set<number>;
 }
 
-function UserNeighborhood({ config, houses, fences, mini, highlightedColumns, onClick, pendingHouses }: RowProps) {
+function UserNeighborhood({
+  config,
+  houses,
+  fences,
+  mini,
+  highlightedColumns,
+  onClick,
+  pendingHouses,
+  highlightedFences,
+}: RowProps) {
   const numGardens = React.useMemo(() => {
     return houses.filter((house) => house?.modifier === "GARDEN").length;
   }, [houses]);
@@ -114,6 +131,7 @@ function UserNeighborhood({ config, houses, fences, mini, highlightedColumns, on
         {houses.map((house, index) => {
           const fenceAfter = index < fences.length && fences[index];
           const highlighted = highlightedColumns?.has(index);
+          const highlightedFence = highlightedFences?.has(index);
           const pendingHouse = pendingHouses?.find((pending) => pending.column === index);
           return (
             <div className="flex" key={index}>
@@ -125,7 +143,9 @@ function UserNeighborhood({ config, houses, fences, mini, highlightedColumns, on
                 onClick={highlighted ? () => onClick?.(index) : undefined}
                 pendingHouse={pendingHouse}
               />
-              {index < houses.length - 1 ? <Fence active={fenceAfter} mini={mini} /> : null}
+              {index < houses.length - 1 ? (
+                <Fence active={fenceAfter} mini={mini} highlighted={highlightedFence} />
+              ) : null}
             </div>
           );
         })}
@@ -156,6 +176,7 @@ export function UserCity({ viewedPlayerId }: CityProps) {
         houses={viewedPlayerState.housesRowOne}
         fences={viewedPlayerState.fencesRowOne}
         highlightedColumns={highlighted?.highlightedColumns?.[0]}
+        highlightedFences={highlighted?.highlightedFences?.[0]}
         mini={false}
         onClick={(column) => onClick(0, column)}
         pendingHouses={highlighted?.pendingHouses?.[0]}
@@ -165,6 +186,7 @@ export function UserCity({ viewedPlayerId }: CityProps) {
         houses={viewedPlayerState.housesRowTwo}
         fences={viewedPlayerState.fencesRowTwo}
         highlightedColumns={highlighted?.highlightedColumns?.[1]}
+        highlightedFences={highlighted?.highlightedFences?.[1]}
         mini={false}
         onClick={(column) => onClick(1, column)}
         pendingHouses={highlighted?.pendingHouses?.[1]}
@@ -174,6 +196,7 @@ export function UserCity({ viewedPlayerId }: CityProps) {
         houses={viewedPlayerState.housesRowThree}
         fences={viewedPlayerState.fencesRowThree}
         highlightedColumns={highlighted?.highlightedColumns?.[2]}
+        highlightedFences={highlighted?.highlightedFences?.[2]}
         mini={false}
         onClick={(column) => onClick(2, column)}
         pendingHouses={highlighted?.pendingHouses?.[2]}
