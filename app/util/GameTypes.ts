@@ -1,7 +1,11 @@
 import { GameCard, GameCardType, PlanCard } from "./CardTypes";
 
-export interface PlayerScores {
-  [player: string]: number | null;
+interface PlayerMetadata {
+  score: number;
+  turn: number;
+}
+export interface PlayerMetadataMap {
+  [player: string]: PlayerMetadata;
 }
 
 export interface GameState {
@@ -10,8 +14,9 @@ export interface GameState {
   seedOffset: number;
   revealedCardValues: Array<GameCard>;
   revealedCardModifiers: Array<GameCardType>;
-  players: PlayerScores;
+  players: PlayerMetadataMap;
   plans: Array<PlanCard>;
   turn: number;
-  active: boolean;
+  completed: boolean;
+  eventLog: string[][];
 }

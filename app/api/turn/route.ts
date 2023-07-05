@@ -55,26 +55,40 @@ export async function POST(request: NextRequest) {
     }
     // Build the update request body for the player
     const newPlayerState = consolidateUpdate(req.action, playerState, gameState.plans);
-    const filter: Filter<Document> = { gameId: req.gameId, playerId: req.playerId };
-    const body: UpdateFilter<Document> = {
+    const playerFilter: Filter<Document> = { gameId: req.gameId, playerId: req.playerId };
+    const playerBody: UpdateFilter<Document> = {
       $set: {
         ...newPlayerState,
       },
     };
 
-    const res = await db.collection("player_states").updateOne(filter, body);
-    if (res.matchedCount != 1) {
+    const playerRes = await db.collection("player_states").updateOne(playerFilter, playerBody);
+    if (playerRes.matchedCount != 1) {
       return NextResponse.json("Did not find any player state matching the given parameters", { status: 500 });
     }
-    if (res.modifiedCount != 1) {
+    if (playerRes.modifiedCount != 1) {
       return NextResponse.json("Unable to update the player state", { status: 500 });
     }
 
     // update game state on completed plans / game end
-    // const newGameState = updateGameState(newPlayerState, gameState);
+    const newGameState = updateGameState(newPlayerState, gameState);
+    const gameFilter: Filter<Document> = { id: gameState.id };
+    const gameBody: UpdateFilter<Document> = {
+      $set: {
+        ...newGameState,
+      },
+    };
+
+    const gameRes = await db.collection("game_states").updateOne(gameFilter, gameBody);
+    if (gameRes.matchedCount != 1) {
+      return NextResponse.json("Did not find any game state matching the given parameters", { status: 500 });
+    }
+    if (gameRes.modifiedCount != 1) {
+      return NextResponse.json("Unable to update the game state", { status: 500 });
+    }
 
     // if it was the last player, increment game state turn
-    return NextResponse.json(newPlayerState, { status: 200 });
+    return NextResponse.json({ gameState: newGameState, playerState: newPlayerState }, { status: 200 });
   } catch (e: any) {
     return NextResponse.json({ error: e.toString() }, { status: 500 });
   }
@@ -194,6 +208,7 @@ export function validateCityPlanCompletion(playerState: PlayerState, plans: Plan
     // update house rows to be used for plans
     if (planCompleted) {
       plan.requirements.forEach(function (req) {
+        const size = req.size - 1;
         // look at each size of estates
         const estatesBucket = combined[size];
         // filter out arrays already being used for plans
@@ -231,6 +246,7 @@ export function validateCityPlanCompletion(playerState: PlayerState, plans: Plan
 
       if (plan.completed) {
         newPlayerState.completedPlans[idx] = plan.secondValue;
+        newPlayerState.lastEvent += " and has completed City Plan " + idx + "!";
       } else {
         newPlayerState.completedPlans[idx] = plan.firstValue;
       }
@@ -240,6 +256,55 @@ export function validateCityPlanCompletion(playerState: PlayerState, plans: Plan
   return newPlayerState;
 }
 
-// function updateGameState(playerState: PlayerState, gameState: GameState): GameState {
-//   return null;
-// }
+function updateGameState(playerState: PlayerState, gameState: GameState): GameState {
+  const newGameState = {
+    ...gameState,
+  };
+  const currentTurn = gameState.turn;
+  const currentTurnLog = gameState.eventLog[currentTurn] || [];
+  currentTurnLog.push(playerState.lastEvent);
+
+  // Update the completed plans for the GameState so that players can determine if
+  // they get first or second score for completing a plan
+  playerState.completedPlans.forEach((_, idx) => {
+    if (gameState.plans[idx].completed != true && playerState.completedPlans[idx] > 0) {
+      newGameState.plans[idx].completed = true;
+      currentTurnLog.push(playerState.playerId + " is the first to complete City Plan " + idx + "!");
+    }
+  });
+
+  // determine if a player has ended the game via completing every single plan
+  const planEndCondition = playerState.completedPlans.every(function (val) {
+    return val > 0;
+  });
+
+  if (planEndCondition) {
+    newGameState.completed = true;
+    currentTurnLog.push(playerState.playerId + " has completed all city plans!");
+  }
+
+  // determine if a player has ended the game via using all of their permit refusals (idx 3)
+  if (playerState.permitRefusals == 3) {
+    newGameState.completed = true;
+    currentTurnLog.push(playerState.playerId + " has used all of their permit refusals!");
+  }
+
+  // Advance the GameState turn if all players have taken the current GameState turn and the game isn't over
+  if (!newGameState.completed) {
+    const nextTurn = gameState.turn + 1;
+    newGameState.players[playerState.playerId]["turn"]++;
+    const advanceTurn = Object.keys(newGameState.players).every(function (e) {
+      return newGameState.players[e].turn == nextTurn;
+    });
+    if (advanceTurn) {
+      const newTurnEventLog: string[] = ["All players have taken their turn!", "Turn " + nextTurn + " has begun."];
+      newGameState.turn++;
+      newGameState.eventLog[nextTurn] = newTurnEventLog;
+    }
+  } else {
+    currentTurnLog.push("The game is over! Calculating scores...");
+  }
+
+  newGameState.eventLog[currentTurn] = currentTurnLog;
+  return newGameState;
+}
