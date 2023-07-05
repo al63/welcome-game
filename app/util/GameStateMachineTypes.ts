@@ -36,7 +36,7 @@ export interface RealEstateStep {
   house: House;
 }
 
-interface BISStep {
+export interface BISStep {
   type: "chooseBis";
   position: number[];
   house: House;
@@ -46,7 +46,7 @@ interface PlaceBISStep {
   type: "placeBis";
   position: number[];
   house: House;
-  duplicateHouse: House;
+  duplicateValue: number;
   duplicateLocation: number[];
 }
 
@@ -77,6 +77,14 @@ export interface TempAgencyModifierChosenAction {
   cardValue: number;
 }
 
+export interface ChoseBISAction {
+  type: "choseBis";
+  position: number[];
+  house: House;
+  duplicatePosition: number[];
+  duplicateValue: number;
+}
+
 export interface ChoseCardAction {
   type: "choseCard";
   cardValue: number;
@@ -99,4 +107,5 @@ export type GameStateMachineAction =
   | TempAgencyModifierChosenAction
   | ChoseCardAction
   | PlacedCardAction
+  | ChoseBISAction
   | SubmitAction;

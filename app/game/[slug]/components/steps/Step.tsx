@@ -10,6 +10,8 @@ import { ChooseBIS } from "./ChooseBIS";
 
 function StepInstructions({ step }: { step: GameStep }) {
   switch (step.type) {
+    case "placeBis":
+      return "Choose on your board where to place the duplicated house.";
     case "chooseBis":
       return "Choose a location on your board to take the BIS effect (duplicate and place an adjacent home).";
     case "estate":

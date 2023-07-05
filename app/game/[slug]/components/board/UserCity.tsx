@@ -145,7 +145,7 @@ export function UserCity({ viewedPlayerId }: CityProps) {
   const buildable = useBuildableLocations(step, viewedPlayerState, playerId);
 
   const onClick = (row: number, column: number) => {
-    buildable?.onBuild?.([row, column]);
+    buildable?.onChosen?.([row, column]);
   };
 
   return (

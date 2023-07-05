@@ -60,6 +60,18 @@ function reducePlacedCardAction(state: GameStateMachine, action: PlacedCardActio
 
 export function gameStateMachineReducer(state: GameStateMachine, action: GameStateMachineAction): GameStateMachine {
   switch (action.type) {
+    case "choseBis": {
+      return {
+        ...state,
+        step: {
+          type: "placeBis",
+          position: action.position,
+          house: action.house,
+          duplicateLocation: action.duplicatePosition,
+          duplicateValue: action.duplicateValue,
+        },
+      };
+    }
     case "tempAgencyModifierChosen": {
       return {
         ...state,

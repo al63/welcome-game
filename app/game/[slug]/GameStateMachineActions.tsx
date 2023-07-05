@@ -1,7 +1,9 @@
 import { CreateTurnAPIRequest } from "@/app/api/models";
 import { GameCardType } from "@/app/util/CardTypes";
 import {
+  BISStep,
   CancelAction,
+  ChoseBISAction,
   ChoseCardAction,
   PlaceCardStep,
   PlacedCardAction,
@@ -26,6 +28,16 @@ export function cancelAction(): CancelAction {
 
 export function chooseTempAgencyModifier(cardValue: number): TempAgencyModifierChosenAction {
   return { type: "tempAgencyModifierChosen", cardValue };
+}
+
+export function chooseBIS(duplicatePosition: number[], duplicateValue: number, step: BISStep): ChoseBISAction {
+  return {
+    type: "choseBis",
+    position: step.position,
+    house: step.house,
+    duplicatePosition,
+    duplicateValue,
+  };
 }
 
 export async function placeHouse(position: number[], step: PlaceCardStep): Promise<PlacedCardAction | SubmitAction> {
