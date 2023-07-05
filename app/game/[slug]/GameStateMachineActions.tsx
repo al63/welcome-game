@@ -8,7 +8,6 @@ import {
   GameStateMachineAction,
   PlaceCardStep,
   PlacedCardAction,
-  SubmitAction,
   TempAgencyModifierChosenAction,
 } from "@/app/util/GameStateMachineTypes";
 import { GameState } from "@/app/util/GameTypes";
