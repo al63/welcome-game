@@ -101,7 +101,7 @@ function consolidateUpdate(action: TurnAction, playerState: PlayerState, plans: 
       }
       break;
     case "estate":
-      newPlayerState.estateModifiers[action.sizeIncreased]++;
+      newPlayerState.estateModifiers[action.sizeIncreased - 1]++;
       break;
     case "bis":
       if (action.bisPosition[0] == 0) {
