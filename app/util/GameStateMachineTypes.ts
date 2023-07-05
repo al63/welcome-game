@@ -53,6 +53,10 @@ export interface FenceStep {
   house: House;
 }
 
+export interface CompletedStep {
+  type: "completed";
+}
+
 export type GameStep =
   | ChooseCardStep
   | BISStep
@@ -62,7 +66,8 @@ export type GameStep =
   | FenceStep
   | PlaceCardStep
   | WaitStep
-  | ErrorStep;
+  | ErrorStep
+  | CompletedStep;
 
 export interface GameStateMachine {
   playerId: string;
@@ -117,6 +122,7 @@ export interface ErrorAction {
 export interface ResumeAction {
   type: "resume";
   gameState: GameState;
+  playerStates: PlayerStateMap;
 }
 
 export type GameStateMachineAction =

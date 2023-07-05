@@ -8,9 +8,12 @@ import { CancelButton } from "./CancelButton";
 import { RealEstateModifier } from "./RealEstateModifier";
 import { ChooseBIS } from "./ChooseBIS";
 import { PlaceFence } from "./PlaceFence";
+import { GameFinished } from "./GameFinished";
 
 function StepInstructions({ step }: { step: GameStep }) {
   switch (step.type) {
+    case "completed":
+      return null;
     case "error":
       return "Something went horribly wrong - try refreshing your browser";
     case "fence":
@@ -49,6 +52,8 @@ function StepInstructions({ step }: { step: GameStep }) {
 
 function StepActions({ step, gameState, playerId }: { step: GameStep; gameState: GameState; playerId: string }) {
   switch (step.type) {
+    case "completed":
+      return <GameFinished />;
     case "fence":
       return <PlaceFence gameState={gameState} playerId={playerId} step={step} />;
     case "chooseBis":

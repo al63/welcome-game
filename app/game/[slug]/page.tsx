@@ -1,130 +1,6 @@
-import { GameCard, GameCardType } from "@/app/util/CardTypes";
 import Game from "./components/Game";
-import { drawPlans } from "@/app/api/utils/PlanDeck";
 import { getGameServerAction } from "@/app/api/game/getGame";
-import { validateCityPlanCompletion } from "@/app/api/turn/route";
-import { GameState } from "@/app/util/GameTypes";
-
-const dummy = {
-  playerId: "bob",
-  gameId: "bub",
-  score: 12,
-  turn: 10,
-  housesRowOne: new Array(10).fill(null),
-  housesRowTwo: new Array(11).fill(null),
-  housesRowThree: new Array(12).fill(null),
-  fencesRowOne: [true, false, false, true, true, false, false, false, true],
-  fencesRowTwo: new Array(10).fill(false),
-  fencesRowThree: new Array(11).fill(false),
-  completedPlans: [0, 0, 0],
-  estateModifiers: [1, 0, 2, 3, 4, 4],
-  permitRefusals: 2,
-};
-
-dummy.housesRowOne[1] = {
-  value: 4,
-  modifier: "TEMP",
-  usedForPlan: true,
-};
-
-dummy.housesRowOne[2] = {
-  value: 5,
-  modifier: "GARDEN",
-  usedForPlan: true,
-};
-dummy.housesRowOne[3] = {
-  value: 6,
-  modifier: "TEMP",
-  usedForPlan: true,
-};
-dummy.housesRowOne[4] = {
-  value: 6,
-  modifier: "TEMP",
-  usedForPlan: true,
-};
-dummy.housesRowOne[5] = {
-  value: 6,
-  modifier: "TEMP",
-};
-dummy.housesRowOne[6] = {
-  value: 6,
-  modifier: "TEMP",
-};
-dummy.housesRowTwo[1] = {
-  value: 2,
-  modifier: "TEMP",
-};
-dummy.housesRowTwo[2] = {
-  value: 3,
-  modifier: "TEMP",
-};
-dummy.housesRowTwo[3] = {
-  value: 4,
-  modifier: "TEMP",
-};
-dummy.housesRowTwo[4] = {
-  value: 5,
-  modifier: "TEMP",
-};
-dummy.housesRowTwo[5] = {
-  value: 5,
-  modifier: "TEMP",
-};
-dummy.housesRowTwo[6] = {
-  value: 8,
-  modifier: "TEMP",
-};
-
-const dummyStates = {
-  [dummy.playerId]: {
-    ...dummy,
-    cityName: "The Cool Zone",
-    completedPlans: [13, 0, 0],
-    lastEvent: "",
-  },
-  bub: {
-    ...dummy,
-    playerId: "bub",
-    cityName: "BubTown, USA",
-    lastEvent: "",
-  },
-  bubbo: {
-    ...dummy,
-    playerId: "bubbo",
-    cityName: "Bubbolubbo",
-    lastEvent: "",
-  },
-  bibby: {
-    ...dummy,
-    playerId: "bibby",
-    cityName: "The Bibcrib",
-    lastEvent: "",
-  },
-};
-
-const dummyRevealedCardValues: GameCard[] = [
-  { value: 8, backingType: "FENCE" },
-  { value: 5, backingType: "TEMP" },
-  { value: 7, backingType: "GARDEN" },
-];
-const dummyRevealedCardModifiers: GameCardType[] = ["ESTATE", "FENCE", "BIS"];
-const dummyGameState: GameState = {
-  id: "asdf",
-  seed: 123,
-  seedOffset: 0,
-  revealedCardModifiers: dummyRevealedCardModifiers,
-  revealedCardValues: dummyRevealedCardValues,
-  players: {
-    bub: { score: 0, turn: 1 },
-    bob: { score: 0, turn: 1 },
-    bubbo: { score: 0, turn: 1 },
-    bibby: { score: 0, turn: 1 },
-  },
-  plans: drawPlans(),
-  turn: 1,
-  completed: false,
-  latestEventLog: [],
-};
+import { dummyGameState, dummyPlayerStates } from "@/app/util/TestData";
 
 export default async function GamePage({
   params,
@@ -138,10 +14,9 @@ export default async function GamePage({
 
   if (params.slug === "test") {
     res = {
-      playerStates: dummyStates,
+      playerStates: dummyPlayerStates,
       gameState: dummyGameState,
     };
-    validateCityPlanCompletion(dummyStates.bub, dummyGameState.plans);
   } else if (playerId != null) {
     res = await getGameServerAction(params.slug, playerId);
   }

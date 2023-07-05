@@ -113,11 +113,13 @@ export function gameStateMachineReducer(state: GameStateMachine, action: GameSta
         step: { type: "error" },
       };
     case "resume":
+      const completed = action.gameState.completed;
       return {
         ...state,
         gameState: action.gameState,
+        playerStates: action.playerStates,
         step: {
-          type: "choose",
+          type: completed ? "completed" : "choose",
         },
       };
     default:
