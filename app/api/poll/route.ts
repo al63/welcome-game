@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (turn == gameState.turn) {
-      return NextResponse.json<PollTurnAPIResponse>({ result: "RESUME" }, { status: 200 });
+      return NextResponse.json<PollTurnAPIResponse>({ result: "RESUME", gameState }, { status: 200 });
     } else if (turn == gameState.turn + 1) {
       return NextResponse.json<PollTurnAPIResponse>({ result: "WAIT" }, { status: 200 });
     } else {
