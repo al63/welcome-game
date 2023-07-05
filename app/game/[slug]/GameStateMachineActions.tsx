@@ -178,6 +178,7 @@ export async function poll(gameId: string, turn: number) {
         console.log(json);
         dispatch({ type: "error" });
       } else if (json.result === "RESUME") {
+        new Audio("/notification.mp3").play();
         dispatch({ type: "resume", gameState: json.gameState, playerStates: json.playerStates });
       }
     } catch (e) {
