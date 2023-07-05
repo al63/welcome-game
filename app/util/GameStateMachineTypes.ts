@@ -1,28 +1,14 @@
 import { PlayerStateMap } from "../api/models";
 import { GameCardType } from "./CardTypes";
 import { GameState } from "./GameTypes";
-import { PlayerState } from "./PlayerTypes";
+import { House } from "./PlayerTypes";
 
 interface ChooseCardStep {
   type: "choose";
 }
 
-interface BISStep {
-  type: "chooseBis";
-}
-
-interface PlaceBISStep {
-  type: "placeBis";
-  duplicatedCardLocation: number[];
-}
-
 interface TempAgencyStep {
   type: "temp";
-  cardValue: number;
-}
-
-interface RealEstateStep {
-  type: "estate";
   cardValue: number;
 }
 
@@ -34,23 +20,34 @@ interface PlaceFenceStep {
   type: "placeFence";
 }
 
-interface PlaceCardStepCommon {
+export interface PlaceCardStep {
   type: "placeCard";
   cardValue: number;
-  cardType: Extract<GameCardType, "GARDEN" | "POOL" | "TEMP">;
+  cardType: GameCardType;
+  followUp?: "BIS" | "ESTATE" | "FENCE";
 }
-
-interface PlaceCardStepEstate {
-  type: "placeCard";
-  cardValue: number;
-  cardType: Extract<GameCardType, "ESTATE">;
-  sizeIncreased: number;
-}
-
-export type PlaceCardStep = PlaceCardStepCommon | PlaceCardStepEstate;
 
 interface WaitStep {
   type: "wait";
+}
+export interface RealEstateStep {
+  type: "estate";
+  position: number[];
+  house: House;
+}
+
+interface BISStep {
+  type: "chooseBis";
+  position: number[];
+  house: House;
+}
+
+interface PlaceBISStep {
+  type: "placeBis";
+  position: number[];
+  house: House;
+  duplicateHouse: House;
+  duplicateLocation: number[];
 }
 
 export type GameStep =
@@ -80,12 +77,6 @@ export interface TempAgencyModifierChosenAction {
   cardValue: number;
 }
 
-export interface RealEstateModifierChosenAction {
-  type: "estateModifierChosen";
-  cardValue: number;
-  sizeIncreased: number;
-}
-
 export interface ChoseCardAction {
   type: "choseCard";
   cardValue: number;
@@ -94,11 +85,18 @@ export interface ChoseCardAction {
 
 export interface PlacedCardAction {
   type: "placedCard";
+  followUp: "BIS" | "ESTATE" | "FENCE";
+  position: number[];
+  house: House;
+}
+
+export interface SubmitAction {
+  type: "submit";
 }
 
 export type GameStateMachineAction =
   | CancelAction
   | TempAgencyModifierChosenAction
-  | RealEstateModifierChosenAction
   | ChoseCardAction
-  | PlacedCardAction;
+  | PlacedCardAction
+  | SubmitAction;

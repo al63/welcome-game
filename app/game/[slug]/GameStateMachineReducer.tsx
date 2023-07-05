@@ -1,17 +1,12 @@
-import { ChoseCardAction, GameStateMachine, GameStateMachineAction } from "@/app/util/GameStateMachineTypes";
+import {
+  ChoseCardAction,
+  GameStateMachine,
+  GameStateMachineAction,
+  PlacedCardAction,
+} from "@/app/util/GameStateMachineTypes";
 
 function reduceChoseAction(state: GameStateMachine, action: ChoseCardAction): GameStateMachine {
   switch (action.cardType) {
-    case "POOL":
-    case "GARDEN":
-      return {
-        ...state,
-        step: {
-          type: "placeCard",
-          cardValue: action.cardValue,
-          cardType: action.cardType,
-        },
-      };
     case "TEMP":
       return {
         ...state,
@@ -20,39 +15,51 @@ function reduceChoseAction(state: GameStateMachine, action: ChoseCardAction): Ga
           cardValue: action.cardValue,
         },
       };
-    case "ESTATE":
-      return {
-        ...state,
-        step: {
-          type: "estate",
-          cardValue: action.cardValue,
-        },
-      };
-    case "BIS":
-    case "FENCE":
-      // TODO:
-      return {
-        ...state,
-        step: {
-          type: "choose",
-        },
-      };
-  }
-}
-
-export function gameStateMachineReducer(state: GameStateMachine, action: GameStateMachineAction): GameStateMachine {
-  switch (action.type) {
-    case "estateModifierChosen": {
+    default:
+      const followUp =
+        action.cardType === "FENCE" || action.cardType === "BIS" || action.cardType === "ESTATE"
+          ? action.cardType
+          : undefined;
       return {
         ...state,
         step: {
           type: "placeCard",
           cardValue: action.cardValue,
-          cardType: "ESTATE",
-          sizeIncreased: action.sizeIncreased,
+          cardType: action.cardType,
+          followUp,
         },
       };
-    }
+  }
+}
+
+function reducePlacedCardAction(state: GameStateMachine, action: PlacedCardAction): GameStateMachine {
+  switch (action.followUp) {
+    case "BIS":
+      return {
+        ...state,
+        step: {
+          type: "chooseBis",
+          house: action.house,
+          position: action.position,
+        },
+      };
+    case "ESTATE":
+      return {
+        ...state,
+        step: {
+          type: "estate",
+          house: action.house,
+          position: action.position,
+        },
+      };
+    case "FENCE":
+      // TODO:
+      return state;
+  }
+}
+
+export function gameStateMachineReducer(state: GameStateMachine, action: GameStateMachineAction): GameStateMachine {
+  switch (action.type) {
     case "tempAgencyModifierChosen": {
       return {
         ...state,
@@ -64,12 +71,7 @@ export function gameStateMachineReducer(state: GameStateMachine, action: GameSta
       };
     }
     case "placedCard": {
-      return {
-        ...state,
-        step: {
-          type: "wait",
-        },
-      };
+      return reducePlacedCardAction(state, action);
     }
     case "cancel": {
       return {
@@ -81,6 +83,11 @@ export function gameStateMachineReducer(state: GameStateMachine, action: GameSta
     }
     case "choseCard":
       return reduceChoseAction(state, action);
+    case "submit":
+      return {
+        ...state,
+        step: { type: "wait" },
+      };
     default:
       return state;
   }

@@ -4,10 +4,9 @@ import { useGameStateMachineDispatch } from "./GameStateMachineContext";
 import { placeHouse } from "./GameStateMachineActions";
 
 interface Buildable {
-  housesRowOne: Set<number>;
-  housesRowTwo: Set<number>;
-  housesRowThree: Set<number>;
-  onBuild: (position: number[]) => void;
+  buildableHouses?: Array<Set<number>>;
+  pendingHouses?: Array<Set<number>>;
+  onBuild?: (position: number[]) => void;
 }
 
 /**
@@ -21,13 +20,21 @@ export function useBuildableLocations(step: GameStep, playerState: PlayerState, 
 
   if (step.type === "placeCard") {
     return {
-      housesRowOne: findBuildableColumns(playerState.housesRowOne, step.cardValue),
-      housesRowTwo: findBuildableColumns(playerState.housesRowTwo, step.cardValue),
-      housesRowThree: findBuildableColumns(playerState.housesRowThree, step.cardValue),
+      buildableHouses: [
+        findBuildableColumns(playerState.housesRowOne, step.cardValue),
+        findBuildableColumns(playerState.housesRowTwo, step.cardValue),
+        findBuildableColumns(playerState.housesRowThree, step.cardValue),
+      ],
       onBuild: async (position) => {
         const res = await placeHouse(position, step);
         dispatch(res);
       },
+    };
+  } else if (step.type === "estate") {
+    const pendingHouses = [new Set<number>(), new Set<number>(), new Set<number>()];
+    pendingHouses[step.position[0]].add(step.position[1]);
+    return {
+      pendingHouses,
     };
   }
 

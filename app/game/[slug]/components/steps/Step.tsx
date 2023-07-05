@@ -6,9 +6,12 @@ import { GameState } from "@/app/util/GameTypes";
 import { TempAgencyModifier } from "./TempAgencyModifier";
 import { CancelButton } from "./CancelButton";
 import { RealEstateModifier } from "./RealEstateModifier";
+import { ChooseBIS } from "./ChooseBIS";
 
 function StepInstructions({ step }: { step: GameStep }) {
   switch (step.type) {
+    case "chooseBis":
+      return "Choose a location on your board to take the BIS effect (duplicate and place an adjacent home).";
     case "estate":
       return "Increase the value for estates of size:";
     case "temp":
@@ -39,8 +42,10 @@ function StepInstructions({ step }: { step: GameStep }) {
 
 function StepActions({ step, gameState }: { step: GameStep; gameState: GameState }) {
   switch (step.type) {
+    case "chooseBis":
+      return <ChooseBIS value={step.cardValue} />;
     case "estate":
-      return <RealEstateModifier value={step.cardValue} />;
+      return <RealEstateModifier step={step} />;
     case "temp":
       return <TempAgencyModifier value={step.cardValue} />;
     case "placeCard":

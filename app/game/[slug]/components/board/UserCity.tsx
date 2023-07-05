@@ -46,9 +46,10 @@ interface CellProps {
   buildable?: boolean;
   pool?: boolean;
   onClick?: () => void;
+  pendingHouse?: boolean;
 }
 
-function Cell({ house, pool, mini, buildable, onClick }: CellProps) {
+function Cell({ house, pool, mini, buildable, onClick, pendingHouse }: CellProps) {
   const occupied = house != null;
   return (
     <div
@@ -56,6 +57,7 @@ function Cell({ house, pool, mini, buildable, onClick }: CellProps) {
         "bg-gray-100": occupied && !buildable,
         "bg-white": !occupied && !buildable,
         "bg-green-300 hover:bg-green-400 cursor-pointer": buildable,
+        "bg-green-400": pendingHouse,
         "border-t-black border-t-2": house?.usedForPlan,
         "w-6 h-6": mini,
         "w-12 h-12": !mini,
@@ -90,10 +92,11 @@ interface RowProps {
   fences: boolean[];
   mini: boolean;
   buildableLocations?: Set<number>;
-  onClick?: (index: number) => void;
+  onBuild?: (index: number) => void;
+  pendingHouses?: Set<number>;
 }
 
-function UserNeighborhood({ config, houses, fences, mini, buildableLocations, onClick }: RowProps) {
+function UserNeighborhood({ config, houses, fences, mini, buildableLocations, onBuild, pendingHouses }: RowProps) {
   const numGardens = React.useMemo(() => {
     return houses.filter((house) => house?.modifier === "GARDEN").length;
   }, [houses]);
@@ -110,6 +113,7 @@ function UserNeighborhood({ config, houses, fences, mini, buildableLocations, on
         {houses.map((house, index) => {
           const fenceAfter = index < fences.length && fences[index];
           const buildable = buildableLocations?.has(index);
+          const pendingHouse = pendingHouses?.has(index);
           return (
             <div className="flex" key={index}>
               <Cell
@@ -117,7 +121,8 @@ function UserNeighborhood({ config, houses, fences, mini, buildableLocations, on
                 pool={config.pools.includes(index)}
                 mini={mini}
                 buildable={buildable}
-                onClick={() => onClick?.(index)}
+                onClick={buildable ? () => onBuild?.(index) : undefined}
+                pendingHouse={pendingHouse}
               />
               {index < houses.length - 1 ? <Fence active={fenceAfter} mini={mini} /> : null}
             </div>
@@ -136,12 +141,10 @@ interface CityProps {
 export function UserCity({ viewedPlayerId }: CityProps) {
   const { step, playerId, playerStates } = useGameStateMachineContext();
   const viewedPlayerState = playerStates[viewedPlayerId];
-  const buildableLocations = useBuildableLocations(step, viewedPlayerState, playerId);
+  const buildable = useBuildableLocations(step, viewedPlayerState, playerId);
 
-  const onClick = (row: number, column: number, columns?: Set<number>) => {
-    if (columns?.has(column)) {
-      buildableLocations?.onBuild([row, column]);
-    }
+  const onClick = (row: number, column: number) => {
+    buildable?.onBuild?.([row, column]);
   };
 
   return (
@@ -151,25 +154,28 @@ export function UserCity({ viewedPlayerId }: CityProps) {
         config={ROW_ONE}
         houses={viewedPlayerState.housesRowOne}
         fences={viewedPlayerState.fencesRowOne}
-        buildableLocations={buildableLocations?.housesRowOne}
+        buildableLocations={buildable?.buildableHouses?.[0]}
         mini={false}
-        onClick={(index) => onClick(0, index, buildableLocations?.housesRowOne)}
+        onBuild={(index) => onClick(0, index)}
+        pendingHouses={buildable?.pendingHouses?.[0]}
       />
       <UserNeighborhood
         config={ROW_TWO}
         houses={viewedPlayerState.housesRowTwo}
         fences={viewedPlayerState.fencesRowTwo}
-        buildableLocations={buildableLocations?.housesRowTwo}
+        buildableLocations={buildable?.buildableHouses?.[1]}
         mini={false}
-        onClick={(index) => onClick(1, index, buildableLocations?.housesRowTwo)}
+        onBuild={(index) => onClick(1, index)}
+        pendingHouses={buildable?.pendingHouses?.[1]}
       />
       <UserNeighborhood
         config={ROW_THREE}
         houses={viewedPlayerState.housesRowThree}
         fences={viewedPlayerState.fencesRowThree}
-        buildableLocations={buildableLocations?.housesRowThree}
+        buildableLocations={buildable?.buildableHouses?.[2]}
         mini={false}
-        onClick={(index) => onClick(2, index, buildableLocations?.housesRowThree)}
+        onBuild={(index) => onClick(2, index)}
+        pendingHouses={buildable?.pendingHouses?.[2]}
       />
     </div>
   );
