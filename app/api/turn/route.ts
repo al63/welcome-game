@@ -54,11 +54,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json("Player not found", { status: 404 });
     }
 
-    if (req.turn != playerState.turn) {
+    if (req.turn != gameState.players[playerState.playerId].turn) {
       return NextResponse.json("Requested turn is not equal to the known player state's turn", { status: 400 });
     }
     // Build the update request body for the player
-    const newPlayerState = consolidateUpdate(req.action, playerState, gameState.plans);
+    const newPlayerState = consolidateUpdate(req.action, playerState, gameState.turn, gameState.plans);
     const playerFilter: Filter<Document> = { gameId: req.gameId, playerId: req.playerId };
     const playerBody: UpdateFilter<Document> = {
       $set: {
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function consolidateUpdate(action: TurnAction, playerState: PlayerState, plans: PlanCard[]) {
+function consolidateUpdate(action: TurnAction, playerState: PlayerState, turn: number, plans: PlanCard[]) {
   const newPlayerState = {
     ...playerState,
   };
@@ -155,7 +155,7 @@ function consolidateUpdate(action: TurnAction, playerState: PlayerState, plans: 
     newPlayerState.housesRowThree[action.housePosition[1]] = action.house;
   }
 
-  let lastEvent = "[" + playerState.turn + "] ";
+  let lastEvent = "[" + turn + "] ";
   lastEvent += newPlayerState.playerId + " played value " + action.house.value;
   if (action.house.modifier) {
     lastEvent += " " + action.house.modifier;
@@ -168,7 +168,6 @@ function consolidateUpdate(action: TurnAction, playerState: PlayerState, plans: 
     lastEvent += " with the BIS on row " + action.bisPosition[0] + " column " + action.bisPosition[1];
   }
   newPlayerState.lastEvent = lastEvent;
-  newPlayerState.turn++;
   return validateCityPlanCompletion(newPlayerState, plans);
 }
 
@@ -330,6 +329,7 @@ function updateGameState(currentPlayerState: PlayerState, gameState: GameState, 
   }
 
   const nextTurn = gameState.turn + 1;
+  newGameState.players[currentPlayerState.playerId].turn = nextTurn;
   const advanceTurn = Object.keys(newGameState.players).every(function (e) {
     return newGameState.players[e].turn == nextTurn;
   });

@@ -15,7 +15,6 @@ export interface PlayerState {
   gameId: string;
   cityName: string;
   score: number;
-  turn: number;
   housesRowOne: Array<House | null>;
   housesRowTwo: Array<House | null>;
   housesRowThree: Array<House | null>;
