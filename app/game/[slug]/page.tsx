@@ -1,5 +1,5 @@
 import { GameCard, GameCardType } from "@/app/util/CardTypes";
-import Game from "./Game";
+import Game from "./components/Game";
 import { drawPlans } from "@/app/api/utils/PlanDeck";
 import { getGameServerAction } from "@/app/api/game/getGame";
 import { validateCityPlanCompletion } from "@/app/api/turn/route";

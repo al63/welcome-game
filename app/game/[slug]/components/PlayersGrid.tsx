@@ -14,7 +14,6 @@ export function PlayersGrid({ onSetViewedPlayer, playerId, viewedPlayerId }: Pla
 
   React.useEffect(() => {
     if (step.type === "placeCard") {
-      // TODO: add others like fence that should go back to your own board
       onSetViewedPlayer(playerId);
     }
   }, [step.type, onSetViewedPlayer, playerId]);
