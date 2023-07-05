@@ -159,7 +159,7 @@ function consolidateUpdate(action: TurnAction, playerState: PlayerState, turn: n
   return validateCityPlanCompletion(newPlayerState, plans);
 }
 
-export function validateCityPlanCompletion(playerState: PlayerState, plans: PlanCard[]): PlayerState {
+function validateCityPlanCompletion(playerState: PlayerState, plans: PlanCard[]): PlayerState {
   const newPlayerState = {
     ...playerState,
   };
