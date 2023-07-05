@@ -173,5 +173,8 @@ export async function poll(gameId: string, turn: number) {
 
     const json = (await res.json()) as PollTurnAPIResponse;
     // TODO: handle error(s)
+    if (json.result === "RESUME") {
+      dispatch({ type: "resume", gameState: json.gameState });
+    }
   };
 }

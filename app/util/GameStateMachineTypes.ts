@@ -114,6 +114,11 @@ export interface ErrorAction {
   type: "error";
 }
 
+export interface ResumeAction {
+  type: "resume";
+  gameState: GameState;
+}
+
 export type GameStateMachineAction =
   | CancelAction
   | TempAgencyModifierChosenAction
@@ -122,4 +127,5 @@ export type GameStateMachineAction =
   | ChoseBISAction
   | SubmitStartAction
   | SubmitCompleteAction
-  | ErrorAction;
+  | ErrorAction
+  | ResumeAction;

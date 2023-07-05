@@ -112,6 +112,14 @@ export function gameStateMachineReducer(state: GameStateMachine, action: GameSta
         ...state,
         step: { type: "error" },
       };
+    case "resume":
+      return {
+        ...state,
+        gameState: action.gameState,
+        step: {
+          type: "choose",
+        },
+      };
     default:
       return state;
   }
