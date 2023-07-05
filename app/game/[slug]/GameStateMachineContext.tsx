@@ -60,7 +60,7 @@ export function GameStateMachineProvider({
     };
   }, [dispatch]);
 
-  useCheckTurnCompletion(state);
+  useCheckTurnCompletion(state, dispatchWithThunk);
 
   return (
     <GameStateMachineContext.Provider value={state}>

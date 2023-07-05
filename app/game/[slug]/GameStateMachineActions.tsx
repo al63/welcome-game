@@ -160,3 +160,16 @@ export async function submitTurn(
     }
   };
 }
+
+export async function poll(gameId: string, turn: number) {
+  return async (dispatch: React.Dispatch<GameStateMachineAction>) => {
+    const res = await fetch(`/api/poll?gameId=${gameId}&turn=${turn}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+    console.log(res);
+  };
+}
