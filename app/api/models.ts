@@ -63,3 +63,8 @@ export interface CreateTurnAPIRequest {
 export interface CreateTurnAPIResponse {
   playerState: PlayerState;
 }
+
+export interface PollTurnAPIResponse {
+  result: "RESUME" | "WAIT" | "ERROR";
+  error?: string;
+}

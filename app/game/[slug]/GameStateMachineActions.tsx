@@ -1,4 +1,4 @@
-import { CreateTurnAPIResponse, TurnAction } from "@/app/api/models";
+import { CreateTurnAPIResponse, PollTurnAPIResponse, TurnAction } from "@/app/api/models";
 import { GameCardType } from "@/app/util/CardTypes";
 import {
   BISStep,
@@ -170,6 +170,8 @@ export async function poll(gameId: string, turn: number) {
         "Content-Type": "application/json",
       },
     });
-    console.log(res);
+
+    const json = (await res.json()) as PollTurnAPIResponse;
+    // TODO: handle error(s)
   };
 }
