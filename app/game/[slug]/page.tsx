@@ -43,42 +43,34 @@ dummy.housesRowOne[4] = {
 dummy.housesRowOne[5] = {
   value: 6,
   modifier: "TEMP",
-  usedForPlan: true,
 };
 dummy.housesRowOne[6] = {
   value: 6,
   modifier: "TEMP",
-  usedForPlan: true,
 };
 dummy.housesRowTwo[1] = {
   value: 4,
   modifier: "TEMP",
-  usedForPlan: true,
 };
 dummy.housesRowTwo[2] = {
   value: 4,
   modifier: "TEMP",
-  usedForPlan: true,
 };
 dummy.housesRowTwo[3] = {
   value: 4,
   modifier: "TEMP",
-  usedForPlan: true,
 };
 dummy.housesRowTwo[4] = {
   value: 4,
   modifier: "TEMP",
-  usedForPlan: true,
 };
 dummy.housesRowTwo[5] = {
   value: 4,
   modifier: "TEMP",
-  usedForPlan: true,
 };
 dummy.housesRowTwo[6] = {
   value: 4,
   modifier: "TEMP",
-  usedForPlan: true,
 };
 
 const dummyStates = {

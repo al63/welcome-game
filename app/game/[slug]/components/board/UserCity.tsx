@@ -50,8 +50,8 @@ interface CellProps {
 }
 
 function Cell({ house, pool, mini, buildable, onClick, pendingHouse }: CellProps) {
-  const occupied = house != null;
   const renderedHouse = house || pendingHouse?.house;
+  const occupied = renderedHouse != null;
 
   return (
     <div
@@ -59,7 +59,6 @@ function Cell({ house, pool, mini, buildable, onClick, pendingHouse }: CellProps
         "bg-gray-100": occupied && !buildable,
         "bg-white": !occupied && !buildable,
         "bg-green-300 hover:bg-green-400 cursor-pointer": buildable,
-        "bg-green-100": pendingHouse,
         "border-t-black border-t-2": house?.usedForPlan,
         "w-6 h-6": mini,
         "w-12 h-12": !mini,

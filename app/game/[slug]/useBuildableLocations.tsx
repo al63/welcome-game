@@ -15,7 +15,7 @@ interface Buildable {
 }
 
 /**
- * Introspects from the game step and player state which houses / fences are buildable.
+ * Introspects from the game step and player state which houses / fences are buildable or are pending being built.
  */
 export function useBuildableLocations(step: GameStep, playerState: PlayerState, playerId: string): Buildable | null {
   const dispatch = useGameStateMachineDispatch();
