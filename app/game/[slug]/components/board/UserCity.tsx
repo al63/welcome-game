@@ -65,7 +65,7 @@ function Cell({ house, pool, mini, highlighted, onClick, pendingHouse }: CellPro
       })}
       onClick={onClick}
     >
-      {pool && !mini ? <div className="bg-blue-500 w-2 h-2 top-1 right-1 absolute" /> : null}
+      {pool && !mini ? <div className="bg-blue-500 w-2 h-2 top-1 right-1.5 absolute" /> : null}
       {renderedHouse != null ? <House house={renderedHouse} showModifiers={!mini} /> : null}
     </div>
   );
@@ -84,13 +84,16 @@ function Fence({ mini, active, highlighted }: FenceProps) {
         {
           "border-black": active && !highlighted,
           "border-transparent": !active && !highlighted,
-          "border-green-300 hover:bg-green-400 cursor-pointer": highlighted,
           "h-6": mini,
           "h-12": !mini,
         },
-        "border w-0"
+        "border w-0 relative"
       )}
-    />
+    >
+      {highlighted ? (
+        <div className="absolute h-12 w-3 -left-1.5 z-10 bg-green-300 hover:bg-green-400 cursor-pointer" />
+      ) : null}
+    </div>
   );
 }
 
