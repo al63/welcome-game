@@ -110,10 +110,10 @@ const dummyStates = {
 
 const dummyRevealedCardValues: GameCard[] = [
   { value: 8, backingType: "FENCE" },
-  { value: 3, backingType: "TEMP" },
+  { value: 5, backingType: "TEMP" },
   { value: 7, backingType: "GARDEN" },
 ];
-const dummyRevealedCardModifiers: GameCardType[] = ["FENCE", "ESTATE", "POOL"];
+const dummyRevealedCardModifiers: GameCardType[] = ["FENCE", "TEMP", "POOL"];
 const dummyGameState = {
   id: "asdf",
   seed: 123,

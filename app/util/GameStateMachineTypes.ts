@@ -66,6 +66,11 @@ export interface CancelAction {
   type: "cancel";
 }
 
+export interface TempAgencyModifierChosenAction {
+  type: "tempAgencyModifierChosen";
+  value: number;
+}
+
 export interface ChoseCardAction {
   type: "choseCard";
   cardValue: number;
@@ -76,4 +81,4 @@ export interface PlacedCardAction {
   type: "placedCard";
 }
 
-export type GameStateMachineAction = CancelAction | ChoseCardAction | PlacedCardAction;
+export type GameStateMachineAction = CancelAction | TempAgencyModifierChosenAction | ChoseCardAction | PlacedCardAction;

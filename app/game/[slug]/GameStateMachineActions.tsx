@@ -1,5 +1,11 @@
 import { GameCardType } from "@/app/util/CardTypes";
-import { CancelAction, ChoseCardAction, PlaceCardStep, PlacedCardAction } from "@/app/util/GameStateMachineTypes";
+import {
+  CancelAction,
+  ChoseCardAction,
+  PlaceCardStep,
+  PlacedCardAction,
+  TempAgencyModifierChosenAction,
+} from "@/app/util/GameStateMachineTypes";
 
 export function chooseCard(cardValue: number, cardType: GameCardType): ChoseCardAction {
   return {
@@ -11,6 +17,10 @@ export function chooseCard(cardValue: number, cardType: GameCardType): ChoseCard
 
 export function cancelAction(): CancelAction {
   return { type: "cancel" };
+}
+
+export function chooseTempAgencyModifier(value: number): TempAgencyModifierChosenAction {
+  return { type: "tempAgencyModifierChosen", value };
 }
 
 export async function placeHouse(position: number[], step: PlaceCardStep): Promise<PlacedCardAction> {

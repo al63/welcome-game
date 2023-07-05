@@ -4,9 +4,12 @@ import { useGameStateMachineContext, useGameStateMachineDispatch } from "./GameS
 import { modifierDisplayName } from "./Card";
 import { GameState } from "@/app/util/GameTypes";
 import { cancelAction } from "./GameStateMachineActions";
+import { TempAgencyModifier } from "./TempAgencyModifier";
 
 function StepInstructions({ step }: { step: GameStep }) {
   switch (step.type) {
+    case "temp":
+      return "Choose what value to modify the selected card to";
     case "placeCard":
       return (
         <>
@@ -40,6 +43,8 @@ function CancelButton() {
 
 function StepActions({ step, gameState }: { step: GameStep; gameState: GameState }) {
   switch (step.type) {
+    case "temp":
+      return <TempAgencyModifier value={step.cardValue} />;
     case "placeCard":
       return <CancelButton />;
     case "choose":
