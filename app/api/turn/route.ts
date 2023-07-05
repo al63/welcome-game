@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
-import { CreateTurnAPIRequest, TurnAction } from "../models";
+import { CreateTurnAPIRequest, PlayerStateMap, TurnAction } from "../models";
 import { Document, Filter, UpdateFilter } from "mongodb";
-import { House, PlayerState } from "@/app/util/PlayerTypes";
-import { GameState } from "@/app/util/GameTypes";
-import { getEstatesResult } from "@/app/util/Scoring";
+import { House, PlayerState, PlayerStates } from "@/app/util/PlayerTypes";
+import { GameState, PlayerMetadataMap } from "@/app/util/GameTypes";
+import { computeScore, getEstatesResult } from "@/app/util/Scoring";
 import { PlanCard } from "@/app/util/CardTypes";
 
 // User takes a turn. This means either
@@ -74,8 +74,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json("Unable to update the player state", { status: 500 });
     }
 
+    // Grab all player states associated with a game for score calculation
+    // this is totally inefficient but yolo
+    const playerStates = db.collection<PlayerState>("player_states");
+    const playerStateQuery: Filter<PlayerState> = { gameId: gameState.id };
+    const playerStatesCursor = playerStates.find<PlayerState>(playerStateQuery);
+
+    const playerStatesMap: PlayerStateMap = {};
+    for await (const doc of playerStatesCursor) {
+      delete (doc as any)["_id"];
+      playerStatesMap[doc.playerId] = doc;
+    }
+
     // update game state on completed plans / game end
-    const newGameState = updateGameState(newPlayerState, gameState);
+    const newGameState = updateGameState(newPlayerState, gameState, playerStatesMap);
     const gameFilter: Filter<Document> = { id: gameState.id };
     const gameBody: UpdateFilter<Document> = {
       $set: {
@@ -262,75 +274,108 @@ export function validateCityPlanCompletion(playerState: PlayerState, plans: Plan
   return newPlayerState;
 }
 
-function updateGameState(playerState: PlayerState, gameState: GameState): GameState {
+function updateGameState(currentPlayerState: PlayerState, gameState: GameState, playerStates: PlayerStates): GameState {
   const newGameState = {
     ...gameState,
   };
   const currentTurn = gameState.turn;
   const currentTurnLog = [];
-  currentTurnLog.push(playerState.lastEvent);
+  currentTurnLog.push(currentPlayerState.lastEvent);
 
   // Update the completed plans for the GameState so that players can determine if
   // they get first or second score for completing a plan
-  playerState.completedPlans.forEach((_, idx) => {
-    if (gameState.plans[idx].completed != true && playerState.completedPlans[idx] > 0) {
+  currentPlayerState.completedPlans.forEach((_, idx) => {
+    if (gameState.plans[idx].completed != true && currentPlayerState.completedPlans[idx] > 0) {
       newGameState.plans[idx].completed = true;
       currentTurnLog.push(
-        "[" + currentTurn + "] " + playerState.playerId + " is the first to complete City Plan " + idx + "!"
+        "[" + currentTurn + "] " + currentPlayerState.playerId + " is the first to complete City Plan " + idx + "!"
       );
     }
   });
 
   // determine if a player has ended the game via completing every single plan
-  const planEndCondition = playerState.completedPlans.every(function (val) {
+  const planEndCondition = currentPlayerState.completedPlans.every(function (val) {
     return val > 0;
   });
 
   if (planEndCondition) {
     newGameState.completed = true;
-    currentTurnLog.push("[" + currentTurn + "] " + playerState.playerId + " has completed all city plans!");
+    currentTurnLog.push("[" + currentTurn + "] " + currentPlayerState.playerId + " has completed all city plans!");
   }
 
   // determine if a player has ended the game via using all of their permit refusals (idx 3)
-  if (playerState.permitRefusals == 3) {
+  if (currentPlayerState.permitRefusals == 3) {
     newGameState.completed = true;
-    currentTurnLog.push("[" + currentTurn + "] " + playerState.playerId + " has used all of their permit refusals!");
+    currentTurnLog.push(
+      "[" + currentTurn + "] " + currentPlayerState.playerId + " has used all of their permit refusals!"
+    );
   }
 
   // determine if a player has ended the game via building in every single spot
-  const rowOneCompleted = playerState.housesRowOne.every(function (house) {
+  const rowOneCompleted = currentPlayerState.housesRowOne.every(function (house) {
     return house != null;
   });
-  const rowTwoCompleted = playerState.housesRowTwo.every(function (house) {
+  const rowTwoCompleted = currentPlayerState.housesRowTwo.every(function (house) {
     return house != null;
   });
-  const rowThreeCompleted = playerState.housesRowThree.every(function (house) {
+  const rowThreeCompleted = currentPlayerState.housesRowThree.every(function (house) {
     return house != null;
   });
 
   if (rowOneCompleted && rowTwoCompleted && rowThreeCompleted) {
     newGameState.completed = true;
     currentTurnLog.push(
-      "[" + currentTurn + "] " + playerState.playerId + " has built every single housing development!"
+      "[" + currentTurn + "] " + currentPlayerState.playerId + " has built every single housing development!"
     );
   }
 
+  const nextTurn = gameState.turn + 1;
+  const advanceTurn = Object.keys(newGameState.players).every(function (e) {
+    return newGameState.players[e].turn == nextTurn;
+  });
   // Advance the GameState turn if all players have taken the current GameState turn and the game isn't over
   if (!newGameState.completed) {
-    const nextTurn = gameState.turn + 1;
-    newGameState.players[playerState.playerId]["turn"]++;
-    const advanceTurn = Object.keys(newGameState.players).every(function (e) {
-      return newGameState.players[e].turn == nextTurn;
-    });
+    newGameState.players[currentPlayerState.playerId]["turn"]++;
     if (advanceTurn) {
       currentTurnLog.push("[" + currentTurn + "] " + "All players have taken their turn!");
       currentTurnLog.push("Turn " + nextTurn + " has begun.");
       newGameState.turn++;
     }
   } else {
-    currentTurnLog.push("The game is over! Calculating scores...");
+    if (advanceTurn) {
+      let winningPlayer = "";
+      let winningPlayerScore = 0;
+      currentTurnLog.push("The game is over! Calculating scores...");
+      const finalPlayersResult = calculateFinalScores(playerStates, newGameState.players);
+      newGameState.players = finalPlayersResult;
+      Object.keys(finalPlayersResult).forEach((player, _) => {
+        if (finalPlayersResult[player].score > winningPlayerScore) {
+          winningPlayer = player;
+          winningPlayerScore = finalPlayersResult[player].score;
+        }
+        currentTurnLog.push(player + ": " + finalPlayersResult[player].score);
+      });
+      currentTurnLog.push(
+        "Congratulations to " + winningPlayer + " of the " + playerStates[winningPlayer].cityName + "!"
+      );
+    } else {
+      currentTurnLog.push("The game is ending! Waiting for all players to finish...");
+    }
   }
 
   newGameState.latestEventLog = currentTurnLog;
   return newGameState;
+}
+
+function calculateFinalScores(playersMap: PlayerStates, currPlayerMap: PlayerMetadataMap): PlayerMetadataMap {
+  const newPlayerMetadataState = {
+    ...currPlayerMap,
+  };
+
+  Object.keys(playersMap).forEach((playerId, _) => {
+    const userScore = computeScore(playerId, playersMap);
+    newPlayerMetadataState[playerId].score = userScore?.summation || 0;
+  });
+
+  return newPlayerMetadataState;
 }
