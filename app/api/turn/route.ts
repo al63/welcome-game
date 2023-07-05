@@ -53,6 +53,10 @@ export async function POST(request: NextRequest) {
     if (!playerState) {
       return NextResponse.json("Player not found", { status: 404 });
     }
+
+    if (req.turn != playerState.turn) {
+      return NextResponse.json("Requested turn is not equal to the known player state's turn", { status: 400 });
+    }
     // Build the update request body for the player
     const newPlayerState = consolidateUpdate(req.action, playerState, gameState.plans);
     const playerFilter: Filter<Document> = { gameId: req.gameId, playerId: req.playerId };
@@ -87,7 +91,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json("Unable to update the game state", { status: 500 });
     }
 
-    // if it was the last player, increment game state turn
     return NextResponse.json({ gameState: newGameState, playerState: newPlayerState }, { status: 200 });
   } catch (e: any) {
     return NextResponse.json({ error: e.toString() }, { status: 500 });
@@ -141,7 +144,7 @@ function consolidateUpdate(action: TurnAction, playerState: PlayerState, plans: 
   }
 
   let lastEvent = "[" + playerState.turn + "] ";
-  lastEvent += newPlayerState.playerId + " played " + action.house.value;
+  lastEvent += newPlayerState.playerId + " played value " + action.house.value;
   if (action.house.modifier) {
     lastEvent += " " + action.house.modifier;
   }
@@ -150,7 +153,7 @@ function consolidateUpdate(action: TurnAction, playerState: PlayerState, plans: 
     lastEvent += ", upgrading the value of estates size " + action.sizeIncreased;
   }
   if (action.type == "bis") {
-    lastEvent += " with the BIS on row" + action.bisPosition[0] + " column " + action.bisPosition[1];
+    lastEvent += " with the BIS on row " + action.bisPosition[0] + " column " + action.bisPosition[1];
   }
   newPlayerState.lastEvent = lastEvent;
   newPlayerState.turn++;
@@ -292,6 +295,24 @@ function updateGameState(playerState: PlayerState, gameState: GameState): GameSt
   if (playerState.permitRefusals == 3) {
     newGameState.completed = true;
     currentTurnLog.push("[" + currentTurn + "] " + playerState.playerId + " has used all of their permit refusals!");
+  }
+
+  // determine if a player has ended the game via building in every single spot
+  const rowOneCompleted = playerState.housesRowOne.every(function (house) {
+    return house != null;
+  });
+  const rowTwoCompleted = playerState.housesRowTwo.every(function (house) {
+    return house != null;
+  });
+  const rowThreeCompleted = playerState.housesRowThree.every(function (house) {
+    return house != null;
+  });
+
+  if (rowOneCompleted && rowTwoCompleted && rowThreeCompleted) {
+    newGameState.completed = true;
+    currentTurnLog.push(
+      "[" + currentTurn + "] " + playerState.playerId + " has built every single housing development!"
+    );
   }
 
   // Advance the GameState turn if all players have taken the current GameState turn and the game isn't over
