@@ -20,7 +20,6 @@ export function PlayersGrid({ onSetViewedPlayer, playerId, viewedPlayerId }: Pla
 
   return (
     <div className="my-4">
-      <h1 className="text-xl p-2">All Cities</h1>
       <div className="flex flex-wrap">
         {Object.keys(playerStates).map((p) => {
           return (
@@ -33,6 +32,7 @@ export function PlayersGrid({ onSetViewedPlayer, playerId, viewedPlayerId }: Pla
               onClick={() => onSetViewedPlayer(p)}
             >
               <h2 className="text-md font-semibold">{p}</h2>
+              <h1 className="text-lg font-bold pb-2 truncate">{playerStates[p].cityName}</h1>
               <MiniUserCity playerId={p} />
             </div>
           );

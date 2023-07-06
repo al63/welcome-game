@@ -229,10 +229,8 @@ export function UserCity({ viewedPlayerId }: CityProps) {
 export function MiniUserCity({ playerId }: { playerId: string }) {
   const { playerStates } = useGameStateMachineContext();
   const viewedPlayerState = playerStates[playerId];
-
   return (
     <div className="max-w-xs">
-      <h1 className="text-xl font-bold p-2 truncate">{`${viewedPlayerState.playerId}'s City: ${viewedPlayerState.cityName}`}</h1>
       <UserNeighborhood
         config={ROW_ONE}
         houses={viewedPlayerState.housesRowOne}
