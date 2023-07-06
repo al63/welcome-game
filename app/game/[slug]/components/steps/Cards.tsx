@@ -15,15 +15,13 @@ export function Cards({ gameState, playerId }: CardsProps) {
 
   return (
     <div>
-      <p className="italic text-xs">{`Upcoming: ${upcoming.join(", ")}`}</p>
       <div className="flex flex-row">
         {gameState.revealedCardValues.map((card: GameCard, index: number) => {
           return (
             <Card
               value={card.value}
-              backingModifier={card.backingType}
+              modifier={gameState.revealedCardModifiers[index]}
               key={index}
-              type="number"
               onClick={() => {
                 dispatch(chooseCard(card.value, gameState.revealedCardModifiers[index]));
               }}
@@ -31,11 +29,7 @@ export function Cards({ gameState, playerId }: CardsProps) {
           );
         })}
       </div>
-      <div className="flex flex-row">
-        {gameState.revealedCardModifiers.map((modifier: GameCardType, index: number) => {
-          return <Card modifier={modifier} key={index} type="modifier" />;
-        })}
-      </div>
+      <p className="mt-2 italic text-sm">{`Upcoming: ${upcoming.join(", ")}`}</p>
       <button
         onClick={async () => {
           dispatch(await submitSkipTurn(gameState, playerId));

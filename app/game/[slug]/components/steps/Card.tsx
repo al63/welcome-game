@@ -1,20 +1,5 @@
 import { GameCardType } from "@/app/util/CardTypes";
-import classNames from "classnames";
 import React from "react";
-
-interface NumberCardProps {
-  value: number | null;
-  backingModifier: GameCardType;
-  onClick: () => void;
-  type: "number";
-}
-
-interface ModifierCardProps {
-  modifier: GameCardType;
-  type: "modifier";
-}
-
-type CardProps = NumberCardProps | ModifierCardProps;
 
 function modifierColor(modifier: GameCardType): string {
   switch (modifier) {
@@ -50,44 +35,23 @@ export function modifierDisplayName(modifier: GameCardType): string {
   }
 }
 
-export function Card(props: CardProps) {
-  let content;
-  if (props.type === "number") {
-    content = (
-      <>
-        <h1 className="text-3xl">{props.value}</h1>
-        <div
-          className={`m-1 absolute top-0 right-0 rounded-sm w-3 h-3 border border-black ${modifierColor(
-            props.backingModifier
-          )}`}
-        />
-        <div
-          className={`m-1 absolute bottom-0 left-0 rounded-sm w-3 h-3 border border-black ${modifierColor(
-            props.backingModifier
-          )}`}
-        />
-      </>
-    );
-  } else {
-    content = (
-      <div className="flex flex-col justify-center items-center text-sm">
-        <div className={`m-1 rounded-sm w-6 h-6 border border-black ${modifierColor(props.modifier)}`} />
-        {modifierDisplayName(props.modifier)}
-      </div>
-    );
-  }
+interface CardProps {
+  value: number;
+  modifier: GameCardType;
+  onClick: () => void;
+}
 
+export function Card({ value, modifier, onClick }: CardProps) {
   return (
     <div
-      className={classNames(
-        "flex relative justify-center items-center m-1 rounded-md text-center w-20 h-28 border border-black bg-amber-50 text-lg",
-        {
-          "cursor-pointer hover:bg-amber-100": props.type === "number",
-        }
-      )}
-      onClick={props.type === "number" ? props.onClick : undefined}
+      className="flex relative justify-center items-center m-1 rounded-md text-center w-20 h-28 border border-black bg-amber-50 text-lg cursor-pointer hover:bg-amber-100"
+      onClick={onClick}
     >
-      {content}
+      <div className="flex flex-col justify-center items-center text-sm">
+        <p className="text-xl">{value}</p>
+        {modifierDisplayName(modifier)}
+        <div className={`m-1 rounded-sm w-6 h-6 border border-black ${modifierColor(modifier)}`} />
+      </div>
     </div>
   );
 }
