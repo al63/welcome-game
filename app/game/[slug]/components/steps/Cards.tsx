@@ -1,22 +1,23 @@
 import { GameCard, GameCardType } from "@/app/util/CardTypes";
 import { Card, modifierDisplayName } from "./Card";
 import { useGameStateMachineDispatch } from "../../GameStateMachineContext";
-import { chooseCard } from "../../GameStateMachineActions";
+import { chooseCard, submitSkipTurn } from "../../GameStateMachineActions";
+import { GameState } from "@/app/util/GameTypes";
 
 interface CardsProps {
-  revealedCardValues: Array<GameCard>;
-  revealedCardModifiers: Array<GameCardType>;
+  gameState: GameState;
+  playerId: string;
 }
 
-export function Cards({ revealedCardValues, revealedCardModifiers }: CardsProps) {
+export async function Cards({ gameState, playerId }: CardsProps) {
   const dispatch = useGameStateMachineDispatch();
-  const upcoming = revealedCardValues.map((card) => modifierDisplayName(card.backingType));
+  const upcoming = gameState.revealedCardValues.map((card) => modifierDisplayName(card.backingType));
 
   return (
     <div>
       <p className="italic text-xs">{`Upcoming: ${upcoming.join(", ")}`}</p>
       <div className="flex flex-row">
-        {revealedCardValues.map((card: GameCard, index: number) => {
+        {gameState.revealedCardValues.map((card: GameCard, index: number) => {
           return (
             <Card
               value={card.value}
@@ -24,17 +25,23 @@ export function Cards({ revealedCardValues, revealedCardModifiers }: CardsProps)
               key={index}
               type="number"
               onClick={() => {
-                dispatch(chooseCard(card.value, revealedCardModifiers[index]));
+                dispatch(chooseCard(card.value, gameState.revealedCardModifiers[index]));
               }}
             />
           );
         })}
       </div>
       <div className="flex flex-row">
-        {revealedCardModifiers.map((modifier: GameCardType, index: number) => {
+        {gameState.revealedCardModifiers.map((modifier: GameCardType, index: number) => {
           return <Card modifier={modifier} key={index} type="modifier" />;
         })}
       </div>
+      <button
+        className="px-8 py-2 rounded-full bg-red-400 hover:bg-red-500 mt-4"
+        onClick={async () => dispatch(await submitSkipTurn(gameState, playerId))}
+      >
+        Skip turn
+      </button>
     </div>
   );
 }

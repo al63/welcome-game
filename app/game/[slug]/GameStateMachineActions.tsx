@@ -78,6 +78,10 @@ export async function placeHouse(
   });
 }
 
+export async function submitSkipTurn(gameState: GameState, playerId: string): Promise<GameStateMachineThunk> {
+  return await submitTurn(gameState, playerId, { type: "refusal" });
+}
+
 export async function submitBISTurn(
   gameState: GameState,
   playerId: string,
