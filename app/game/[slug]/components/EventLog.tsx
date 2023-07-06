@@ -12,7 +12,7 @@ export function EventLog() {
   }, [gameState.latestEventLog]);
 
   return (
-    <div className="m-2">
+    <div className="m-2 max-w-md">
       <h1 className="text-lg">Event Log</h1>
       <div ref={scrollRef} className="border-2 border-black w-full h-40 rounded-md overflow-scroll whitespace-normal">
         {gameState.latestEventLog.map((event, index) => {
