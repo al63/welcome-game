@@ -76,13 +76,14 @@ export const dummyPlayerStates = {
   [dummy.playerId]: {
     ...dummy,
     cityName: "The Cool Zone",
-    completedPlans: [13, 0, 0],
+    completedPlans: [6, 0, 13],
     lastEvent: "",
   },
   bub: {
     ...dummy,
     playerId: "bub",
     cityName: "BubTown, USA",
+    completedPlans: [8, 10, 0],
     lastEvent: "",
   },
   bubbo: {
@@ -119,6 +120,6 @@ export const dummyGameState: GameState = {
   },
   plans: drawPlans(),
   turn: 1,
-  completed: true,
+  completed: false,
   latestEventLog: [],
 };

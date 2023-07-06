@@ -14,7 +14,7 @@ export function UserBoard({ viewedPlayerId }: Props) {
           <UserCity viewedPlayerId={viewedPlayerId} />
         </div>
         <div className="pl-2">
-          <CityPlans />
+          <CityPlans viewedPlayerId={viewedPlayerId} />
         </div>
       </div>
       <div className="border-t pt-2 border-gray-500">

@@ -17,12 +17,26 @@ function Requirement({ size, quantity }: { size: number; quantity: number }) {
   );
 }
 
+type CompletionState = "incomplete" | "completeFirst" | "completeSecond";
+
 interface CityPlanProps {
   plan: PlanCard;
-  completed: boolean;
+  state: CompletionState;
 }
 
-function CityPlan({ plan, completed }: CityPlanProps) {
+function CityPlan({ plan, state }: CityPlanProps) {
+  let first;
+  switch (state) {
+    case "incomplete":
+      first = plan.firstValue;
+      break;
+    case "completeFirst":
+      first = "\u2713";
+      break;
+    case "completeSecond":
+      first = "x";
+  }
+
   return (
     <div className="m-1 flex flex-col justify-center items-start p-1 rounded-md text-center w-20 border border-black bg-amber-50 text-lg">
       <div className="text-red-700 font-bold">n&deg;{plan.difficulty}</div>
@@ -34,11 +48,12 @@ function CityPlan({ plan, completed }: CityPlanProps) {
       <div className="flex items-center justify-around w-full mt-2">
         <div
           className={classNames("rounded-full w-6 h-6 flex items-center justify-center", {
-            "bg-red-700 text-white": completed,
-            "bg-gray-700 text-gray-300": !completed,
+            "bg-green-500 text-white": state === "completeFirst",
+            "bg-red-700 text-white": state === "completeSecond",
+            "bg-gray-700 text-gray-300": state === "incomplete",
           })}
         >
-          {completed ? "\u2713" : plan.firstValue}
+          {first}
         </div>
         <div className="rounded-full bg-gray-300 text-gray-700 w-6 h-6 flex items-center justify-center">
           {plan.secondValue}
@@ -48,27 +63,31 @@ function CityPlan({ plan, completed }: CityPlanProps) {
   );
 }
 
-export function CityPlans() {
+export function CityPlans({ viewedPlayerId }: { viewedPlayerId: string }) {
   const { playerStates, gameState } = useGameStateMachineContext();
 
-  // convert player states completed plans to booleans for if a plan has been completed at all
-  const completedPlans = React.useMemo(() => {
-    return Object.keys(playerStates).reduce<boolean[]>(
-      (accum, playerId) => {
-        return playerStates[playerId].completedPlans
-          .map((plan) => plan > 0) // convert to bools
-          .map((completed, index) => completed || accum[index]); // combine with other players
-      },
-      [false, false, false]
-    );
-  }, [playerStates]);
+  const completionState: CompletionState[] = React.useMemo(() => {
+    return gameState.plans.map((plan, index) => {
+      if (playerStates[viewedPlayerId].completedPlans[index] === plan.firstValue) {
+        // if player completed first
+        return "completeFirst";
+      } else {
+        // if anyone has completed
+        const anyCompletion = Object.keys(playerStates).reduce((accum, playerId) => {
+          return accum || playerStates[playerId].completedPlans[index] > 0;
+        }, false);
+
+        return anyCompletion ? "completeSecond" : "incomplete";
+      }
+    });
+  }, [gameState.plans, viewedPlayerId, playerStates]);
 
   return (
     <div className="flex flex-col">
       <h1 className="text-xl text-center">City Plans</h1>
       <div className="flex">
         {gameState.plans.map((plan, index) => (
-          <CityPlan plan={plan} completed={completedPlans[index]} key={index} />
+          <CityPlan plan={plan} state={completionState[index]} key={index} />
         ))}
       </div>
     </div>
