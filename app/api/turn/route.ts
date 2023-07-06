@@ -6,6 +6,7 @@ import { PlayerState, PlayerStates } from "@/app/util/PlayerTypes";
 import { GameState, PlayerMetadataMap } from "@/app/util/GameTypes";
 import { computeScore, getEstatesResult } from "@/app/util/Scoring";
 import { PlanCard } from "@/app/util/CardTypes";
+import { ActiveCards, drawCards, shuffleWithSeedAndDrawOffset } from "../utils/Deck";
 
 // User takes a turn. This means either
 // 1) playing a card
@@ -266,7 +267,7 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
     ...gameState,
   };
   const currentTurn = gameState.turn;
-  const currentTurnLog = [];
+  const currentTurnLog = [...gameState.latestEventLog];
   currentTurnLog.push(currentPlayerState.lastEvent);
 
   // Update the completed plans for the GameState so that players can determine if
@@ -349,6 +350,10 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
   }
 
   newGameState.latestEventLog = currentTurnLog;
+  const shuffledDeck = shuffleWithSeedAndDrawOffset(newGameState.seed, gameState.turn);
+  const activeCards: ActiveCards = drawCards(shuffledDeck);
+  newGameState.revealedCardValues = activeCards.revealedNumbers;
+  newGameState.revealedCardModifiers = activeCards.revealedModifiers.map((gameCard) => gameCard.backingType);
   return newGameState;
 }
 

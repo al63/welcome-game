@@ -31,7 +31,6 @@ export async function POST(request: NextRequest) {
     const gameObj: GameState = {
       id: gameId,
       seed: seedDate,
-      seedOffset: 1,
       revealedCardValues: activeCards.revealedNumbers,
       revealedCardModifiers: activeCards.revealedModifiers.map((gameCard) => gameCard.backingType),
       players: playerMap,
