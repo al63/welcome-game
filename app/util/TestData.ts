@@ -109,7 +109,6 @@ const dummyRevealedCardModifiers: GameCardType[] = ["ESTATE", "FENCE", "BIS"];
 export const dummyGameState: GameState = {
   id: "asdf",
   seed: 123,
-  seedOffset: 0,
   revealedCardModifiers: dummyRevealedCardModifiers,
   revealedCardValues: dummyRevealedCardValues,
   players: {
