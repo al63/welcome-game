@@ -86,9 +86,9 @@ export function computeScore(playerId: string, playerStates: PlayerStates): User
 
   let place = -1;
   let tempAgenciesCount = 0;
-  let prevScore = -1;
+  let prevScore = 1000;
   for (let i = 0; i < tempAgenciesByPlayer.length; i++) {
-    if (tempAgenciesByPlayer[i].tempAgencies > prevScore) {
+    if (tempAgenciesByPlayer[i].tempAgencies < prevScore) {
       place++;
       prevScore = tempAgenciesByPlayer[i].tempAgencies;
     }
