@@ -114,7 +114,7 @@ export default function NewGame() {
               const path = `/game/${createdGame.gameId}?player=${player}`;
               const link = `${window.location.href.slice(0, window.location.href.length - 1)}${path}`;
               return (
-                <li className="m-2" key={player}>
+                <li className="m-2 break-all" key={player}>
                   <span>{player}: </span>
                   <a className="text-blue-500 underline" href={path}>
                     {link}

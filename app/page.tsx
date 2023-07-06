@@ -1,4 +1,3 @@
-import { Footer } from "./components/Footer";
 import NewGame from "./components/NewGame";
 
 export default function Home() {
@@ -20,7 +19,6 @@ export default function Home() {
         </p>
         <NewGame />
       </div>
-      <Footer />
     </div>
   );
 }
