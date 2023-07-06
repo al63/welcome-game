@@ -224,9 +224,8 @@ function validateCityPlanCompletion(playerState: PlayerState, plans: PlanCard[],
         // for each requirement, start marking houses as used for a plan up to the quantity of the requirement
         for (let i = 0; i < req.quantity; i++) {
           const estate = availableEstates[i];
-          console.log("ESTATE: ", estate);
           for (let j = estate.columns[0]; j <= estate.columns[1]; j++) {
-            switch (size) {
+            switch (estate.row) {
               case 0:
                 const colRowOne = newPlayerState.housesRowOne[j];
                 if (colRowOne != null) {
