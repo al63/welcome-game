@@ -9,28 +9,37 @@ export default function NewGame() {
   const [loading, setLoading] = React.useState(false);
   const [createdGame, setCreatedGame] = React.useState<CreateGameResponse | null>(null);
 
-  const onNameChange = (index: number, value: string) => {
-    const updated = [...players];
-    updated[index] = value;
-    setCreatedGame(null);
-    setPlayers(updated);
-  };
+  const onNameChange = React.useCallback(
+    (index: number, value: string) => {
+      const updated = [...players];
+      updated[index] = value;
+      setCreatedGame(null);
+      setPlayers(updated);
+    },
+    [players]
+  );
 
-  const onNewPlayerClicked = (index: number) => {
-    const updated = [...players];
-    updated.splice(index + 1, 0, "");
-    setCreatedGame(null);
-    setPlayers(updated);
-  };
+  const onNewPlayerClicked = React.useCallback(
+    (index: number) => {
+      const updated = [...players];
+      updated.splice(index + 1, 0, "");
+      setCreatedGame(null);
+      setPlayers(updated);
+    },
+    [players]
+  );
 
-  const onRemovePlayerClicked = (index: number) => {
-    const updated = [...players];
-    updated.splice(index, 1);
-    setCreatedGame(null);
-    setPlayers(updated);
-  };
+  const onRemovePlayerClicked = React.useCallback(
+    (index: number) => {
+      const updated = [...players];
+      updated.splice(index, 1);
+      setCreatedGame(null);
+      setPlayers(updated);
+    },
+    [players]
+  );
 
-  const onCreate = async () => {
+  const onCreate = React.useCallback(async () => {
     setLoading(true);
     const playerIds = players.map((player, index) => player || `Player ${index + 1}`);
     try {
@@ -53,7 +62,7 @@ export default function NewGame() {
       alert("Error creating game");
     }
     setLoading(false);
-  };
+  }, [players]);
 
   return (
     <div className="flex flex-col rounded-md">

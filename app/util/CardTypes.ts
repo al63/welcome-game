@@ -1,4 +1,4 @@
-export type GameCardType = "GARDEN" | "BIS" | "ESTATE" | "TEMP" | "POOL" | "FENCE";
+export type GameCardType = "PARK" | "BIS" | "ESTATE" | "TEMP" | "POOL" | "FENCE";
 
 export interface GameCard {
   value: number;

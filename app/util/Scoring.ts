@@ -53,7 +53,7 @@ export function computeScore(playerId: string, playerStates: PlayerStates): User
 
   const houseRows = [playerState.housesRowOne, playerState.housesRowTwo, playerState.housesRowThree];
 
-  const parks = houseRows.map((row) => countType(row, "GARDEN"));
+  const parks = houseRows.map((row) => countType(row, "PARK"));
   // possible to have more parks than the score system accounts for
   const parkScores = [
     ROW_ONE.parkScores[parks[0]] ?? ROW_ONE.parkScores[ROW_ONE.parkScores.length - 1],

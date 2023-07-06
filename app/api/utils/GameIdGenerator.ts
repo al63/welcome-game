@@ -849,7 +849,6 @@ const CITY_DESCRIPTORS = [
   "Palace",
   "Parcel",
   "Park",
-  "Park",
   "Parkland",
   "Pasture",
   "Plantation",

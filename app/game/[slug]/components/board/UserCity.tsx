@@ -124,8 +124,8 @@ function UserNeighborhood({
   pendingHouses,
   highlightedFences,
 }: RowProps) {
-  const numGardens = React.useMemo(() => {
-    return houses.filter((house) => house?.modifier === "GARDEN").length;
+  const numParks = React.useMemo(() => {
+    return houses.filter((house) => house?.modifier === "PARK").length;
   }, [houses]);
 
   if (config.houses !== houses.length) {
@@ -134,7 +134,7 @@ function UserNeighborhood({
 
   return (
     <div className="flex flex-col items-end">
-      {mini ? null : <ParksProgress scores={config.parkScores} count={numGardens} />}
+      {mini ? null : <ParksProgress scores={config.parkScores} count={numParks} />}
       <div className="flex mb-2">
         <Fence active mini={mini} />
         {houses.map((house, index) => {

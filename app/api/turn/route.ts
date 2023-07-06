@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
 import { CreateTurnAPIRequest, PlayerStateMap, TurnAction } from "../models";
 import { Db, Document, Filter, UpdateFilter } from "mongodb";
-import { PlayerState, PlayerStates } from "@/app/util/PlayerTypes";
+import { PlayerState } from "@/app/util/PlayerTypes";
 import { GameState, PlayerMetadataMap } from "@/app/util/GameTypes";
 import { computeScore, getEstatesResult } from "@/app/util/Scoring";
 import { PlanCard } from "@/app/util/CardTypes";

@@ -26,7 +26,7 @@ dummy.housesRowOne[1] = {
 
 dummy.housesRowOne[2] = {
   value: 5,
-  modifier: "GARDEN",
+  modifier: "PARK",
   usedForPlan: true,
 };
 dummy.housesRowOne[3] = {
@@ -102,7 +102,7 @@ export const dummyPlayerStates = {
 const dummyRevealedCardValues: GameCard[] = [
   { value: 8, backingType: "FENCE" },
   { value: 5, backingType: "TEMP" },
-  { value: 7, backingType: "GARDEN" },
+  { value: 7, backingType: "PARK" },
 ];
 const dummyRevealedCardModifiers: GameCardType[] = ["ESTATE", "FENCE", "BIS"];
 

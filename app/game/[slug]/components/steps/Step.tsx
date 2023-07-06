@@ -46,7 +46,7 @@ function StepInstructions({ step }: { step: GameStep }) {
         </p>
       );
     default:
-      throw "unhandled step in instrutions";
+      throw "unhandled step in instructions";
   }
 }
 

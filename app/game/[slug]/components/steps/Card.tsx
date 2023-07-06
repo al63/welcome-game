@@ -13,7 +13,7 @@ function modifierColor(modifier: GameCardType): string {
       return "bg-rose-400";
     case "TEMP":
       return "bg-orange-400";
-    case "GARDEN":
+    case "PARK":
       return "bg-green-600";
   }
 }
@@ -30,7 +30,7 @@ export function modifierDisplayName(modifier: GameCardType): string {
       return "BIS";
     case "TEMP":
       return "Temp Agency";
-    case "GARDEN":
+    case "PARK":
       return "Park";
   }
 }

@@ -27,7 +27,7 @@ export function shuffleWithSeedAndDrawOffset(seed: number, offset: number): Game
   return remainingDeck;
 }
 
-// The deck has numbers facing up, with a peek at what their backing type is (FENCE, GARDEN, etc.)
+// The deck has numbers facing up, with a peek at what their backing type is (FENCE, PARK, etc.)
 // WHen you draw cards, you flip the numbers down so that their backing type is revealed, also
 // revealing a new set of numbers.
 // the index lines up the modifiers with the numbers in play
