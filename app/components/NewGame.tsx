@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { CreateGameResponse } from "./api/models";
+import { CreateGameResponse } from "../api/models";
 import { LoadingSpinner } from "./LoadingSpinner";
 import classNames from "classnames";
 

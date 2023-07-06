@@ -1,4 +1,5 @@
-import NewGame from "./NewGame";
+import { Footer } from "./components/Footer";
+import NewGame from "./components/NewGame";
 
 export default function Home() {
   return (
@@ -19,13 +20,7 @@ export default function Home() {
         </p>
         <NewGame />
       </div>
-      <div className="w-full text-center py-4 bottom-0 bg-gray-400 text-white">
-        Made by{" "}
-        <a className="underline" href="https://alec-lee.com">
-          Alec
-        </a>{" "}
-        and Liz
-      </div>
+      <Footer />
     </div>
   );
 }
