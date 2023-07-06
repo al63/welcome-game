@@ -32,7 +32,6 @@ export function PlayersGrid({ onSetViewedPlayer, playerId, viewedPlayerId }: Pla
               onClick={() => onSetViewedPlayer(p)}
             >
               <h2 className="text-md font-semibold">{p}</h2>
-              <h1 className="text-lg font-bold pb-2 truncate">{playerStates[p].cityName}</h1>
               <MiniUserCity playerId={p} />
             </div>
           );
