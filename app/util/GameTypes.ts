@@ -11,7 +11,6 @@ export interface PlayerMetadataMap {
 export interface GameState {
   id: string;
   seed: number;
-  seedOffset: number;
   revealedCardValues: Array<GameCard>;
   revealedCardModifiers: Array<GameCardType>;
   players: PlayerMetadataMap;

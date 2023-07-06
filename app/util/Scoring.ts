@@ -81,14 +81,14 @@ export function computeScore(playerId: string, playerStates: PlayerStates): User
     .filter((x) => x.tempAgencies > 0);
 
   tempAgenciesByPlayer.sort((x, y) => {
-    return x.tempAgencies - y.tempAgencies;
+    return y.tempAgencies - x.tempAgencies;
   });
 
   let place = -1;
   let tempAgenciesCount = 0;
-  let prevScore = -1;
+  let prevScore = 1000;
   for (let i = 0; i < tempAgenciesByPlayer.length; i++) {
-    if (tempAgenciesByPlayer[i].tempAgencies > prevScore) {
+    if (tempAgenciesByPlayer[i].tempAgencies < prevScore) {
       place++;
       prevScore = tempAgenciesByPlayer[i].tempAgencies;
     }
@@ -175,7 +175,7 @@ export function getEstatesResult(fenceRow: boolean[], houseRow: Array<House | nu
   for (let i = 0; i < fenceRow.length + 1; i++) {
     lastFenceIdx++;
 
-    if (firstFenceIdx == -1 && lastFenceIdx == 0) {
+    if (firstFenceIdx == -1 && lastFenceIdx == 0 && fenceRow[lastFenceIdx]) {
       const res = checkValidEstate(houseRow, 0, 0);
       if (res.isValid) {
         estateResult[0].push({
@@ -183,11 +183,19 @@ export function getEstatesResult(fenceRow: boolean[], houseRow: Array<House | nu
           usedForPlan: res.usedInPlan,
         });
       }
-    } else if (firstFenceIdx == fenceRow.length - 1) {
+    } else if (firstFenceIdx == fenceRow.length - 1 && fenceRow[firstFenceIdx]) {
       const res = checkValidEstate(houseRow, houseRow.length - 1, houseRow.length - 1);
       if (res.isValid) {
         estateResult[0].push({
           columns: [houseRow.length - 1, houseRow.length - 1],
+          usedForPlan: res.usedInPlan,
+        });
+      }
+    } else if (lastFenceIdx == fenceRow.length) {
+      const res = checkValidEstate(houseRow, firstFenceIdx + 1, houseRow.length - 1);
+      if (res.isValid) {
+        estateResult[lastFenceIdx - firstFenceIdx - 1].push({
+          columns: [firstFenceIdx + 1, houseRow.length - 1],
           usedForPlan: res.usedInPlan,
         });
       }
