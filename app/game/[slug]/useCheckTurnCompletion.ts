@@ -14,7 +14,6 @@ export function useCheckTurnCompletion(
         return -1;
       }
 
-      console.log("poll API here");
       dispatch(await poll(state.gameState.id, state.gameState.turn + 1));
       checkId = window.setTimeout(check, 5000);
     }
