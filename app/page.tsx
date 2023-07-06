@@ -19,8 +19,8 @@ export default function Home() {
           .
         </p>
         <NewGame />
-        <Footer />
       </div>
+      <Footer />
     </div>
   );
 }
