@@ -4,7 +4,7 @@ import NewGame from "./components/NewGame";
 export default function Home() {
   return (
     <div className="w-full">
-      <div className="w-full min-h-screen p-4 flex flex-col items-center">
+      <div className="w-full p-4 flex flex-col items-center pb-20">
         <h1 className="m-8 italic text-5xl text-center">Welcome to Your Perfect Home</h1>
         <p className="mb-2">
           A web version of the <span className="italic">Welcome To...</span> board game. Learn how to play the game{" "}
