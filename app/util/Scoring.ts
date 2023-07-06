@@ -86,7 +86,7 @@ export function computeScore(playerId: string, playerStates: PlayerStates): User
 
   let place = -1;
   let tempAgenciesCount = 0;
-  let prevScore = 1000;
+  let prevScore = Infinity;
   for (let i = 0; i < tempAgenciesByPlayer.length; i++) {
     if (tempAgenciesByPlayer[i].tempAgencies < prevScore) {
       place++;
@@ -98,7 +98,7 @@ export function computeScore(playerId: string, playerStates: PlayerStates): User
       break;
     }
   }
-  const tempAgenciesScore = TEMP_SCORES[place] ?? 0;
+  const tempAgenciesScore = tempAgenciesCount > 0 ? TEMP_SCORES[place] ?? 0 : 0;
 
   const estatesScore = calculateEstatesScore(playerState);
   const estatesScoreSum = estatesScore.reduce((accum, cur) => {
