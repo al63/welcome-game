@@ -5,7 +5,7 @@ import { LoadingSpinner } from "./LoadingSpinner";
 import classNames from "classnames";
 
 export default function NewGame() {
-  const [players, setPlayers] = React.useState<Array<string | null>>([null, null]);
+  const [players, setPlayers] = React.useState<Array<string>>(["", ""]);
   const [loading, setLoading] = React.useState(false);
   const [createdGame, setCreatedGame] = React.useState<CreateGameResponse | null>(null);
 
@@ -18,7 +18,7 @@ export default function NewGame() {
 
   const onNewPlayerClicked = (index: number) => {
     const updated = [...players];
-    updated.splice(index + 1, 0, null);
+    updated.splice(index + 1, 0, "");
     setCreatedGame(null);
     setPlayers(updated);
   };
@@ -32,7 +32,7 @@ export default function NewGame() {
 
   const onCreate = async () => {
     setLoading(true);
-    const playerIds = players.map((player, index) => player ?? `Player ${index + 1}`);
+    const playerIds = players.map((player, index) => player || `Player ${index + 1}`);
     try {
       const res = await fetch("/api/game", {
         method: "POST",
@@ -65,7 +65,8 @@ export default function NewGame() {
             <input
               className="border rounded-sm flex-grow p-1 w-72"
               maxLength={20}
-              value={player == null ? `Player ${index + 1}` : player}
+              placeholder={`Player ${index + 1}`}
+              value={player}
               onChange={(e) => onNameChange(index, e.target.value)}
             />
             {players.length < 6 ? (
