@@ -1241,6 +1241,6 @@ export function generateCityName() {
     " of " +
     (randomNumber == 0
       ? NOUNS[Math.floor(Math.random() * NOUNS.length)]
-      : " the " + ANIMALS[Math.floor(Math.random() * ANIMALS.length)])
+      : "the " + ANIMALS[Math.floor(Math.random() * ANIMALS.length)])
   );
 }
