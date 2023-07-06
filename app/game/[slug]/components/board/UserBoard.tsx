@@ -10,10 +10,10 @@ export function UserBoard({ viewedPlayerId }: Props) {
   return (
     <div className="bg-orange-100 inline-block p-2 rounded-lg drop-shadow-sm min-w-fit">
       <div className="flex">
-        <div className="pr-4 border-r border-gray-500">
+        <div className="pr-2 border-r border-gray-500">
           <UserCity viewedPlayerId={viewedPlayerId} />
         </div>
-        <div className="pl-4">
+        <div className="pl-2">
           <CityPlans />
         </div>
       </div>
