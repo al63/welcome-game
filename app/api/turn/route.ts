@@ -289,7 +289,7 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
           (idx + 1) +
           " for " +
           currentPlayerState.completedPlans[idx] +
-          "points!"
+          " points!"
       );
     }
   });
@@ -305,74 +305,68 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
       currentTurnLog,
       "[" + currentTurn + "] " + currentPlayerState.playerId + " has completed all city plans!"
     );
-  }
-
-  // determine if a player has ended the game via using all of their permit refusals (idx 3)
-  if (currentPlayerState.permitRefusals == 3) {
+  } else if (currentPlayerState.permitRefusals == 3) {
+    // determine if a player has ended the game via using all of their permit refusals (idx 3)
     newGameState.completed = true;
     currentTurnLog = addEventLog(
       currentTurnLog,
       "[" + currentTurn + "] " + currentPlayerState.playerId + " has used all of their permit refusals!"
     );
+  } else {
+    // determine if a player has ended the game via building in every single spot
+    const rowOneCompleted = currentPlayerState.housesRowOne.every(function (house) {
+      return house != null;
+    });
+    const rowTwoCompleted = currentPlayerState.housesRowTwo.every(function (house) {
+      return house != null;
+    });
+    const rowThreeCompleted = currentPlayerState.housesRowThree.every(function (house) {
+      return house != null;
+    });
+
+    if (rowOneCompleted && rowTwoCompleted && rowThreeCompleted) {
+      newGameState.completed = true;
+      currentTurnLog = addEventLog(
+        currentTurnLog,
+        "[" + currentTurn + "] " + currentPlayerState.playerId + " has built every single housing development!"
+      );
+    }
   }
-
-  // determine if a player has ended the game via building in every single spot
-  const rowOneCompleted = currentPlayerState.housesRowOne.every(function (house) {
-    return house != null;
-  });
-  const rowTwoCompleted = currentPlayerState.housesRowTwo.every(function (house) {
-    return house != null;
-  });
-  const rowThreeCompleted = currentPlayerState.housesRowThree.every(function (house) {
-    return house != null;
-  });
-
-  if (rowOneCompleted && rowTwoCompleted && rowThreeCompleted) {
-    newGameState.completed = true;
-    currentTurnLog = addEventLog(
-      currentTurnLog,
-      "[" + currentTurn + "] " + currentPlayerState.playerId + " has built every single housing development!"
-    );
-  }
-
   const nextTurn = gameState.turn + 1;
   newGameState.players[currentPlayerState.playerId].turn = nextTurn;
   const advanceTurn = Object.keys(newGameState.players).every(function (e) {
     return newGameState.players[e].turn == nextTurn;
   });
-  // Advance the GameState turn if all players have taken the current GameState turn and the game isn't over
-  if (!newGameState.completed) {
-    if (advanceTurn) {
-      currentTurnLog = addEventLog(currentTurnLog, "Turn " + nextTurn + " has begun.");
-      newGameState.turn++;
-    }
-  } else {
-    if (advanceTurn) {
-      let winningPlayer = "";
-      let winningPlayerScore = 0;
-      currentTurnLog = addEventLog(currentTurnLog, "The game is over! Calculating scores...");
-      const finalPlayersResult = await calculateFinalScores(db, newGameState.players);
-      newGameState.players = finalPlayersResult;
-      Object.keys(finalPlayersResult).forEach((player, _) => {
-        if (finalPlayersResult[player].score > winningPlayerScore) {
-          winningPlayer = player;
-          winningPlayerScore = finalPlayersResult[player].score;
-        }
-        currentTurnLog = addEventLog(currentTurnLog, player + ": " + finalPlayersResult[player].score);
-      });
-      currentTurnLog = addEventLog(currentTurnLog, "Congratulations to " + winningPlayer + "!");
-    } else {
-      currentTurnLog = addEventLog(currentTurnLog, "The game is ending! Waiting for all players to finish...");
-    }
+
+  if (advanceTurn) {
+    currentTurnLog = addEventLog(currentTurnLog, "Turn " + nextTurn + " has begun.");
+    newGameState.turn++;
   }
 
-  const cardsDrawn = newGameState.turn * 3;
+  if (advanceTurn && newGameState.completed) {
+    let winningPlayer = "";
+    let winningPlayerScore = -1;
+    currentTurnLog = addEventLog(currentTurnLog, "The game is over! Calculating scores...");
+    const finalPlayersResult = await calculateFinalScores(db, newGameState.players, gameState.id);
+    newGameState.players = finalPlayersResult;
+    Object.keys(finalPlayersResult).forEach((player, _) => {
+      if (finalPlayersResult[player].score > winningPlayerScore) {
+        winningPlayer = player;
+        winningPlayerScore = finalPlayersResult[player].score;
+      }
+      currentTurnLog = addEventLog(currentTurnLog, player + ": " + finalPlayersResult[player].score);
+    });
+    currentTurnLog = addEventLog(currentTurnLog, "Congratulations to " + winningPlayer + "!");
+  }
+
+  const cardsDrawn = gameState.turn * 3;
   const deckExhausted = cardsDrawn % 81 == 0;
+  const cardsToDraw = gameState.turn % 27;
   if (deckExhausted) {
     currentTurnLog = addEventLog(currentTurnLog, "[" + nextTurn + "] The deck has been exhausted -- shuffling!");
   }
   const seed = deckExhausted ? new Date().getTime() : gameState.seed;
-  const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, gameState.turn);
+  const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, cardsToDraw);
   const activeCards: ActiveCards = drawCards(shuffledDeck);
   newGameState.revealedCardValues = activeCards.revealedNumbers;
   newGameState.revealedCardModifiers = activeCards.revealedModifiers.map((gameCard) => gameCard.backingType);
@@ -380,9 +374,13 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
   return newGameState;
 }
 
-async function calculateFinalScores(db: Db, currPlayerMap: PlayerMetadataMap): Promise<PlayerMetadataMap> {
+async function calculateFinalScores(
+  db: Db,
+  currPlayerMap: PlayerMetadataMap,
+  gameId: string
+): Promise<PlayerMetadataMap> {
   const playerStates = db.collection<PlayerState>("player_states");
-  const playerStateQuery: Filter<PlayerState> = { gameId: currPlayerMap.gameId };
+  const playerStateQuery: Filter<PlayerState> = { gameId: gameId };
   const playerStatesCursor = playerStates.find<PlayerState>(playerStateQuery);
 
   const playerStatesMap: PlayerStateMap = {};
@@ -396,7 +394,11 @@ async function calculateFinalScores(db: Db, currPlayerMap: PlayerMetadataMap): P
 
   Object.keys(playerStatesMap).forEach((playerId, _) => {
     const userScore = computeScore(playerId, playerStatesMap);
-    newPlayerMetadataState[playerId].score = userScore?.summation || 0;
+    console.log(userScore);
+    if (userScore == null) {
+      return;
+    }
+    newPlayerMetadataState[playerId].score = userScore?.summation;
   });
 
   return newPlayerMetadataState;
