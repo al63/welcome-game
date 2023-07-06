@@ -1,4 +1,4 @@
-import { GameCard, GameCardType } from "@/app/util/CardTypes";
+import { GameCard } from "@/app/util/CardTypes";
 import { Card, modifierDisplayName } from "./Card";
 import { useGameStateMachineDispatch } from "../../GameStateMachineContext";
 import { chooseCard, submitSkipTurn } from "../../GameStateMachineActions";

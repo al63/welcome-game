@@ -1,18 +1,17 @@
 import React from "react";
 import { submitTurn } from "../../GameStateMachineActions";
 import { useGameStateMachineDispatch } from "../../GameStateMachineContext";
-import { CancelButton } from "./CancelButton";
-import { FenceStep } from "@/app/util/GameStateMachineTypes";
+import { BISStep, FenceStep } from "@/app/util/GameStateMachineTypes";
 import { GameState } from "@/app/util/GameTypes";
-import { SkipButton } from "./SkipButton";
 
-interface PlaceFenceProps {
-  step: FenceStep;
+interface ChooseBISProps {
+  step: BISStep | FenceStep;
   gameState: GameState;
   playerId: string;
+  text: string;
 }
 
-export function PlaceFence({ step, gameState, playerId }: PlaceFenceProps) {
+export function SkipButton({ step, gameState, playerId, text }: ChooseBISProps) {
   const dispatch = useGameStateMachineDispatch();
 
   const onSkip = React.useCallback(async () => {
@@ -26,9 +25,8 @@ export function PlaceFence({ step, gameState, playerId }: PlaceFenceProps) {
   }, [dispatch, step, gameState, playerId]);
 
   return (
-    <div className="space-x-2">
-      <SkipButton step={step} gameState={gameState} playerId={playerId} text="Skip Fence" />
-      <CancelButton />
-    </div>
+    <button className="px-8 py-2 rounded-full bg-yellow-200 hover:bg-yellow-300" onClick={onSkip}>
+      {text}
+    </button>
   );
 }
