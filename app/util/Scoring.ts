@@ -81,7 +81,7 @@ export function computeScore(playerId: string, playerStates: PlayerStates): User
     .filter((x) => x.tempAgencies > 0);
 
   tempAgenciesByPlayer.sort((x, y) => {
-    return x.tempAgencies - y.tempAgencies;
+    return y.tempAgencies - x.tempAgencies;
   });
 
   let place = -1;
