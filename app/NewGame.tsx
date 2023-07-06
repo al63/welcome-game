@@ -65,46 +65,47 @@ export default function NewGame() {
   }, [players]);
 
   return (
-    <div className="flex flex-col rounded-md">
-      <h2 className="text-xl my-4 font-semibold">Players</h2>
-
-      {players.map((player, index) => {
-        return (
-          <div key={index} className="flex mb-2">
-            <input
-              className="border rounded-sm flex-grow p-1 w-72"
-              maxLength={20}
-              placeholder={`Player ${index + 1}`}
-              value={player}
-              onChange={(e) => onNameChange(index, e.target.value)}
-            />
-            {players.length < 6 ? (
-              <button className="ml-2 hover:bg-slate-200 px-3 rounded-full" onClick={() => onNewPlayerClicked(index)}>
-                +
+    <div className="flex flex-col items-center">
+      <div className="flex flex-col rounded-md">
+        <h2 className="text-xl my-4 font-semibold">Players</h2>
+        {players.map((player, index) => {
+          return (
+            <div key={index} className="flex mb-2">
+              <input
+                className="border rounded-sm flex-grow p-1 w-72"
+                maxLength={20}
+                placeholder={`Player ${index + 1}`}
+                value={player}
+                onChange={(e) => onNameChange(index, e.target.value)}
+              />
+              {players.length < 6 ? (
+                <button className="ml-2 hover:bg-slate-200 px-3 rounded-full" onClick={() => onNewPlayerClicked(index)}>
+                  +
+                </button>
+              ) : null}
+              <button
+                className={classNames("ml-2 hover:bg-slate-200 px-3 rounded-full", {
+                  invisible: players.length < 3,
+                })}
+                onClick={() => onRemovePlayerClicked(index)}
+              >
+                -
               </button>
-            ) : null}
-            <button
-              className={classNames("ml-2 hover:bg-slate-200 px-3 rounded-full", {
-                invisible: players.length < 3,
-              })}
-              onClick={() => onRemovePlayerClicked(index)}
-            >
-              -
-            </button>
-          </div>
-        );
-      })}
-      <button
-        className={classNames("self-center px-8 py-2 mt-4 rounded-full flex", {
-          "bg-red-200 hover:bg-red-300": !createdGame && !loading,
-          "bg-red-100 text-gray-400": !!createdGame || loading,
+            </div>
+          );
         })}
-        onClick={onCreate}
-        disabled={createdGame != null}
-      >
-        {loading ? <LoadingSpinner /> : null}
-        {loading ? "Creating..." : "Create Game"}
-      </button>
+        <button
+          className={classNames("self-center px-8 py-2 mt-4 rounded-full flex", {
+            "bg-red-200 hover:bg-red-300": !createdGame && !loading,
+            "bg-red-100 text-gray-400": !!createdGame || loading,
+          })}
+          onClick={onCreate}
+          disabled={createdGame != null}
+        >
+          {loading ? <LoadingSpinner /> : null}
+          {loading ? "Creating..." : "Create Game"}
+        </button>
+      </div>
       {createdGame != null ? (
         <div className="mt-6">
           <h1>To start the game, share the links below to the respective players and click on your own.</h1>
