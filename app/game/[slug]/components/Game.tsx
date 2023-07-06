@@ -27,7 +27,7 @@ export default function Game({ initialPlayerStates, initialGameState, playerId }
       <div className="min-w-full m-2">
         <div className="flex flex-col items-start lg:items-stretch lg:flex-row">
           <UserBoard viewedPlayerId={viewedPlayerId} />
-          <div className="flex flex-row lg:flex-col mx-4 mt-4">
+          <div className="flex flex-row lg:flex-col mx-2 lg:mx-4 mt-4">
             <Step />
             <div className="ml-4 lg:ml-0 lg:mt-auto">
               <EventLog />
