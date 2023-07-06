@@ -267,7 +267,7 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
     ...gameState,
   };
   const currentTurn = gameState.turn;
-  const currentTurnLog = [...gameState.latestEventLog];
+  const currentTurnLog = [];
   currentTurnLog.push(currentPlayerState.lastEvent);
 
   // Update the completed plans for the GameState so that players can determine if
