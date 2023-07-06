@@ -15,6 +15,7 @@ export default function Home() {
           >
             here
           </a>
+          .
         </p>
         <NewGame />
       </div>
