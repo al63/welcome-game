@@ -231,7 +231,7 @@ export function MiniUserCity({ playerId }: { playerId: string }) {
   const viewedPlayerState = playerStates[playerId];
   return (
     <div className="max-w-xs">
-      <h1 className="text-lg font-bold pb-2 truncate">{viewedPlayerState.cityName}</h1>
+      <h1 className="text-lg font-bold pb-2 truncate text-center">{viewedPlayerState.cityName}</h1>
       <UserNeighborhood
         config={ROW_ONE}
         houses={viewedPlayerState.housesRowOne}
