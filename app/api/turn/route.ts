@@ -157,10 +157,10 @@ function consolidateUpdate(action: TurnAction, playerState: PlayerState, turn: n
     lastEvent += " with the BIS on row " + action.bisPosition[0] + " column " + action.bisPosition[1];
   }
   newPlayerState.lastEvent = lastEvent;
-  return validateCityPlanCompletion(newPlayerState, plans);
+  return validateCityPlanCompletion(newPlayerState, plans, turn);
 }
 
-function validateCityPlanCompletion(playerState: PlayerState, plans: PlanCard[]): PlayerState {
+function validateCityPlanCompletion(playerState: PlayerState, plans: PlanCard[], turn: number): PlayerState {
   const newPlayerState = {
     ...playerState,
   };
@@ -222,9 +222,10 @@ function validateCityPlanCompletion(playerState: PlayerState, plans: PlanCard[])
           return !e.usedForPlan;
         });
         // for each requirement, start marking houses as used for a plan up to the quantity of the requirement
-        for (let i = 0; i <= req.quantity; i++) {
+        for (let i = 0; i < req.quantity; i++) {
           const estate = availableEstates[i];
-          for (let j = estate.columns[0]; j < estate.columns[1]; j++) {
+          console.log("ESTATE: ", estate);
+          for (let j = estate.columns[0]; j <= estate.columns[1]; j++) {
             switch (size) {
               case 0:
                 const colRowOne = newPlayerState.housesRowOne[j];
@@ -250,9 +251,10 @@ function validateCityPlanCompletion(playerState: PlayerState, plans: PlanCard[])
         }
       });
 
-      if (plan.completed) {
+      if (plan.completed || (plan.turnCompleted != null && plan.turnCompleted < turn)) {
         newPlayerState.completedPlans[idx] = plan.secondValue;
-        newPlayerState.lastEvent += " and has completed City Plan " + idx + "!";
+        newPlayerState.lastEvent +=
+          " and has completed City Plan " + (idx + 1) + " for " + plan.secondValue + " points!";
       } else {
         newPlayerState.completedPlans[idx] = plan.firstValue;
       }
@@ -267,16 +269,28 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
     ...gameState,
   };
   const currentTurn = gameState.turn;
-  const currentTurnLog = [];
-  currentTurnLog.push(currentPlayerState.lastEvent);
+  let currentTurnLog = [...gameState.latestEventLog];
+  currentTurnLog = addEventLog(currentTurnLog, currentPlayerState.lastEvent);
 
   // Update the completed plans for the GameState so that players can determine if
   // they get first or second score for completing a plan
   currentPlayerState.completedPlans.forEach((_, idx) => {
-    if (gameState.plans[idx].completed != true && currentPlayerState.completedPlans[idx] > 0) {
+    if (
+      (gameState.plans[idx].completed != true || gameState.plans[idx].turnCompleted == gameState.turn) &&
+      currentPlayerState.completedPlans[idx] > 0
+    ) {
       newGameState.plans[idx].completed = true;
-      currentTurnLog.push(
-        "[" + currentTurn + "] " + currentPlayerState.playerId + " is the first to complete City Plan " + idx + "!"
+      currentTurnLog = addEventLog(
+        currentTurnLog,
+        "[" +
+          currentTurn +
+          "] " +
+          currentPlayerState.playerId +
+          " is the first to complete City Plan " +
+          (idx + 1) +
+          " for " +
+          currentPlayerState.completedPlans[idx] +
+          "points!"
       );
     }
   });
@@ -288,13 +302,17 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
 
   if (planEndCondition) {
     newGameState.completed = true;
-    currentTurnLog.push("[" + currentTurn + "] " + currentPlayerState.playerId + " has completed all city plans!");
+    currentTurnLog = addEventLog(
+      currentTurnLog,
+      "[" + currentTurn + "] " + currentPlayerState.playerId + " has completed all city plans!"
+    );
   }
 
   // determine if a player has ended the game via using all of their permit refusals (idx 3)
   if (currentPlayerState.permitRefusals == 3) {
     newGameState.completed = true;
-    currentTurnLog.push(
+    currentTurnLog = addEventLog(
+      currentTurnLog,
       "[" + currentTurn + "] " + currentPlayerState.playerId + " has used all of their permit refusals!"
     );
   }
@@ -312,7 +330,8 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
 
   if (rowOneCompleted && rowTwoCompleted && rowThreeCompleted) {
     newGameState.completed = true;
-    currentTurnLog.push(
+    currentTurnLog = addEventLog(
+      currentTurnLog,
       "[" + currentTurn + "] " + currentPlayerState.playerId + " has built every single housing development!"
     );
   }
@@ -325,15 +344,14 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
   // Advance the GameState turn if all players have taken the current GameState turn and the game isn't over
   if (!newGameState.completed) {
     if (advanceTurn) {
-      currentTurnLog.push("[" + currentTurn + "] " + "All players have taken their turn!");
-      currentTurnLog.push("Turn " + nextTurn + " has begun.");
+      currentTurnLog = addEventLog(currentTurnLog, "Turn " + nextTurn + " has begun.");
       newGameState.turn++;
     }
   } else {
     if (advanceTurn) {
       let winningPlayer = "";
       let winningPlayerScore = 0;
-      currentTurnLog.push("The game is over! Calculating scores...");
+      currentTurnLog = addEventLog(currentTurnLog, "The game is over! Calculating scores...");
       const finalPlayersResult = await calculateFinalScores(db, newGameState.players);
       newGameState.players = finalPlayersResult;
       Object.keys(finalPlayersResult).forEach((player, _) => {
@@ -341,19 +359,25 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
           winningPlayer = player;
           winningPlayerScore = finalPlayersResult[player].score;
         }
-        currentTurnLog.push(player + ": " + finalPlayersResult[player].score);
+        currentTurnLog = addEventLog(currentTurnLog, player + ": " + finalPlayersResult[player].score);
       });
-      currentTurnLog.push("Congratulations to " + winningPlayer + "!");
+      currentTurnLog = addEventLog(currentTurnLog, "Congratulations to " + winningPlayer + "!");
     } else {
-      currentTurnLog.push("The game is ending! Waiting for all players to finish...");
+      currentTurnLog = addEventLog(currentTurnLog, "The game is ending! Waiting for all players to finish...");
     }
   }
 
-  newGameState.latestEventLog = currentTurnLog;
-  const shuffledDeck = shuffleWithSeedAndDrawOffset(newGameState.seed, gameState.turn);
+  const cardsDrawn = newGameState.turn * 3;
+  const deckExhausted = cardsDrawn % 81 == 0;
+  if (deckExhausted) {
+    currentTurnLog = addEventLog(currentTurnLog, "[" + nextTurn + "] The deck has been exhausted -- shuffling!");
+  }
+  const seed = deckExhausted ? new Date().getTime() : gameState.seed;
+  const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, gameState.turn);
   const activeCards: ActiveCards = drawCards(shuffledDeck);
   newGameState.revealedCardValues = activeCards.revealedNumbers;
   newGameState.revealedCardModifiers = activeCards.revealedModifiers.map((gameCard) => gameCard.backingType);
+  newGameState.latestEventLog = currentTurnLog;
   return newGameState;
 }
 
@@ -377,4 +401,13 @@ async function calculateFinalScores(db: Db, currPlayerMap: PlayerMetadataMap): P
   });
 
   return newPlayerMetadataState;
+}
+
+function addEventLog(log: string[], val: string): string[] {
+  const newLog = [...log];
+  if (newLog.length > 15) {
+    newLog.shift();
+  }
+  newLog.push(val);
+  return newLog;
 }
