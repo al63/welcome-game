@@ -5,11 +5,11 @@ import { chooseCard, submitSkipTurn } from "../../GameStateMachineActions";
 import { GameState } from "@/app/util/GameTypes";
 
 interface CardsProps {
-  gameState: GameState;
   playerId: string;
+  gameState: GameState;
 }
 
-export async function Cards({ gameState, playerId }: CardsProps) {
+export function Cards({ gameState, playerId }: CardsProps) {
   const dispatch = useGameStateMachineDispatch();
   const upcoming = gameState.revealedCardValues.map((card) => modifierDisplayName(card.backingType));
 
@@ -37,8 +37,10 @@ export async function Cards({ gameState, playerId }: CardsProps) {
         })}
       </div>
       <button
+        onClick={async () => {
+          dispatch(await submitSkipTurn(gameState, playerId));
+        }}
         className="px-8 py-2 rounded-full bg-red-400 hover:bg-red-500 mt-4"
-        onClick={async () => dispatch(await submitSkipTurn(gameState, playerId))}
       >
         Skip turn
       </button>

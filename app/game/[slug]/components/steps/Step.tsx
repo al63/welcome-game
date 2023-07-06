@@ -65,7 +65,7 @@ function StepActions({ step, gameState, playerId }: { step: GameStep; gameState:
     case "placeCard":
       return <CancelButton />;
     case "choose":
-      return <Cards gameState={gameState} playerId={playerId} />;
+      return <Cards playerId={playerId} gameState={gameState} />;
     default:
       return null;
   }
