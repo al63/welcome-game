@@ -31,7 +31,7 @@ export function modifierDisplayName(modifier: GameCardType): string {
     case "TEMP":
       return "Temp Agency";
     case "GARDEN":
-      return "Garden";
+      return "Park";
   }
 }
 
