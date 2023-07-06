@@ -83,14 +83,14 @@ export default function NewGame() {
                   +
                 </button>
               ) : null}
-              <button
-                className={classNames("ml-2 hover:bg-slate-200 px-3 rounded-full", {
-                  invisible: players.length < 3,
-                })}
-                onClick={() => onRemovePlayerClicked(index)}
-              >
-                -
-              </button>
+              {players.length > 2 ? (
+                <button
+                  className="ml-2 hover:bg-slate-200 px-3 rounded-full"
+                  onClick={() => onRemovePlayerClicked(index)}
+                >
+                  -
+                </button>
+              ) : null}
             </div>
           );
         })}
