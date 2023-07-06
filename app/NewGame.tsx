@@ -56,15 +56,15 @@ export default function NewGame() {
   };
 
   return (
-    <div className="flex flex-col w-96 rounded-md">
+    <div className="flex flex-col rounded-md">
       <h2 className="text-xl my-4 font-semibold">Players</h2>
 
       {players.map((player, index) => {
         return (
           <div key={index} className="flex mb-2">
             <input
-              className="border rounded-sm flex-grow p-1"
-              maxLength={16}
+              className="border rounded-sm flex-grow p-1 w-72"
+              maxLength={20}
               value={player == null ? `Player ${index + 1}` : player}
               onChange={(e) => onNameChange(index, e.target.value)}
             />
@@ -73,14 +73,14 @@ export default function NewGame() {
                 +
               </button>
             ) : null}
-            {players.length > 2 ? (
-              <button
-                className="ml-2 hover:bg-slate-200 px-3 rounded-full"
-                onClick={() => onRemovePlayerClicked(index)}
-              >
-                -
-              </button>
-            ) : null}
+            <button
+              className={classNames("ml-2 hover:bg-slate-200 px-3 rounded-full", {
+                invisible: players.length < 3,
+              })}
+              onClick={() => onRemovePlayerClicked(index)}
+            >
+              -
+            </button>
           </div>
         );
       })}
