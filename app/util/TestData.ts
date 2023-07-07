@@ -122,4 +122,5 @@ export const dummyGameState: GameState = {
   turn: 1,
   completed: false,
   latestEventLog: [],
+  createdAt: new Date(),
 };
