@@ -3,7 +3,7 @@ import clientPromise from "../../../lib/mongodb";
 import { CreateTurnAPIRequest, PlayerStateMap, TurnAction } from "../models";
 import { Db, Document, Filter, UpdateFilter } from "mongodb";
 import { PlayerState } from "@/app/util/PlayerTypes";
-import { GameState, PlayerMetadataMap } from "@/app/util/GameTypes";
+import { FinalScores, GameState, PlayerMetadataMap, ScoringInfo } from "@/app/util/GameTypes";
 import { computeScore, getEstatesResult } from "@/app/util/Scoring";
 import { PlanCard } from "@/app/util/CardTypes";
 import { ActiveCards, drawCards, shuffleWithSeedAndDrawOffset } from "../utils/Deck";
@@ -344,19 +344,13 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
   }
 
   if (advanceTurn && newGameState.completed) {
-    let winningPlayer = "";
-    let winningPlayerScore = -1;
     currentTurnLog = addEventLog(currentTurnLog, "The game is over! Calculating scores...");
-    const finalPlayersResult = await calculateFinalScores(db, newGameState.players, gameState.id);
-    newGameState.players = finalPlayersResult;
-    Object.keys(finalPlayersResult).forEach((player, _) => {
-      if (finalPlayersResult[player].score > winningPlayerScore) {
-        winningPlayer = player;
-        winningPlayerScore = finalPlayersResult[player].score;
-      }
-      currentTurnLog = addEventLog(currentTurnLog, player + ": " + finalPlayersResult[player].score);
+    const finalScores = await calculateFinalScores(db, newGameState.players, gameState.id);
+    newGameState.players = finalScores.playerMetadataMap;
+    finalScores.scoringInfo.forEach((info) => {
+      currentTurnLog = addEventLog(currentTurnLog, `${info.playerId}: ${info.score}`);
     });
-    currentTurnLog = addEventLog(currentTurnLog, "Congratulations to " + winningPlayer + "!");
+    currentTurnLog = addEventLog(currentTurnLog, `Congratulations to ${finalScores.scoringInfo[0].playerId}!`);
   }
 
   const cardsDrawn = gameState.turn * 3;
@@ -374,11 +368,7 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
   return newGameState;
 }
 
-async function calculateFinalScores(
-  db: Db,
-  currPlayerMap: PlayerMetadataMap,
-  gameId: string
-): Promise<PlayerMetadataMap> {
+async function calculateFinalScores(db: Db, currPlayerMap: PlayerMetadataMap, gameId: string): Promise<FinalScores> {
   const playerStates = db.collection<PlayerState>("player_states");
   const playerStateQuery: Filter<PlayerState> = { gameId: gameId };
   const playerStatesCursor = playerStates.find<PlayerState>(playerStateQuery);
@@ -388,20 +378,70 @@ async function calculateFinalScores(
     delete (doc as any)["_id"];
     playerStatesMap[doc.playerId] = doc;
   }
+
   const newPlayerMetadataState = {
     ...currPlayerMap,
   };
 
-  Object.keys(playerStatesMap).forEach((playerId, _) => {
+  const scores = Object.keys(playerStatesMap).map((playerId) => {
     const userScore = computeScore(playerId, playerStatesMap);
-    console.log(userScore);
-    if (userScore == null) {
-      return;
-    }
-    newPlayerMetadataState[playerId].score = userScore?.summation;
+
+    return {
+      playerId,
+      score: userScore?.summation ?? 0,
+      estates: userScore?.estates,
+    };
   });
 
-  return newPlayerMetadataState;
+  // update player metadata as well
+  scores.forEach((score) => {
+    newPlayerMetadataState[score.playerId].score = score.score;
+  });
+
+  scores.sort((x, y) => {
+    const diff = y.score - x.score;
+    if (diff !== 0) {
+      return diff;
+    }
+
+    // break tie breakers by
+    // 1) most estates
+    // 2) most of each incremental estate starting at 1
+    const yCount =
+      y.estates?.reduce((accum, cur) => {
+        return accum + cur.count;
+      }, 0) ?? 0;
+    const xCount =
+      x.estates?.reduce((accum, cur) => {
+        return accum + cur.count;
+      }, 0) ?? 0;
+
+    const estatesDiff = yCount - xCount;
+    if (estatesDiff !== 0) {
+      return estatesDiff;
+    }
+
+    for (let i = 0; i < (y.estates?.length ?? 0); i++) {
+      const ed = (y.estates?.[i].count ?? 0) - (x.estates?.[i].count ?? 0);
+      if (ed !== 0) {
+        return ed;
+      }
+    }
+
+    return 0;
+  });
+
+  const scoringInfo = scores.map((scores) => {
+    return {
+      score: scores.score,
+      playerId: scores.playerId,
+    };
+  });
+
+  return {
+    scoringInfo,
+    playerMetadataMap: newPlayerMetadataState,
+  };
 }
 
 function addEventLog(log: string[], val: string): string[] {

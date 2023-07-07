@@ -1,5 +1,15 @@
 import { GameCard, GameCardType, PlanCard } from "./CardTypes";
 
+export interface FinalScores {
+  scoringInfo: Array<ScoringInfo>;
+  playerMetadataMap: PlayerMetadataMap;
+}
+
+export interface ScoringInfo {
+  score: number;
+  playerId: string;
+}
+
 interface PlayerMetadata {
   score: number;
   turn: number;
