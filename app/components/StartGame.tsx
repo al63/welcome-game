@@ -20,6 +20,7 @@ export function StartGame({ createdGame }: StartGameProps) {
           return (
             <li className="mx-2 my-4 break-all" key={player}>
               <span className="font-semibold">{player}: </span>
+              {/* Dont want any prefetching at all, even on hover, so just a tags*/}
               <a className="text-blue-500 underline" href={path}>
                 {link}
               </a>

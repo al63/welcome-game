@@ -1,6 +1,7 @@
 import Game from "./components/Game";
 import { getGameServerAction } from "@/app/api/game/getGame";
 import { dummyGameState, dummyPlayerStates } from "@/app/util/TestData";
+import { GameNotFound } from "./components/GameNotFound";
 
 export default async function GamePage({
   params,
@@ -22,7 +23,7 @@ export default async function GamePage({
   }
 
   if (res == null || playerId == null) {
-    return <div>Game / Player combination not found.</div>;
+    return <GameNotFound />;
   }
 
   return <Game initialPlayerStates={res.playerStates} playerId={playerId} initialGameState={res.gameState} />;

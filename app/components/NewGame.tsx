@@ -7,7 +7,7 @@ import { Players } from "./Players";
 import { StartGame } from "./StartGame";
 
 export default function NewGame() {
-  const [players, setPlayers] = React.useState<Array<string>>(["", ""]);
+  const [players, setPlayers] = React.useState<string[]>(["", ""]);
   const [loading, setLoading] = React.useState(false);
   const [createdGame, setCreatedGame] = React.useState<CreateGameResponse | null>(null);
 
