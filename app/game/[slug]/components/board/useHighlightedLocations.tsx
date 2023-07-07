@@ -199,7 +199,6 @@ function findDuplicableColumns(
   fences: boolean[],
   pendingPosition: number | null
 ): Set<number> {
-  // TODO: you aren't actually allowed to place the dupe house if a fence is in between: <15> | <15 BIS> is not allowed
   // For the BIS action, we can duplicate any house if:
   //  1) There is an adjacent empty space.
   //  2) Said adjacent empty space isn't cut off by a fence
