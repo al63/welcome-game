@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json<PollTurnAPIResponse>({ result: "WAIT" }, { status: 200 });
     } else {
       return NextResponse.json<PollTurnAPIResponse>(
-        { result: "ERROR", error: "Game Turn: " + gameState.turn + ", Requested Turn: " + turn },
+        { result: "ERROR", error: `Game Turn: ${gameState.turn}, Requested Turn: ${turn}` },
         { status: 400 }
       );
     }

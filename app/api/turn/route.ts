@@ -3,7 +3,7 @@ import clientPromise from "../../../lib/mongodb";
 import { CreateTurnAPIRequest, PlayerStateMap, TurnAction } from "../models";
 import { Db, Document, Filter, UpdateFilter } from "mongodb";
 import { PlayerState } from "@/app/util/PlayerTypes";
-import { FinalScores, GameState, PlayerMetadataMap, ScoringInfo } from "@/app/util/GameTypes";
+import { FinalScores, GameState, PlayerMetadataMap } from "@/app/util/GameTypes";
 import { computeScore, getEstatesResult } from "@/app/util/Scoring";
 import { PlanCard } from "@/app/util/CardTypes";
 import { ActiveCards, drawCards, shuffleWithSeedAndDrawOffset } from "../utils/Deck";
@@ -103,7 +103,7 @@ function consolidateUpdate(action: TurnAction, playerState: PlayerState, turn: n
   switch (action.type) {
     case "refusal":
       playerState.permitRefusals++;
-      playerState.lastEvent = playerState.playerId + " has no valid moves and has received a permit refusal.";
+      playerState.lastEvent = `${playerState.playerId} has no valid moves and has received a permit refusal.`;
       return playerState;
     case "fence":
       if (action.fencePosition[0] == 0) {
@@ -142,17 +142,15 @@ function consolidateUpdate(action: TurnAction, playerState: PlayerState, turn: n
     newPlayerState.housesRowThree[action.housePosition[1]] = action.house;
   }
 
-  let lastEvent = "[" + turn + "] ";
-  lastEvent += newPlayerState.playerId + " played value " + action.house.value;
+  let lastEvent = `[${turn}] ${newPlayerState.playerId} played value ${action.house.value}`;
   if (action.house.modifier) {
-    lastEvent += " " + action.house.modifier;
+    lastEvent += ` ${action.house.modifier}`;
   }
-  lastEvent += " on row " + action.housePosition[0] + " column " + action.housePosition[1];
+  lastEvent += ` on row ${action.housePosition[0]} column ${action.housePosition[1]}`;
   if (action.type == "estate") {
-    lastEvent += ", upgrading the value of estates size " + action.sizeIncreased;
-  }
-  if (action.type == "bis") {
-    lastEvent += " with the BIS on row " + action.bisPosition[0] + " column " + action.bisPosition[1];
+    lastEvent += `, upgrading the value of estates size ${action.sizeIncreased}`;
+  } else if (action.type == "bis") {
+    lastEvent += ` with the BIS on row ${action.bisPosition[0]} column ${action.bisPosition[1]}`;
   }
   newPlayerState.lastEvent = lastEvent;
   return validateCityPlanCompletion(newPlayerState, plans, turn);
@@ -250,8 +248,7 @@ function validateCityPlanCompletion(playerState: PlayerState, plans: PlanCard[],
 
       if (plan.completed || (plan.turnCompleted != null && plan.turnCompleted < turn)) {
         newPlayerState.completedPlans[idx] = plan.secondValue;
-        newPlayerState.lastEvent +=
-          " and has completed City Plan " + (idx + 1) + " for " + plan.secondValue + " points!";
+        newPlayerState.lastEvent += ` and has completed City Plan ${idx + 1} for ${plan.secondValue} points!`;
       } else {
         newPlayerState.completedPlans[idx] = plan.firstValue;
       }
@@ -279,15 +276,9 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
       newGameState.plans[idx].completed = true;
       currentTurnLog = addEventLog(
         currentTurnLog,
-        "[" +
-          currentTurn +
-          "] " +
-          currentPlayerState.playerId +
-          " is the first to complete City Plan " +
-          (idx + 1) +
-          " for " +
-          currentPlayerState.completedPlans[idx] +
-          " points!"
+        `[${currentTurn}] ${currentPlayerState.playerId} is the first to complete City Plan ${idx + 1} for ${
+          currentPlayerState.completedPlans[idx]
+        } points!`
       );
     }
   });
@@ -301,14 +292,14 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
     newGameState.completed = true;
     currentTurnLog = addEventLog(
       currentTurnLog,
-      "[" + currentTurn + "] " + currentPlayerState.playerId + " has completed all city plans!"
+      `[${currentTurn}] ${currentPlayerState.playerId} has completed all city plans!`
     );
   } else if (currentPlayerState.permitRefusals == 3) {
     // determine if a player has ended the game via using all of their permit refusals (idx 3)
     newGameState.completed = true;
     currentTurnLog = addEventLog(
       currentTurnLog,
-      "[" + currentTurn + "] " + currentPlayerState.playerId + " has used all of their permit refusals!"
+      `[${currentTurn}] ${currentPlayerState.playerId} has used all of their permit refusals!`
     );
   } else {
     // determine if a player has ended the game via building in every single spot
@@ -326,7 +317,7 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
       newGameState.completed = true;
       currentTurnLog = addEventLog(
         currentTurnLog,
-        "[" + currentTurn + "] " + currentPlayerState.playerId + " has built every single housing development!"
+        `[${currentTurn}] ${currentPlayerState.playerId} has built every single housing development!`
       );
     }
   }
@@ -337,7 +328,7 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
   });
 
   if (advanceTurn) {
-    currentTurnLog = addEventLog(currentTurnLog, "Turn " + nextTurn + " has begun.");
+    currentTurnLog = addEventLog(currentTurnLog, `Turn ${nextTurn} has begun.`);
     newGameState.turn++;
   }
 
@@ -355,7 +346,7 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
   const deckExhausted = cardsDrawn % 81 == 0;
   const cardsToDraw = gameState.turn % 27;
   if (deckExhausted) {
-    currentTurnLog = addEventLog(currentTurnLog, "[" + nextTurn + "] The deck has been exhausted -- shuffling!");
+    currentTurnLog = addEventLog(currentTurnLog, `[${nextTurn}] The deck has been exhausted -- shuffling!`);
   }
   const seed = deckExhausted ? new Date().getTime() : gameState.seed;
   const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, cardsToDraw);
