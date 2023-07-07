@@ -12,12 +12,6 @@ import { ActiveCards, drawCards, shuffleWithSeedAndDrawOffset } from "../utils/D
 // TODO: think about what data we're not returning to the client (i.e. seed)
 // TODO: generate new seed if we havae to shuffle the deck partway thru the game
 
-/* created TTL here briefly:
-    const options: CreateIndexesOptions = {
-      expireAfterSeconds: 86400,
-    };
-    const createIndex = await db.collection("game_states").createIndex({ createdAt: 1 }, options);
-*/
 // Create a new game + player states given a list of players
 export async function POST(request: NextRequest) {
   try {
