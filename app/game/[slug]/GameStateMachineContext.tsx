@@ -55,7 +55,7 @@ export function GameStateMachineProvider({
   });
 
   const dispatchWithThunk = React.useMemo(() => {
-    return (action: GameStateMachineAction | ((dispatch: React.Dispatch<GameStateMachineAction>) => void)) => {
+    return (action: GameStateMachineAction | GameStateMachineThunk) => {
       if (typeof action === "function") {
         action(dispatch);
       } else {

@@ -1,11 +1,12 @@
 import { GameStateMachine, GameStateMachineAction } from "@/app/util/GameStateMachineTypes";
 import { useEffect } from "react";
 import { poll } from "./GameStateMachineActions";
+import { GameStateMachineThunk } from "./GameStateMachineContext";
 
 // Once the player has submitted their turn and is waiting for everyone else periodically query the API
 export function useCheckTurnCompletion(
   state: GameStateMachine,
-  dispatch: (action: GameStateMachineAction | ((dispatch: React.Dispatch<GameStateMachineAction>) => void)) => void
+  dispatch: (action: GameStateMachineAction | GameStateMachineThunk) => void
 ) {
   useEffect(() => {
     let checkId = -1;

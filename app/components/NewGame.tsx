@@ -50,7 +50,7 @@ export default function NewGame() {
           "bg-red-100 text-gray-400": !!createdGame || loading,
         })}
         onClick={onCreate}
-        disabled={createdGame != null}
+        disabled={loading || createdGame != null}
       >
         {loading ? <LoadingSpinner /> : null}
         {loading ? "Creating..." : "Create Game"}
