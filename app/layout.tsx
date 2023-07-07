@@ -4,7 +4,8 @@ import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Welcome To... online board game",
+  title: "Welcome To Your Perfect Home",
+  description: "Play Welcome To Your Perfect Home online",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
