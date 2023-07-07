@@ -1,3 +1,4 @@
+import { PlayerStateMap } from "../api/models";
 import { drawPlans } from "../api/utils/PlanDeck";
 import { GameCard, GameCardType } from "./CardTypes";
 import { GameState } from "./GameTypes";
@@ -16,7 +17,7 @@ const dummy = {
   completedPlans: [0, 0, 0],
   estateModifiers: [1, 0, 2, 3, 4, 4],
   permitRefusals: 2,
-  createAt: new Date(),
+  createdAt: new Date(),
 };
 
 dummy.housesRowOne[1] = {
@@ -73,7 +74,7 @@ dummy.housesRowTwo[6] = {
   modifier: "TEMP",
 };
 
-export const dummyPlayerStates = {
+export const dummyPlayerStates: PlayerStateMap = {
   [dummy.playerId]: {
     ...dummy,
     cityName: "The Cool Zone",
