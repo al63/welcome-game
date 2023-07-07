@@ -1,48 +1,20 @@
 "use client";
-import Image from "next/image";
 import React from "react";
 import { CreateGameResponse } from "../api/models";
 import { LoadingSpinner } from "./LoadingSpinner";
 import classNames from "classnames";
+import { Players } from "./Players";
+import { StartGame } from "./StartGame";
 
 export default function NewGame() {
   const [players, setPlayers] = React.useState<Array<string>>(["", ""]);
   const [loading, setLoading] = React.useState(false);
   const [createdGame, setCreatedGame] = React.useState<CreateGameResponse | null>(null);
-  const [copiedPlayer, setCopiedPlayer] = React.useState<string>("");
 
-  const onNameChange = React.useCallback(
-    (index: number, value: string) => {
-      const updated = [...players];
-      updated[index] = value;
-      setCreatedGame(null);
-      setCopiedPlayer("");
-      setPlayers(updated);
-    },
-    [players]
-  );
-
-  const onNewPlayerClicked = React.useCallback(
-    (index: number) => {
-      const updated = [...players];
-      updated.splice(index + 1, 0, "");
-      setCreatedGame(null);
-      setCopiedPlayer("");
-      setPlayers(updated);
-    },
-    [players]
-  );
-
-  const onRemovePlayerClicked = React.useCallback(
-    (index: number) => {
-      const updated = [...players];
-      updated.splice(index, 1);
-      setCreatedGame(null);
-      setCopiedPlayer("");
-      setPlayers(updated);
-    },
-    [players]
-  );
+  const _setPlayers = React.useCallback((players: string[]) => {
+    setCreatedGame(null);
+    setPlayers(players);
+  }, []);
 
   const onCreate = React.useCallback(async () => {
     setLoading(true);
@@ -71,86 +43,19 @@ export default function NewGame() {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="flex flex-col rounded-md">
-        <h2 className="text-xl my-4 font-semibold">Players</h2>
-        {players.map((player, index) => {
-          return (
-            <div key={index} className="flex mb-2">
-              <input
-                className="border rounded-sm flex-grow p-1 w-72"
-                maxLength={20}
-                placeholder={`Player ${index + 1}`}
-                value={player}
-                onChange={(e) => onNameChange(index, e.target.value)}
-              />
-              {players.length < 6 ? (
-                <button className="ml-2 hover:bg-slate-200 px-3 rounded-full" onClick={() => onNewPlayerClicked(index)}>
-                  +
-                </button>
-              ) : null}
-              {players.length > 2 ? (
-                <button
-                  className="ml-2 hover:bg-slate-200 px-3 rounded-full"
-                  onClick={() => onRemovePlayerClicked(index)}
-                >
-                  -
-                </button>
-              ) : null}
-            </div>
-          );
+      <Players players={players} onUpdate={_setPlayers} />
+      <button
+        className={classNames("self-center px-8 py-2 mt-4 rounded-full flex", {
+          "bg-red-200 hover:bg-red-300": !createdGame && !loading,
+          "bg-red-100 text-gray-400": !!createdGame || loading,
         })}
-        <button
-          className={classNames("self-center px-8 py-2 mt-4 rounded-full flex", {
-            "bg-red-200 hover:bg-red-300": !createdGame && !loading,
-            "bg-red-100 text-gray-400": !!createdGame || loading,
-          })}
-          onClick={onCreate}
-          disabled={createdGame != null}
-        >
-          {loading ? <LoadingSpinner /> : null}
-          {loading ? "Creating..." : "Create Game"}
-        </button>
-      </div>
-      {createdGame != null ? (
-        <div className="mt-6">
-          <h1>To start the game, share the links below to the respective players and click on your own.</h1>
-          <ul className="list-disc">
-            {createdGame.players.map((player) => {
-              const path = `/game/${createdGame.gameId}?player=${player}`;
-              const link = `${window.location.href.slice(0, window.location.href.length - 1)}${path}`;
-              return (
-                <li className="mx-2 my-4 break-all" key={player}>
-                  <span>{player}: </span>
-                  <a className="text-blue-500 underline" href={path}>
-                    {link}
-                  </a>
-                  <div>
-                    <button
-                      className={classNames("self-center px-2 py-1 mt-2 rounded-full flex", {
-                        "bg-amber-300 hover:bg-amber-400": copiedPlayer !== player,
-                        "bg-amber-200 text-gray-600": copiedPlayer === player,
-                      })}
-                      onClick={() => {
-                        setCopiedPlayer(player);
-                        navigator.clipboard.writeText(link);
-                      }}
-                    >
-                      <Image
-                        className="inline cursor-pointer hover:bg-slate-200 rounded-full p-1"
-                        height="24"
-                        width="24"
-                        src="/copy.svg"
-                        alt={`Copy link for ${player}`}
-                      />
-                      {copiedPlayer === player ? "Copied" : "Copy Link"}
-                    </button>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      ) : null}
+        onClick={onCreate}
+        disabled={createdGame != null}
+      >
+        {loading ? <LoadingSpinner /> : null}
+        {loading ? "Creating..." : "Create Game"}
+      </button>
+      {createdGame != null ? <StartGame createdGame={createdGame} /> : null}
     </div>
   );
 }
