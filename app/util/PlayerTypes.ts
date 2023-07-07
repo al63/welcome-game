@@ -25,4 +25,5 @@ export interface PlayerState {
   estateModifiers: number[];
   permitRefusals: number;
   lastEvent: string;
+  createdAt: Date;
 }
