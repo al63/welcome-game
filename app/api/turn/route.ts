@@ -27,9 +27,7 @@ import { ActiveCards, drawCards, shuffleWithSeedAndDrawOffset } from "../utils/D
 //
 // There's no validation on if the board or turns taken are valid.
 // Validate that the PlayerState.turn == GameState.turn first before saving to DB.
-// TODO: poll API, pass in turn
-// response here is "please hold" or "new turn has begun"
-
+// TODO: make polling action for shuffling the deck when a city plan is completed
 export async function POST(request: NextRequest) {
   try {
     const req = (await request.json()) as CreateTurnAPIRequest;
