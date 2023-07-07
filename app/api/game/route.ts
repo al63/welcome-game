@@ -7,11 +7,9 @@ import { drawPlans } from "@/app/api/utils/PlanDeck";
 import { PlayerState } from "@/app/util/PlayerTypes";
 import { ActiveCards, drawCards, shuffleWithSeedAndDrawOffset } from "../utils/Deck";
 
-// TODO: add TTL
 // TODO: do stupid checking to make sure we don't have collisions
 // MAYBE TODO: clean up game state if player state somehow fails
 // TODO: think about what data we're not returning to the client (i.e. seed)
-// TODO: generate new seed if we havae to shuffle the deck partway thru the game
 
 // Create a new game + player states given a list of players
 export async function POST(request: NextRequest) {
@@ -38,6 +36,7 @@ export async function POST(request: NextRequest) {
       turn: 1,
       completed: false,
       latestEventLog: ["The game has begun -- good luck!"],
+      createdAt: new Date(),
     };
     const client = await clientPromise;
     const db = client.db("wtypf");
@@ -63,6 +62,7 @@ export async function POST(request: NextRequest) {
         estateModifiers: new Array(6).fill(0),
         permitRefusals: 0,
         lastEvent: "",
+        createdAt: new Date(),
       };
     });
     const playerRes = await db.collection("player_states").insertMany(playersStateList);

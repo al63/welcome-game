@@ -28,4 +28,5 @@ export interface GameState {
   turn: number;
   completed: boolean;
   latestEventLog: string[];
+  createdAt: Date;
 }
