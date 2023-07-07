@@ -1167,13 +1167,13 @@ const NOUNS = [
 
 const randomNumber = Math.floor(Math.random() * 2);
 export function generateGameId() {
-  return (
+  const gameId =
     ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)] +
     COLORS[Math.floor(Math.random() * COLORS.length)] +
     (randomNumber == 0
       ? ANIMALS[Math.floor(Math.random() * ANIMALS.length)]
-      : NOUNS[Math.floor(Math.random() * NOUNS.length)])
-  );
+      : NOUNS[Math.floor(Math.random() * NOUNS.length)]);
+  return gameId.replaceAll(" ", "");
 }
 
 export function generateCityName() {
