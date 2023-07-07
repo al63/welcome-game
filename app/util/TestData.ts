@@ -16,6 +16,7 @@ const dummy = {
   completedPlans: [0, 0, 0],
   estateModifiers: [1, 0, 2, 3, 4, 4],
   permitRefusals: 2,
+  createAt: new Date(),
 };
 
 dummy.housesRowOne[1] = {
