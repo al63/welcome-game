@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import React from "react";
 import { CreateGameResponse } from "../api/models";
 import { LoadingSpinner } from "./LoadingSpinner";
@@ -8,12 +9,14 @@ export default function NewGame() {
   const [players, setPlayers] = React.useState<Array<string>>(["", ""]);
   const [loading, setLoading] = React.useState(false);
   const [createdGame, setCreatedGame] = React.useState<CreateGameResponse | null>(null);
+  const [copiedPlayer, setCopiedPlayer] = React.useState<string>("");
 
   const onNameChange = React.useCallback(
     (index: number, value: string) => {
       const updated = [...players];
       updated[index] = value;
       setCreatedGame(null);
+      setCopiedPlayer("");
       setPlayers(updated);
     },
     [players]
@@ -24,6 +27,7 @@ export default function NewGame() {
       const updated = [...players];
       updated.splice(index + 1, 0, "");
       setCreatedGame(null);
+      setCopiedPlayer("");
       setPlayers(updated);
     },
     [players]
@@ -34,6 +38,7 @@ export default function NewGame() {
       const updated = [...players];
       updated.splice(index, 1);
       setCreatedGame(null);
+      setCopiedPlayer("");
       setPlayers(updated);
     },
     [players]
@@ -114,11 +119,32 @@ export default function NewGame() {
               const path = `/game/${createdGame.gameId}?player=${player}`;
               const link = `${window.location.href.slice(0, window.location.href.length - 1)}${path}`;
               return (
-                <li className="m-2 break-all" key={player}>
+                <li className="mx-2 my-4 break-all" key={player}>
                   <span>{player}: </span>
                   <a className="text-blue-500 underline" href={path}>
                     {link}
                   </a>
+                  <div>
+                    <button
+                      className={classNames("self-center px-2 py-1 mt-2 rounded-full flex", {
+                        "bg-amber-300 hover:bg-amber-400": copiedPlayer !== player,
+                        "bg-amber-200 text-gray-600": copiedPlayer === player,
+                      })}
+                      onClick={() => {
+                        setCopiedPlayer(player);
+                        navigator.clipboard.writeText(link);
+                      }}
+                    >
+                      <Image
+                        className="inline cursor-pointer hover:bg-slate-200 rounded-full p-1"
+                        height="24"
+                        width="24"
+                        src="/copy.svg"
+                        alt={`Copy link for ${player}`}
+                      />
+                      {copiedPlayer === player ? "Copied" : "Copy Link"}
+                    </button>
+                  </div>
                 </li>
               );
             })}
