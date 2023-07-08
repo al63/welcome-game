@@ -11,7 +11,7 @@ export interface ActiveCards {
 // Deterministically shuffle and then use the offset to determine how many draws have occurred
 // Offset will be multiples of 3 -- will start at because the first turn of the game has 3 cards drawn
 export function shuffleWithSeedAndDrawOffset(seed: number, offset: number): GameCard[] {
-  const deck = GAME_DECK;
+  const deck = [...GAME_DECK]; // the srand library we are using mutates on shuffle... which causes hot lambdas to be inconsistent
   const srandSeeded = new Srand(seed);
   const res: GameCard[] = srandSeeded.shuffle(deck);
 
