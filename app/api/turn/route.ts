@@ -74,7 +74,18 @@ export async function POST(request: NextRequest) {
     }
 
     // update game state on completed plans / game end
-    const newGameState = await updateGameState(db, newPlayerState, gameState);
+
+    const playerStates = db.collection<PlayerState>("player_states");
+    const playerStateQuery: Filter<PlayerState> = { gameId: req.gameId };
+    const playerStatesCursor = playerStates.find<PlayerState>(playerStateQuery);
+
+    const playerStatesMap: PlayerStateMap = {};
+    for await (const doc of playerStatesCursor) {
+      delete (doc as any)["_id"];
+      playerStatesMap[doc.playerId] = doc;
+    }
+
+    const newGameState = await updateGameState(db, newPlayerState, gameState, playerStatesMap);
     const gameFilter: Filter<Document> = { id: gameState.id };
     const gameBody: UpdateFilter<Document> = {
       $set: {
@@ -258,7 +269,12 @@ function validateCityPlanCompletion(playerState: PlayerState, plans: PlanCard[],
   return newPlayerState;
 }
 
-async function updateGameState(db: Db, currentPlayerState: PlayerState, gameState: GameState): Promise<GameState> {
+async function updateGameState(
+  db: Db,
+  currentPlayerState: PlayerState,
+  gameState: GameState,
+  playerStatesMap: PlayerStateMap
+): Promise<GameState> {
   const newGameState = {
     ...gameState,
   };
@@ -283,44 +299,7 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
     }
   });
 
-  // determine if a player has ended the game via completing every single plan
-  const planEndCondition = currentPlayerState.completedPlans.every(function (val) {
-    return val > 0;
-  });
-
-  if (planEndCondition) {
-    newGameState.completed = true;
-    currentTurnLog = addEventLog(
-      currentTurnLog,
-      `[${currentTurn}] ${currentPlayerState.playerId} has completed all city plans!`
-    );
-  } else if (currentPlayerState.permitRefusals == 3) {
-    // determine if a player has ended the game via using all of their permit refusals (idx 3)
-    newGameState.completed = true;
-    currentTurnLog = addEventLog(
-      currentTurnLog,
-      `[${currentTurn}] ${currentPlayerState.playerId} has used all of their permit refusals!`
-    );
-  } else {
-    // determine if a player has ended the game via building in every single spot
-    const rowOneCompleted = currentPlayerState.housesRowOne.every(function (house) {
-      return house != null;
-    });
-    const rowTwoCompleted = currentPlayerState.housesRowTwo.every(function (house) {
-      return house != null;
-    });
-    const rowThreeCompleted = currentPlayerState.housesRowThree.every(function (house) {
-      return house != null;
-    });
-
-    if (rowOneCompleted && rowTwoCompleted && rowThreeCompleted) {
-      newGameState.completed = true;
-      currentTurnLog = addEventLog(
-        currentTurnLog,
-        `[${currentTurn}] ${currentPlayerState.playerId} has built every single housing development!`
-      );
-    }
-  }
+  // game completion used to be here
   const nextTurn = gameState.turn + 1;
   newGameState.players[currentPlayerState.playerId].turn = nextTurn;
   const advanceTurn = Object.keys(newGameState.players).every(function (e) {
@@ -330,6 +309,15 @@ async function updateGameState(db: Db, currentPlayerState: PlayerState, gameStat
   if (advanceTurn) {
     currentTurnLog = addEventLog(currentTurnLog, `Turn ${nextTurn} has begun.`);
     newGameState.turn++;
+    const playerIdKeys = Object.keys(playerStatesMap);
+    playerIdKeys.forEach((key) => {
+      const gameCompleted = isGameCompleted(playerStatesMap[key]);
+      if (gameCompleted) {
+        newGameState.completed = true;
+        // do the painstaking task of adding the specifics here later
+        currentTurnLog = addEventLog(currentTurnLog, `[${nextTurn}] ${key} has completed the game!`);
+      }
+    });
   }
 
   if (advanceTurn && newGameState.completed) {
@@ -440,4 +428,38 @@ function addEventLog(log: string[], val: string): string[] {
   }
   newLog.push(val);
   return newLog;
+}
+
+function isGameCompleted(playerState: PlayerState): boolean {
+  console.log(playerState);
+  let isGameCompleted = false;
+
+  // determine if a player has ended the game via completing every single plan
+  const planEndCondition = playerState.completedPlans.every(function (val) {
+    return val > 0;
+  });
+
+  if (planEndCondition) {
+    isGameCompleted = true;
+  } else if (playerState.permitRefusals == 3) {
+    // determine if a player has ended the game via using all of their permit refusals (idx 3)
+    isGameCompleted = true;
+  } else {
+    // determine if a player has ended the game via building in every single spot
+    const rowOneCompleted = playerState.housesRowOne.every(function (house) {
+      return house != null;
+    });
+    const rowTwoCompleted = playerState.housesRowTwo.every(function (house) {
+      return house != null;
+    });
+    const rowThreeCompleted = playerState.housesRowThree.every(function (house) {
+      return house != null;
+    });
+
+    if (rowOneCompleted && rowTwoCompleted && rowThreeCompleted) {
+      isGameCompleted = true;
+    }
+  }
+
+  return isGameCompleted;
 }
