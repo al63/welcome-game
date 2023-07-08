@@ -180,7 +180,6 @@ export async function submitTurn(
         return;
       }
 
-      console.log(json);
       if (json.promptReshuffle) {
         if (action.type !== "refusal") {
           dispatch({ type: "promptReshuffle", pendingAction: action });
