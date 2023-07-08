@@ -1,4 +1,4 @@
-import { PlayerStateMap } from "../api/models";
+import { PermitRefusalAction, PlayerStateMap, TurnAction } from "../api/models";
 import { GameCardType } from "./CardTypes";
 import { GameState } from "./GameTypes";
 import { House, PlayerState } from "./PlayerTypes";
@@ -17,6 +17,11 @@ export interface PlaceCardStep {
   cardValue: number;
   cardType: GameCardType;
   followUp?: "BIS" | "ESTATE" | "FENCE";
+}
+
+export interface PromptReshuffleStep {
+  type: "promptReshuffle";
+  pendingAction: Exclude<TurnAction, PermitRefusalAction>;
 }
 
 interface WaitStep {
@@ -66,6 +71,7 @@ export type GameStep =
   | FenceStep
   | PlaceCardStep
   | WaitStep
+  | PromptReshuffleStep
   | ErrorStep
   | CompletedStep;
 
@@ -125,6 +131,11 @@ export interface ResumeAction {
   playerStates: PlayerStateMap;
 }
 
+interface PromptReshuffleAction {
+  type: "promptReshuffle";
+  pendingAction: Exclude<TurnAction, PermitRefusalAction>;
+}
+
 export type GameStateMachineAction =
   | CancelAction
   | TempAgencyModifierChosenAction
@@ -134,4 +145,5 @@ export type GameStateMachineAction =
   | SubmitStartAction
   | SubmitCompleteAction
   | ErrorAction
-  | ResumeAction;
+  | ResumeAction
+  | PromptReshuffleAction;

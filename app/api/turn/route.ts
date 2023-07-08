@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
-import { CreateTurnAPIRequest, PlayerStateMap, TurnAction } from "../models";
+import { CreateTurnAPIRequest, PlayerStateMap, ShuffleTurnException, TurnAction } from "../models";
 import { Db, Document, Filter, UpdateFilter } from "mongodb";
 import { PlayerState } from "@/app/util/PlayerTypes";
 import { FinalScores, GameState, PlayerMetadataMap } from "@/app/util/GameTypes";
@@ -27,7 +27,6 @@ import { ActiveCards, drawCards, shuffleWithSeedAndDrawOffset } from "../utils/D
 //
 // There's no validation on if the board or turns taken are valid.
 // Validate that the PlayerState.turn == GameState.turn first before saving to DB.
-// TODO: make polling action for shuffling the deck when a city plan is completed
 export async function POST(request: NextRequest) {
   try {
     const req = (await request.json()) as CreateTurnAPIRequest;
@@ -57,7 +56,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json("Requested turn is not equal to the known player state's turn", { status: 400 });
     }
     // Build the update request body for the player
-    const newPlayerState = consolidateUpdate(req.action, playerState, gameState.turn, gameState.plans);
+    const newPlayerState = consolidateUpdate(req.action, playerState, gameState.turn, gameState.plans, req.shuffle);
     const playerFilter: Filter<Document> = { gameId: req.gameId, playerId: req.playerId };
     const playerBody: UpdateFilter<Document> = {
       $set: {
@@ -85,7 +84,7 @@ export async function POST(request: NextRequest) {
       playerStatesMap[doc.playerId] = doc;
     }
 
-    const newGameState = await updateGameState(db, newPlayerState, gameState, playerStatesMap);
+    const newGameState = await updateGameState(db, newPlayerState, gameState, playerStatesMap, req.shuffle);
     const gameFilter: Filter<Document> = { id: gameState.id };
     const gameBody: UpdateFilter<Document> = {
       $set: {
@@ -101,20 +100,32 @@ export async function POST(request: NextRequest) {
       return NextResponse.json("Unable to update the game state", { status: 500 });
     }
 
-    return NextResponse.json({ gameState: newGameState, playerState: newPlayerState }, { status: 200 });
+    return NextResponse.json(
+      { gameState: newGameState, playerState: newPlayerState, promptReshuffle: false },
+      { status: 200 }
+    );
   } catch (e: any) {
+    if (e instanceof ShuffleTurnException) {
+      return NextResponse.json({ promptReshuffle: true }, { status: 200 });
+    }
     return NextResponse.json({ error: e.toString() }, { status: 500 });
   }
 }
 
-function consolidateUpdate(action: TurnAction, playerState: PlayerState, turn: number, plans: PlanCard[]) {
+function consolidateUpdate(
+  action: TurnAction,
+  playerState: PlayerState,
+  turn: number,
+  plans: PlanCard[],
+  shuffleForCompletedPlan: boolean | undefined
+) {
   const newPlayerState = {
     ...playerState,
   };
   switch (action.type) {
     case "refusal":
       playerState.permitRefusals++;
-      playerState.lastEvent = `${playerState.playerId} has no valid moves and has received a permit refusal.`;
+      playerState.lastEvent = `[${turn}] ${playerState.playerId} has no valid moves and has received a permit refusal.`;
       return playerState;
     case "fence":
       if (action.fencePosition[0] == 0) {
@@ -164,10 +175,15 @@ function consolidateUpdate(action: TurnAction, playerState: PlayerState, turn: n
     lastEvent += ` with the BIS on row ${action.bisPosition[0]} column ${action.bisPosition[1]}`;
   }
   newPlayerState.lastEvent = lastEvent;
-  return validateCityPlanCompletion(newPlayerState, plans, turn);
+  return validateCityPlanCompletion(newPlayerState, plans, turn, shuffleForCompletedPlan);
 }
 
-function validateCityPlanCompletion(playerState: PlayerState, plans: PlanCard[], turn: number): PlayerState {
+function validateCityPlanCompletion(
+  playerState: PlayerState,
+  plans: PlanCard[],
+  turn: number,
+  shuffleForCompletedPlan: boolean | undefined
+): PlayerState {
   const newPlayerState = {
     ...playerState,
   };
@@ -220,6 +236,9 @@ function validateCityPlanCompletion(playerState: PlayerState, plans: PlanCard[],
     });
     // update house rows to be used for plans
     if (planCompleted) {
+      if (shuffleForCompletedPlan == null) {
+        throw new ShuffleTurnException();
+      }
       plan.requirements.forEach(function (req) {
         const size = req.size - 1;
         // look at each size of estates
@@ -273,7 +292,8 @@ async function updateGameState(
   db: Db,
   currentPlayerState: PlayerState,
   gameState: GameState,
-  playerStatesMap: PlayerStateMap
+  playerStatesMap: PlayerStateMap,
+  shuffle: boolean | undefined
 ): Promise<GameState> {
   const newGameState = {
     ...gameState,
@@ -290,12 +310,21 @@ async function updateGameState(
       currentPlayerState.completedPlans[idx] > 0
     ) {
       newGameState.plans[idx].completed = true;
-      currentTurnLog = addEventLog(
-        currentTurnLog,
-        `[${currentTurn}] ${currentPlayerState.playerId} is the first to complete City Plan ${idx + 1} for ${
-          currentPlayerState.completedPlans[idx]
-        } points!`
-      );
+      if (shuffle != null) {
+        if (shuffle) {
+          newGameState.shuffleOffset = 1;
+          const seed = new Date().getTime();
+          const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, 1);
+          const activeCards: ActiveCards = drawCards(shuffledDeck);
+          newGameState.seed = seed;
+          newGameState.revealedCardValues = activeCards.revealedNumbers;
+          newGameState.revealedCardModifiers = activeCards.revealedModifiers.map((gameCard) => gameCard.backingType);
+          currentTurnLog = addEventLog(
+            currentTurnLog,
+            `[${currentTurn}] ${currentPlayerState.playerId} has decided to shuffle the deck.`
+          );
+        }
+      }
     }
   });
 
@@ -307,7 +336,6 @@ async function updateGameState(
   });
 
   if (advanceTurn) {
-    currentTurnLog = addEventLog(currentTurnLog, `Turn ${nextTurn} has begun.`);
     newGameState.turn++;
     const playerIdKeys = Object.keys(playerStatesMap);
     playerIdKeys.forEach((key) => {
@@ -319,18 +347,21 @@ async function updateGameState(
       }
     });
 
-    const cardsDrawn = newGameState.turn * 3;
+    let seed = gameState.seed;
+    let shuffleOffset = newGameState.shuffleOffset + 1;
+    const cardsDrawn = shuffleOffset * 3;
     const deckExhausted = cardsDrawn % 81 == 0;
-    const cardsToDraw = newGameState.turn % 27;
     if (deckExhausted) {
       currentTurnLog = addEventLog(currentTurnLog, `[${nextTurn}] The deck has been exhausted -- shuffling!`);
+      shuffleOffset = 1;
+      seed = new Date().getTime();
     }
-    const seed = deckExhausted ? new Date().getTime() : gameState.seed;
-    const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, cardsToDraw);
+    const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, shuffleOffset);
     const activeCards: ActiveCards = drawCards(shuffledDeck);
     newGameState.revealedCardValues = activeCards.revealedNumbers;
     newGameState.revealedCardModifiers = activeCards.revealedModifiers.map((gameCard) => gameCard.backingType);
     newGameState.seed = seed;
+    newGameState.shuffleOffset = shuffleOffset;
   }
 
   if (advanceTurn && newGameState.completed) {
@@ -342,7 +373,6 @@ async function updateGameState(
     });
     currentTurnLog = addEventLog(currentTurnLog, `Congratulations to ${finalScores.scoringInfo[0].playerId}!`);
   }
-
   newGameState.latestEventLog = currentTurnLog;
   return newGameState;
 }

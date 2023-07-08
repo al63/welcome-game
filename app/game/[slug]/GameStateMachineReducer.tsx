@@ -102,6 +102,7 @@ export function gameStateMachineReducer(state: GameStateMachine, action: GameSta
     case "submitted":
       return {
         ...state,
+        step: { type: "wait" },
         playerStates: {
           ...state.playerStates,
           [state.playerId]: action.playerState,
@@ -121,6 +122,11 @@ export function gameStateMachineReducer(state: GameStateMachine, action: GameSta
         step: {
           type: completed ? "completed" : "choose",
         },
+      };
+    case "promptReshuffle":
+      return {
+        ...state,
+        step: { type: "promptReshuffle", pendingAction: action.pendingAction },
       };
     default:
       return state;

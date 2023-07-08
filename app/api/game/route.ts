@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
       players: playerMap,
       plans: drawPlans(),
       turn: 1,
+      shuffleOffset: 1,
       completed: false,
       latestEventLog: ["The game has begun -- good luck!"],
       createdAt: new Date(),

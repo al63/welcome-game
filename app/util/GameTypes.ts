@@ -26,6 +26,7 @@ export interface GameState {
   players: PlayerMetadataMap;
   plans: Array<PlanCard>;
   turn: number;
+  shuffleOffset: number;
   completed: boolean;
   latestEventLog: string[];
   createdAt: Date;

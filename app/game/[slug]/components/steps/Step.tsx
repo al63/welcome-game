@@ -9,9 +9,12 @@ import { RealEstateModifier } from "./RealEstateModifier";
 import { ChooseBIS } from "./ChooseBIS";
 import { PlaceFence } from "./PlaceFence";
 import { GameFinished } from "./GameFinished";
+import { ReshuffleOptions } from "./ReshuffleOptions";
 
 function StepInstructions({ step }: { step: GameStep }) {
   switch (step.type) {
+    case "promptReshuffle":
+      return "Would you like to reshuffle the deck?";
     case "completed":
       return null;
     case "error":
@@ -52,6 +55,8 @@ function StepInstructions({ step }: { step: GameStep }) {
 
 function StepActions({ step, gameState, playerId }: { step: GameStep; gameState: GameState; playerId: string }) {
   switch (step.type) {
+    case "promptReshuffle":
+      return <ReshuffleOptions gameState={gameState} step={step} playerId={playerId} />;
     case "completed":
       return <GameFinished />;
     case "fence":

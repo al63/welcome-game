@@ -16,11 +16,16 @@ export function SkipButton({ step, gameState, playerId, text }: ChooseBISProps) 
 
   const onSkip = React.useCallback(async () => {
     dispatch(
-      await submitTurn(gameState, playerId, {
-        type: "standard",
-        house: step.house,
-        housePosition: step.position,
-      })
+      await submitTurn(
+        gameState,
+        playerId,
+        {
+          type: "standard",
+          house: step.house,
+          housePosition: step.position,
+        },
+        undefined
+      )
     );
   }, [dispatch, step, gameState, playerId]);
 

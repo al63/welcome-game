@@ -123,6 +123,7 @@ export const dummyGameState: GameState = {
   plans: drawPlans(),
   turn: 1,
   completed: false,
+  shuffleOffset: 1,
   latestEventLog: [],
   createdAt: new Date(),
 };

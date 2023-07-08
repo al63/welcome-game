@@ -38,7 +38,6 @@ export function GameStateMachineProvider({
   initialPlayerStates,
   children,
 }: GameStateMachineProviderProps) {
-  // initial game state is either 1) choose a card, 2) waiting for other to choose a card (we refreshed), 3) game ended
   let type: "wait" | "completed" | "choose" = "choose";
   if (initialGameState.completed) {
     type = "completed";

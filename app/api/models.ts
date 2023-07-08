@@ -58,11 +58,19 @@ export interface CreateTurnAPIRequest {
   playerId: string;
   turn: number;
   action: TurnAction;
+  shuffle?: boolean;
 }
 
-export interface CreateTurnAPIResponse {
+interface CreateTurnSuccessAPIResponse {
   playerState: PlayerState;
+  promptReshuffle: false;
 }
+
+interface CreateTurnReshuffleAPIResponse {
+  promptReshuffle: true;
+}
+
+export type CreateTurnAPIResponse = CreateTurnSuccessAPIResponse | CreateTurnReshuffleAPIResponse;
 
 interface ResumePollResponse {
   result: "RESUME";
@@ -74,9 +82,20 @@ interface WaitPollResponse {
   result: "WAIT";
 }
 
+interface ShufflePollResponse {
+  result: "SHUFFLE";
+}
+
 interface ErrorPollResponse {
   result: "ERROR";
   error: string;
 }
 
-export type PollTurnAPIResponse = ResumePollResponse | WaitPollResponse | ErrorPollResponse;
+export type PollTurnAPIResponse = ResumePollResponse | WaitPollResponse | ShufflePollResponse | ErrorPollResponse;
+
+export class ShuffleTurnException extends Error {
+  constructor() {
+    super("User must choose whether to reshuffle or not");
+    this.name = "ShuffleTurnException";
+  }
+}
