@@ -318,6 +318,19 @@ async function updateGameState(
         currentTurnLog = addEventLog(currentTurnLog, `[${nextTurn}] ${key} has completed the game!`);
       }
     });
+
+    const cardsDrawn = newGameState.turn * 3;
+    const deckExhausted = cardsDrawn % 81 == 0;
+    const cardsToDraw = newGameState.turn % 27;
+    if (deckExhausted) {
+      currentTurnLog = addEventLog(currentTurnLog, `[${nextTurn}] The deck has been exhausted -- shuffling!`);
+    }
+    const seed = deckExhausted ? new Date().getTime() : gameState.seed;
+    const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, cardsToDraw);
+    const activeCards: ActiveCards = drawCards(shuffledDeck);
+    newGameState.revealedCardValues = activeCards.revealedNumbers;
+    newGameState.revealedCardModifiers = activeCards.revealedModifiers.map((gameCard) => gameCard.backingType);
+    newGameState.seed = seed;
   }
 
   if (advanceTurn && newGameState.completed) {
@@ -330,17 +343,6 @@ async function updateGameState(
     currentTurnLog = addEventLog(currentTurnLog, `Congratulations to ${finalScores.scoringInfo[0].playerId}!`);
   }
 
-  const cardsDrawn = gameState.turn * 3;
-  const deckExhausted = cardsDrawn % 81 == 0;
-  const cardsToDraw = gameState.turn % 27;
-  if (deckExhausted) {
-    currentTurnLog = addEventLog(currentTurnLog, `[${nextTurn}] The deck has been exhausted -- shuffling!`);
-  }
-  const seed = deckExhausted ? new Date().getTime() : gameState.seed;
-  const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, cardsToDraw);
-  const activeCards: ActiveCards = drawCards(shuffledDeck);
-  newGameState.revealedCardValues = activeCards.revealedNumbers;
-  newGameState.revealedCardModifiers = activeCards.revealedModifiers.map((gameCard) => gameCard.backingType);
   newGameState.latestEventLog = currentTurnLog;
   return newGameState;
 }
@@ -431,7 +433,6 @@ function addEventLog(log: string[], val: string): string[] {
 }
 
 function isGameCompleted(playerState: PlayerState): boolean {
-  console.log(playerState);
   let isGameCompleted = false;
 
   // determine if a player has ended the game via completing every single plan
