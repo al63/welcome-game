@@ -4,6 +4,7 @@ import {
   GameStateMachineAction,
   PlacedCardAction,
 } from "@/app/util/GameStateMachineTypes";
+import { ESTATE_MODIFIERS } from "@/app/util/Scoring";
 
 function reduceChoseAction(state: GameStateMachine, action: ChoseCardAction): GameStateMachine {
   switch (action.cardType) {
@@ -16,10 +17,22 @@ function reduceChoseAction(state: GameStateMachine, action: ChoseCardAction): Ga
         },
       };
     default:
-      const followUp =
+      let followUp =
         action.cardType === "FENCE" || action.cardType === "BIS" || action.cardType === "ESTATE"
           ? action.cardType
           : undefined;
+
+      if (followUp === "ESTATE") {
+        // it's possible there are no possible estates to upgrade, in which case there is no follow up.
+        const playerState = state.playerStates[state.playerId];
+        const completedAll = playerState.estateModifiers.every((modifierIndex, index) => {
+          return modifierIndex === ESTATE_MODIFIERS[index].length - 1;
+        });
+        if (completedAll) {
+          followUp = undefined;
+        }
+      }
+
       return {
         ...state,
         step: {

@@ -15,7 +15,7 @@ const dummy = {
   fencesRowTwo: new Array(10).fill(false),
   fencesRowThree: new Array(11).fill(false),
   completedPlans: [0, 0, 0],
-  estateModifiers: [1, 0, 2, 3, 4, 4],
+  estateModifiers: [1, 2, 3, 4, 4, 4],
   permitRefusals: 2,
   createdAt: new Date(),
 };
