@@ -3,7 +3,7 @@ import { House } from "@/app/util/PlayerTypes";
 import classNames from "classnames";
 import React from "react";
 import { useGameStateMachineContext } from "../../GameStateMachineContext";
-import { PendingInfo, useHighlightedLocations } from "./useHighlightedLocations";
+import { PendingInfo, useHighlightedLocations } from "../../useHighlightedLocations";
 
 interface ParksProgressProps {
   scores: number[];
