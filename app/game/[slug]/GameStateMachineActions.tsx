@@ -5,6 +5,7 @@ import {
   CancelAction,
   ChoseBISAction,
   ChoseCardAction,
+  ChoseReshuffleAction,
   GameStateMachineAction,
   PlaceCardStep,
   PlacedCardAction,
@@ -166,10 +167,15 @@ export async function submitTurn(
   };
 }
 
-export async function poll(gameId: string, turn: number, playerId: string) {
+export async function poll(gameState: GameState, playerId: string, shouldReshuffle?: boolean) {
+  const { id, turn } = gameState;
   return async (dispatch: React.Dispatch<GameStateMachineAction>) => {
     try {
-      const res = await fetch(`/api/poll?gameId=${gameId}&turn=${turn}&playerId=${playerId}`, {
+      let endpoint = `/api/poll?gameId=${id}&turn=${turn}&playerId=${playerId}`;
+      if (shouldReshuffle != null) {
+        endpoint += `&shuffle=${shouldReshuffle}`;
+      }
+      const res = await fetch(endpoint, {
         method: "GET",
         headers: {
           Accept: "application/json",
@@ -181,6 +187,9 @@ export async function poll(gameId: string, turn: number, playerId: string) {
       if (!res.ok || json.result === "ERROR") {
         console.log(json);
         dispatch({ type: "error" });
+      } else if (json.result === "SHUFFLE") {
+        new Audio("/notification.mp3").play();
+        dispatch({ type: "promptReshuffle" });
       } else if (json.result === "RESUME") {
         new Audio("/notification.mp3").play();
         dispatch({ type: "resume", gameState: json.gameState, playerStates: json.playerStates });
@@ -190,4 +199,8 @@ export async function poll(gameId: string, turn: number, playerId: string) {
       dispatch({ type: "error" });
     }
   };
+}
+
+export function pickShouldReshuffle(shouldReshuffle: boolean): ChoseReshuffleAction {
+  return { type: "choseReshuffle", shouldReshuffle };
 }

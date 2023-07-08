@@ -15,7 +15,7 @@ export function useCheckTurnCompletion(
         return -1;
       }
 
-      dispatch(await poll(state.gameState.id, state.gameState.turn + 1, state.playerId));
+      dispatch(await poll(state.gameState, state.playerId, state.step.shouldReshuffle));
       checkId = window.setTimeout(check, 5000);
     }
 
@@ -24,5 +24,5 @@ export function useCheckTurnCompletion(
       clearTimeout(id);
       clearTimeout(checkId);
     };
-  }, [state.step, state.gameState.id, state.gameState.turn, dispatch]);
+  }, [state.step, dispatch, state.playerId, state.gameState]);
 }

@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 
     if (gameState.eligibleShuffles.length > 0) {
       if (gameState.eligibleShuffles.includes(playerId)) {
-        if (shuffle) {
+        if (shuffle != null) {
           updateGameStateShuffle(db, gameId, shuffle, playerId);
         } else {
           return NextResponse.json<PollTurnAPIResponse>({ result: "SHUFFLE" }, { status: 200 });

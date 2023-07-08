@@ -19,8 +19,13 @@ export interface PlaceCardStep {
   followUp?: "BIS" | "ESTATE" | "FENCE";
 }
 
+interface PromptReshuffleStep {
+  type: "promptReshuffle";
+}
+
 interface WaitStep {
   type: "wait";
+  shouldReshuffle?: boolean;
 }
 
 interface ErrorStep {
@@ -66,6 +71,7 @@ export type GameStep =
   | FenceStep
   | PlaceCardStep
   | WaitStep
+  | PromptReshuffleStep
   | ErrorStep
   | CompletedStep;
 
@@ -125,6 +131,15 @@ export interface ResumeAction {
   playerStates: PlayerStateMap;
 }
 
+interface PromptReshuffleAction {
+  type: "promptReshuffle";
+}
+
+interface ChoseReshuffleAction {
+  type: "choseReshuffle";
+  shouldReshuffle: boolean;
+}
+
 export type GameStateMachineAction =
   | CancelAction
   | TempAgencyModifierChosenAction
@@ -134,4 +149,6 @@ export type GameStateMachineAction =
   | SubmitStartAction
   | SubmitCompleteAction
   | ErrorAction
-  | ResumeAction;
+  | ResumeAction
+  | PromptReshuffleAction
+  | ChoseReshuffleAction;
