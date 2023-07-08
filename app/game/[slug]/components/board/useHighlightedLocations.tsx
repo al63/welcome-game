@@ -40,7 +40,7 @@ export function useHighlightedLocations(viewedPlayerId: string): Buildable | nul
         findBuildableColumns(playerState.housesRowThree, step.cardValue),
       ],
       onColumnChosen: async (position) => {
-        const res = await placeHouse(gameState, playerId, position, step);
+        const res = await placeHouse(gameState, playerState, position, step);
         dispatch(res);
       },
     };

@@ -12,8 +12,9 @@ import {
 } from "@/app/util/GameStateMachineTypes";
 import { GameState } from "@/app/util/GameTypes";
 import { ROW_ONE, ROW_THREE, ROW_TWO } from "@/app/util/Neighborhoods";
-import { House } from "@/app/util/PlayerTypes";
+import { House, PlayerState } from "@/app/util/PlayerTypes";
 import { GameStateMachineThunk } from "./GameStateMachineContext";
+import { ESTATE_MODIFIERS } from "@/app/util/Scoring";
 
 export function chooseCard(cardValue: number, cardType: GameCardType): ChoseCardAction {
   return {
@@ -43,7 +44,7 @@ export function chooseBIS(duplicatePosition: number[], duplicateValue: number, s
 
 export async function placeHouse(
   gameState: GameState,
-  playerId: string,
+  playerState: PlayerState,
   position: number[],
   step: PlaceCardStep
 ): Promise<PlacedCardAction | GameStateMachineThunk> {
@@ -53,6 +54,14 @@ export async function placeHouse(
   if (step.cardType === "POOL") {
     const poolPositions = [ROW_ONE.pools, ROW_TWO.pools, ROW_THREE.pools];
     if (poolPositions[position[0]].indexOf(position[1]) < 0) {
+      modifier = undefined;
+    }
+  } else if (step.cardType === "ESTATE") {
+    // for estate actions, it's possible every single real estate size has already been upgraded
+    const completedAll = playerState.estateModifiers.every((modifierIndex, index) => {
+      return modifierIndex === ESTATE_MODIFIERS[index].length - 1;
+    });
+    if (completedAll) {
       modifier = undefined;
     }
   }
@@ -73,7 +82,7 @@ export async function placeHouse(
 
   return await submitTurn(
     gameState,
-    playerId,
+    playerState.playerId,
     {
       type: "standard",
       house,
