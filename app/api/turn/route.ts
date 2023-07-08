@@ -117,7 +117,7 @@ function consolidateUpdate(
   playerState: PlayerState,
   turn: number,
   plans: PlanCard[],
-  shuffle: boolean | undefined
+  shuffleForCompletedPlan: boolean | undefined
 ) {
   const newPlayerState = {
     ...playerState,
@@ -175,14 +175,14 @@ function consolidateUpdate(
     lastEvent += ` with the BIS on row ${action.bisPosition[0]} column ${action.bisPosition[1]}`;
   }
   newPlayerState.lastEvent = lastEvent;
-  return validateCityPlanCompletion(newPlayerState, plans, turn, shuffle);
+  return validateCityPlanCompletion(newPlayerState, plans, turn, shuffleForCompletedPlan);
 }
 
 function validateCityPlanCompletion(
   playerState: PlayerState,
   plans: PlanCard[],
   turn: number,
-  shuffle: boolean | undefined
+  shuffleForCompletedPlan: boolean | undefined
 ): PlayerState {
   const newPlayerState = {
     ...playerState,
@@ -236,7 +236,7 @@ function validateCityPlanCompletion(
     });
     // update house rows to be used for plans
     if (planCompleted) {
-      if (shuffle == null) {
+      if (shuffleForCompletedPlan == null) {
         throw new ShuffleTurnException();
       }
       plan.requirements.forEach(function (req) {
@@ -293,7 +293,7 @@ async function updateGameState(
   currentPlayerState: PlayerState,
   gameState: GameState,
   playerStatesMap: PlayerStateMap,
-  shuffle?: boolean | undefined
+  shuffle: boolean | undefined
 ): Promise<GameState> {
   const newGameState = {
     ...gameState,
