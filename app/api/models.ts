@@ -61,9 +61,16 @@ export interface CreateTurnAPIRequest {
   shuffle?: boolean;
 }
 
-export interface CreateTurnAPIResponse {
+interface CreateTurnSuccessAPIResponse {
   playerState: PlayerState;
+  promptReshuffle: false;
 }
+
+interface CreateTurnReshuffleAPIResponse {
+  promptReshuffle: true;
+}
+
+export type CreateTurnAPIResponse = CreateTurnSuccessAPIResponse | CreateTurnReshuffleAPIResponse;
 
 interface ResumePollResponse {
   result: "RESUME";

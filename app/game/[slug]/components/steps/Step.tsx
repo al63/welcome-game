@@ -56,7 +56,7 @@ function StepInstructions({ step }: { step: GameStep }) {
 function StepActions({ step, gameState, playerId }: { step: GameStep; gameState: GameState; playerId: string }) {
   switch (step.type) {
     case "promptReshuffle":
-      return <ReshuffleOptions />;
+      return <ReshuffleOptions gameState={gameState} step={step} playerId={playerId} />;
     case "completed":
       return <GameFinished />;
     case "fence":

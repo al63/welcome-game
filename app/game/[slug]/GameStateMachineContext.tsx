@@ -38,13 +38,9 @@ export function GameStateMachineProvider({
   initialPlayerStates,
   children,
 }: GameStateMachineProviderProps) {
-  let type: "wait" | "completed" | "choose" | "promptReshuffle" = "choose";
+  let type: "wait" | "completed" | "choose" = "choose";
   if (initialGameState.completed) {
-    // game already finished
     type = "completed";
-  } else if (initialGameState.eligibleShuffles.indexOf(playerId) >= 0) {
-    // player still needs to pick whether or not to reshuffle
-    type = "promptReshuffle";
   } else if (initialGameState.players[playerId].turn > initialGameState.turn) {
     type = "wait";
   }

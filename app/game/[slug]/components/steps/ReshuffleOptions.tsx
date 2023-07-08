@@ -1,15 +1,22 @@
 import React from "react";
-import { pickShouldReshuffle } from "../../GameStateMachineActions";
+import { submitTurn } from "../../GameStateMachineActions";
 import { useGameStateMachineDispatch } from "../../GameStateMachineContext";
+import { PromptReshuffleStep } from "@/app/util/GameStateMachineTypes";
+import { GameState } from "@/app/util/GameTypes";
 
-export function ReshuffleOptions() {
+interface ReshuffleProps {
+  gameState: GameState;
+  step: PromptReshuffleStep;
+  playerId: string;
+}
+export function ReshuffleOptions({ gameState, step, playerId }: ReshuffleProps) {
   const dispatch = useGameStateMachineDispatch();
 
   const onClick = React.useCallback(
-    (reshuffle: boolean) => {
-      dispatch(pickShouldReshuffle(reshuffle));
+    async (reshuffle: boolean) => {
+      dispatch(await submitTurn(gameState, playerId, step.pendingAction, reshuffle));
     },
-    [dispatch]
+    [dispatch, gameState, playerId, step.pendingAction]
   );
 
   return (

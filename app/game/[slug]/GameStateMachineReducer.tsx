@@ -126,14 +126,7 @@ export function gameStateMachineReducer(state: GameStateMachine, action: GameSta
     case "promptReshuffle":
       return {
         ...state,
-        step: { type: "promptReshuffle" },
-      };
-    case "choseReshuffle":
-      // If a user is prompted to reshuffle, we bring ourselves back to the wait state.
-      // that causes us to poll the API again, but with our reshuffle choice.
-      return {
-        ...state,
-        step: { type: "wait", shouldReshuffle: action.shouldReshuffle },
+        step: { type: "promptReshuffle", pendingAction: action.pendingAction },
       };
     default:
       return state;

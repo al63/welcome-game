@@ -5,7 +5,6 @@ import {
   CancelAction,
   ChoseBISAction,
   ChoseCardAction,
-  ChoseReshuffleAction,
   GameStateMachineAction,
   PlaceCardStep,
   PlacedCardAction,
@@ -72,15 +71,20 @@ export async function placeHouse(
     };
   }
 
-  return await submitTurn(gameState, playerId, {
-    type: "standard",
-    house,
-    housePosition: position,
-  });
+  return await submitTurn(
+    gameState,
+    playerId,
+    {
+      type: "standard",
+      house,
+      housePosition: position,
+    },
+    undefined
+  );
 }
 
 export async function submitSkipTurn(gameState: GameState, playerId: string): Promise<GameStateMachineThunk> {
-  return await submitTurn(gameState, playerId, { type: "refusal" });
+  return await submitTurn(gameState, playerId, { type: "refusal" }, undefined);
 }
 
 export async function submitBISTurn(
@@ -91,13 +95,18 @@ export async function submitBISTurn(
   bisHouse: House,
   bisPosition: number[]
 ): Promise<GameStateMachineThunk> {
-  return await submitTurn(gameState, playerId, {
-    type: "bis",
-    house,
-    housePosition,
-    bisHouse,
-    bisPosition,
-  });
+  return await submitTurn(
+    gameState,
+    playerId,
+    {
+      type: "bis",
+      house,
+      housePosition,
+      bisHouse,
+      bisPosition,
+    },
+    undefined
+  );
 }
 
 export async function submitEstateTurn(
@@ -107,12 +116,17 @@ export async function submitEstateTurn(
   housePosition: number[],
   sizeIncreased: number
 ): Promise<GameStateMachineThunk> {
-  return await submitTurn(gameState, playerId, {
-    type: "estate",
-    house,
-    housePosition,
-    sizeIncreased,
-  });
+  return await submitTurn(
+    gameState,
+    playerId,
+    {
+      type: "estate",
+      house,
+      housePosition,
+      sizeIncreased,
+    },
+    undefined
+  );
 }
 
 export async function submitFenceTurn(
@@ -122,18 +136,24 @@ export async function submitFenceTurn(
   housePosition: number[],
   fencePosition: number[]
 ) {
-  return await submitTurn(gameState, playerId, {
-    type: "fence",
-    house,
-    housePosition,
-    fencePosition,
-  });
+  return await submitTurn(
+    gameState,
+    playerId,
+    {
+      type: "fence",
+      house,
+      housePosition,
+      fencePosition,
+    },
+    undefined
+  );
 }
 
 export async function submitTurn(
   gameState: GameState,
   playerId: string,
-  action: TurnAction
+  action: TurnAction,
+  shuffle: boolean | undefined
 ): Promise<GameStateMachineThunk> {
   return async (dispatch: React.Dispatch<GameStateMachineAction>) => {
     dispatch({ type: "submitting" });
@@ -149,6 +169,7 @@ export async function submitTurn(
           playerId,
           turn: gameState.turn,
           action,
+          shuffle,
         }),
       });
 
@@ -159,7 +180,16 @@ export async function submitTurn(
         return;
       }
 
-      dispatch({ type: "submitted", playerState: json.playerState });
+      console.log(json);
+      if (json.promptReshuffle) {
+        if (action.type !== "refusal") {
+          dispatch({ type: "promptReshuffle", pendingAction: action });
+        } else {
+          throw "Unexpected reshuffle request for permit refusal";
+        }
+      } else {
+        dispatch({ type: "submitted", playerState: json.playerState });
+      }
     } catch (e) {
       console.log(e);
       dispatch({ type: "error" });
@@ -187,9 +217,6 @@ export async function poll(gameState: GameState, playerId: string, shouldReshuff
       if (!res.ok || json.result === "ERROR") {
         console.log(json);
         dispatch({ type: "error" });
-      } else if (json.result === "SHUFFLE") {
-        new Audio("/notification.mp3").play();
-        dispatch({ type: "promptReshuffle" });
       } else if (json.result === "RESUME") {
         new Audio("/notification.mp3").play();
         dispatch({ type: "resume", gameState: json.gameState, playerStates: json.playerStates });
@@ -199,8 +226,4 @@ export async function poll(gameState: GameState, playerId: string, shouldReshuff
       dispatch({ type: "error" });
     }
   };
-}
-
-export function pickShouldReshuffle(shouldReshuffle: boolean): ChoseReshuffleAction {
-  return { type: "choseReshuffle", shouldReshuffle };
 }
