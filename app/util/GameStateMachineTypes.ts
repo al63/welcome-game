@@ -26,7 +26,6 @@ export interface PromptReshuffleStep {
 
 interface WaitStep {
   type: "wait";
-  shouldReshuffle?: boolean;
 }
 
 interface ErrorStep {
