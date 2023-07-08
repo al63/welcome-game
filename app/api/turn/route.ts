@@ -290,6 +290,7 @@ async function updateGameState(
       currentPlayerState.completedPlans[idx] > 0
     ) {
       newGameState.plans[idx].completed = true;
+      newGameState.eligibleShuffles.push(currentPlayerState.playerId);
       currentTurnLog = addEventLog(
         currentTurnLog,
         `[${currentTurn}] ${currentPlayerState.playerId} is the first to complete City Plan ${idx + 1} for ${

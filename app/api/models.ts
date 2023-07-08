@@ -74,9 +74,13 @@ interface WaitPollResponse {
   result: "WAIT";
 }
 
+interface ShufflePollResponse {
+  result: "SHUFFLE";
+}
+
 interface ErrorPollResponse {
   result: "ERROR";
   error: string;
 }
 
-export type PollTurnAPIResponse = ResumePollResponse | WaitPollResponse | ErrorPollResponse;
+export type PollTurnAPIResponse = ResumePollResponse | WaitPollResponse | ShufflePollResponse | ErrorPollResponse;
