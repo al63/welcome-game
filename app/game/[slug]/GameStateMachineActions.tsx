@@ -196,14 +196,11 @@ export async function submitTurn(
   };
 }
 
-export async function poll(gameState: GameState, playerId: string, shouldReshuffle?: boolean) {
+export async function poll(gameState: GameState, playerId: string) {
   const { id, turn } = gameState;
   return async (dispatch: React.Dispatch<GameStateMachineAction>) => {
     try {
       let endpoint = `/api/poll?gameId=${id}&turn=${turn + 1}&playerId=${playerId}`;
-      if (shouldReshuffle != null) {
-        endpoint += `&shuffle=${shouldReshuffle}`;
-      }
       const res = await fetch(endpoint, {
         method: "GET",
         headers: {

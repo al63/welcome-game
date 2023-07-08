@@ -15,7 +15,7 @@ export function useCheckTurnCompletion(
         return -1;
       }
 
-      dispatch(await poll(state.gameState, state.playerId, state.step.shouldReshuffle));
+      dispatch(await poll(state.gameState, state.playerId));
       checkId = window.setTimeout(check, 5000);
     }
 
