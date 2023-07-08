@@ -117,7 +117,7 @@ function consolidateUpdate(
   playerState: PlayerState,
   turn: number,
   plans: PlanCard[],
-  shuffle?: boolean
+  shuffle: boolean | undefined
 ) {
   const newPlayerState = {
     ...playerState,
@@ -182,7 +182,7 @@ function validateCityPlanCompletion(
   playerState: PlayerState,
   plans: PlanCard[],
   turn: number,
-  shuffle?: boolean
+  shuffle: boolean | undefined
 ): PlayerState {
   const newPlayerState = {
     ...playerState,
@@ -293,7 +293,7 @@ async function updateGameState(
   currentPlayerState: PlayerState,
   gameState: GameState,
   playerStatesMap: PlayerStateMap,
-  shuffle?: boolean
+  shuffle?: boolean | undefined
 ): Promise<GameState> {
   const newGameState = {
     ...gameState,
