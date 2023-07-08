@@ -1,4 +1,4 @@
-import { House } from "./PlayerTypes";
+import { House } from "./playerTypes";
 
 export function findBuildableColumns(row: Array<House | null>, value: number): Set<number> {
   const output = new Set<number>();

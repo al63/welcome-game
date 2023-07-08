@@ -1,7 +1,7 @@
 import { PermitRefusalAction, PlayerStateMap, TurnAction } from "../api/models";
-import { GameCardType } from "./CardTypes";
-import { GameState } from "./GameTypes";
-import { House, PlayerState } from "./PlayerTypes";
+import { GameCardType } from "./cardTypes";
+import { GameState } from "./gameTypes";
+import { House, PlayerState } from "./playerTypes";
 
 interface ChooseCardStep {
   type: "choose";

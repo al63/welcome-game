@@ -1,7 +1,7 @@
 import { PlayerStateMap } from "../api/models";
-import { drawPlans } from "../api/utils/PlanDeck";
-import { GameCard, GameCardType } from "./CardTypes";
-import { GameState } from "./GameTypes";
+import { drawPlans } from "../api/utils/planDeck";
+import { GameCard, GameCardType } from "./cardTypes";
+import { GameState } from "./gameTypes";
 
 const dummy = {
   playerId: "bob",

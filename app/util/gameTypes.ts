@@ -1,4 +1,4 @@
-import { GameCard, GameCardType, PlanCard } from "./CardTypes";
+import { GameCard, GameCardType, PlanCard } from "./cardTypes";
 
 export interface FinalScores {
   scoringInfo: Array<ScoringInfo>;

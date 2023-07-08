@@ -1,4 +1,4 @@
-import { GameCard } from "./CardTypes";
+import { GameCard } from "./cardTypes";
 
 export const GAME_DECK: GameCard[] = [
   { value: 1, backingType: "PARK" },
