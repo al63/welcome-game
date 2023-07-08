@@ -63,6 +63,8 @@ function StepActions({ step, gameState, playerId }: { step: GameStep; gameState:
       return <PlaceFence gameState={gameState} playerId={playerId} step={step} />;
     case "chooseBis":
       return <ChooseBIS gameState={gameState} playerId={playerId} step={step} />;
+    case "placeBis":
+      return <CancelButton />;
     case "estate":
       return <RealEstateModifier step={step} />;
     case "temp":
