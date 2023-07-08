@@ -342,7 +342,6 @@ async function updateGameState(
   });
 
   if (advanceTurn) {
-    currentTurnLog = addEventLog(currentTurnLog, `Turn ${nextTurn} has begun.`);
     newGameState.turn++;
     const playerIdKeys = Object.keys(playerStatesMap);
     playerIdKeys.forEach((key) => {
@@ -354,14 +353,19 @@ async function updateGameState(
       }
     });
 
+    let seed = gameState.seed;
+    let shuffleOffset = gameState.shuffleOffset + 1;
     const cardsDrawn = newGameState.turn * 3;
     const deckExhausted = cardsDrawn % 81 == 0;
     const cardsToDraw = newGameState.turn % 27;
     if (deckExhausted) {
       currentTurnLog = addEventLog(currentTurnLog, `[${nextTurn}] The deck has been exhausted -- shuffling!`);
+      shuffleOffset = 1;
+      seed = new Date().getTime();
     }
-    const seed = deckExhausted ? new Date().getTime() : gameState.seed;
-    const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, cardsToDraw);
+
+    // const cardsToDraw = gameState.shuffleOffset % 27;
+    const shuffledDeck = shuffleWithSeedAndDrawOffset(gameState.seed, cardsToDraw);
     const activeCards: ActiveCards = drawCards(shuffledDeck);
     newGameState.revealedCardValues = activeCards.revealedNumbers;
     newGameState.revealedCardModifiers = activeCards.revealedModifiers.map((gameCard) => gameCard.backingType);
