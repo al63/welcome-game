@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       playerStatesMap[doc.playerId] = doc;
     }
 
-    const newGameState = await updateGameState(db, newPlayerState, gameState, playerStatesMap);
+    const newGameState = await updateGameState(db, newPlayerState, gameState, playerStatesMap, req.gshuffle);
     const gameFilter: Filter<Document> = { id: gameState.id };
     const gameBody: UpdateFilter<Document> = {
       $set: {
