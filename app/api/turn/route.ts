@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       playerStatesMap[doc.playerId] = doc;
     }
 
-    const newGameState = await updateGameState(db, newPlayerState, gameState, playerStatesMap, req.gshuffle);
+    const newGameState = await updateGameState(db, newPlayerState, gameState, playerStatesMap, req.shuffle);
     const gameFilter: Filter<Document> = { id: gameState.id };
     const gameBody: UpdateFilter<Document> = {
       $set: {
@@ -324,12 +324,6 @@ async function updateGameState(
           );
         }
       }
-      currentTurnLog = addEventLog(
-        currentTurnLog,
-        `[${currentTurn}] ${currentPlayerState.playerId} is the first to complete City Plan ${idx + 1} for ${
-          currentPlayerState.completedPlans[idx]
-        } points!`
-      );
     }
   });
 
