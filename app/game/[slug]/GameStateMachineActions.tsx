@@ -171,7 +171,7 @@ export async function poll(gameState: GameState, playerId: string, shouldReshuff
   const { id, turn } = gameState;
   return async (dispatch: React.Dispatch<GameStateMachineAction>) => {
     try {
-      let endpoint = `/api/poll?gameId=${id}&turn=${turn}&playerId=${playerId}`;
+      let endpoint = `/api/poll?gameId=${id}&turn=${turn + 1}&playerId=${playerId}`;
       if (shouldReshuffle != null) {
         endpoint += `&shuffle=${shouldReshuffle}`;
       }
