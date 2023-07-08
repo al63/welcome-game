@@ -125,7 +125,7 @@ function consolidateUpdate(
   switch (action.type) {
     case "refusal":
       playerState.permitRefusals++;
-      playerState.lastEvent = `${playerState.playerId} has no valid moves and has received a permit refusal.`;
+      playerState.lastEvent = `[${turn}] ${playerState.playerId} has no valid moves and has received a permit refusal.`;
       return playerState;
     case "fence":
       if (action.fencePosition[0] == 0) {
@@ -316,6 +316,7 @@ async function updateGameState(
           const seed = new Date().getTime();
           const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, 1);
           const activeCards: ActiveCards = drawCards(shuffledDeck);
+          newGameState.seed = seed;
           newGameState.revealedCardValues = activeCards.revealedNumbers;
           newGameState.revealedCardModifiers = activeCards.revealedModifiers.map((gameCard) => gameCard.backingType);
           currentTurnLog = addEventLog(
@@ -323,6 +324,8 @@ async function updateGameState(
             `[${currentTurn}] ${currentPlayerState.playerId} has decided to shuffle the deck.`
           );
         }
+      } else {
+        throw new ShuffleTurnException();
       }
     }
   });
@@ -347,22 +350,20 @@ async function updateGameState(
     });
 
     let seed = gameState.seed;
-    let shuffleOffset = gameState.shuffleOffset + 1;
-    const cardsDrawn = newGameState.turn * 3;
+    let shuffleOffset = newGameState.shuffleOffset + 1;
+    const cardsDrawn = shuffleOffset * 3;
     const deckExhausted = cardsDrawn % 81 == 0;
-    const cardsToDraw = newGameState.turn % 27;
     if (deckExhausted) {
       currentTurnLog = addEventLog(currentTurnLog, `[${nextTurn}] The deck has been exhausted -- shuffling!`);
       shuffleOffset = 1;
       seed = new Date().getTime();
     }
-
-    // const cardsToDraw = gameState.shuffleOffset % 27;
-    const shuffledDeck = shuffleWithSeedAndDrawOffset(gameState.seed, cardsToDraw);
+    const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, shuffleOffset);
     const activeCards: ActiveCards = drawCards(shuffledDeck);
     newGameState.revealedCardValues = activeCards.revealedNumbers;
     newGameState.revealedCardModifiers = activeCards.revealedModifiers.map((gameCard) => gameCard.backingType);
     newGameState.seed = seed;
+    newGameState.shuffleOffset = shuffleOffset;
   }
 
   if (advanceTurn && newGameState.completed) {
