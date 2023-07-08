@@ -293,7 +293,7 @@ async function updateGameState(
   db: Db,
   currentPlayerState: PlayerState,
   gameState: GameState,
-  playerStatesMap: PlayerStateMap,g
+  playerStatesMap: PlayerStateMap,
   shuffle?: boolean
 ): Promise<GameState> {
   const newGameState = {
@@ -319,9 +319,10 @@ async function updateGameState(
           const activeCards: ActiveCards = drawCards(shuffledDeck);
           newGameState.revealedCardValues = activeCards.revealedNumbers;
           newGameState.revealedCardModifiers = activeCards.revealedModifiers.map((gameCard) => gameCard.backingType);
-          if (newGameState.latestEventLog) {
-            newGameState.latestEventLog?.push(`${currentPlayerState.playerId} has decided to shuffle the deck.`);
-          }
+          currentTurnLog = addEventLog(
+            currentTurnLog,
+            `[${currentTurn}] ${currentPlayerState.playerId} has decided to shuffle the deck.`
+          );
         }
       }
       currentTurnLog = addEventLog(
@@ -376,7 +377,6 @@ async function updateGameState(
     });
     currentTurnLog = addEventLog(currentTurnLog, `Congratulations to ${finalScores.scoringInfo[0].playerId}!`);
   }
-
   newGameState.latestEventLog = currentTurnLog;
   return newGameState;
 }
