@@ -166,10 +166,10 @@ export async function submitTurn(
   };
 }
 
-export async function poll(gameId: string, turn: number) {
+export async function poll(gameId: string, turn: number, playerId: string) {
   return async (dispatch: React.Dispatch<GameStateMachineAction>) => {
     try {
-      const res = await fetch(`/api/poll?gameId=${gameId}&turn=${turn}`, {
+      const res = await fetch(`/api/poll?gameId=${gameId}&turn=${turn}&playerId=${playerId}`, {
         method: "GET",
         headers: {
           Accept: "application/json",

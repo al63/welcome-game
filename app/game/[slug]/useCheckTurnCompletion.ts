@@ -15,7 +15,7 @@ export function useCheckTurnCompletion(
         return -1;
       }
 
-      dispatch(await poll(state.gameState.id, state.gameState.turn + 1));
+      dispatch(await poll(state.gameState.id, state.gameState.turn + 1, state.playerId));
       checkId = window.setTimeout(check, 5000);
     }
 
