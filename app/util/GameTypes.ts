@@ -28,7 +28,6 @@ export interface GameState {
   turn: number;
   shuffleOffset: number;
   completed: boolean;
-  eligibleShuffles: string[];
   latestEventLog: string[];
   createdAt: Date;
 }

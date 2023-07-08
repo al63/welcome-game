@@ -124,7 +124,6 @@ export const dummyGameState: GameState = {
   turn: 1,
   completed: false,
   shuffleOffset: 1,
-  eligibleShuffles: [],
   latestEventLog: [],
   createdAt: new Date(),
 };

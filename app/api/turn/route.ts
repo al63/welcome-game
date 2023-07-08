@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
-import { CreateTurnAPIRequest, PlayerStateMap, TurnAction } from "../models";
+import { CreateTurnAPIRequest, PlayerStateMap, ShuffleTurnException, TurnAction } from "../models";
 import { Db, Document, Filter, UpdateFilter } from "mongodb";
 import { PlayerState } from "@/app/util/PlayerTypes";
 import { FinalScores, GameState, PlayerMetadataMap } from "@/app/util/GameTypes";
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json("Requested turn is not equal to the known player state's turn", { status: 400 });
     }
     // Build the update request body for the player
-    const newPlayerState = consolidateUpdate(req.action, playerState, gameState.turn, gameState.plans);
+    const newPlayerState = consolidateUpdate(req.action, playerState, gameState.turn, gameState.plans, req.shuffle);
     const playerFilter: Filter<Document> = { gameId: req.gameId, playerId: req.playerId };
     const playerBody: UpdateFilter<Document> = {
       $set: {
@@ -101,13 +101,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json("Unable to update the game state", { status: 500 });
     }
 
-    return NextResponse.json({ gameState: newGameState, playerState: newPlayerState }, { status: 200 });
+    return NextResponse.json(
+      { gameState: newGameState, playerState: newPlayerState, promptReshuffle: false },
+      { status: 200 }
+    );
   } catch (e: any) {
+    if (e instanceof ShuffleTurnException) {
+      return NextResponse.json({ promptReshuffle: true }, { status: 200 });
+    }
     return NextResponse.json({ error: e.toString() }, { status: 500 });
   }
 }
 
-function consolidateUpdate(action: TurnAction, playerState: PlayerState, turn: number, plans: PlanCard[]) {
+function consolidateUpdate(
+  action: TurnAction,
+  playerState: PlayerState,
+  turn: number,
+  plans: PlanCard[],
+  shuffle?: boolean
+) {
   const newPlayerState = {
     ...playerState,
   };
@@ -164,10 +176,15 @@ function consolidateUpdate(action: TurnAction, playerState: PlayerState, turn: n
     lastEvent += ` with the BIS on row ${action.bisPosition[0]} column ${action.bisPosition[1]}`;
   }
   newPlayerState.lastEvent = lastEvent;
-  return validateCityPlanCompletion(newPlayerState, plans, turn);
+  return validateCityPlanCompletion(newPlayerState, plans, turn, shuffle);
 }
 
-function validateCityPlanCompletion(playerState: PlayerState, plans: PlanCard[], turn: number): PlayerState {
+function validateCityPlanCompletion(
+  playerState: PlayerState,
+  plans: PlanCard[],
+  turn: number,
+  shuffle?: boolean
+): PlayerState {
   const newPlayerState = {
     ...playerState,
   };
@@ -220,6 +237,9 @@ function validateCityPlanCompletion(playerState: PlayerState, plans: PlanCard[],
     });
     // update house rows to be used for plans
     if (planCompleted) {
+      if (shuffle == null) {
+        throw new ShuffleTurnException();
+      }
       plan.requirements.forEach(function (req) {
         const size = req.size - 1;
         // look at each size of estates
@@ -273,7 +293,8 @@ async function updateGameState(
   db: Db,
   currentPlayerState: PlayerState,
   gameState: GameState,
-  playerStatesMap: PlayerStateMap
+  playerStatesMap: PlayerStateMap,g
+  shuffle?: boolean
 ): Promise<GameState> {
   const newGameState = {
     ...gameState,
@@ -290,7 +311,19 @@ async function updateGameState(
       currentPlayerState.completedPlans[idx] > 0
     ) {
       newGameState.plans[idx].completed = true;
-      newGameState.eligibleShuffles.push(currentPlayerState.playerId);
+      if (shuffle != null) {
+        if (shuffle) {
+          newGameState.shuffleOffset = 1;
+          const seed = new Date().getTime();
+          const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, 1);
+          const activeCards: ActiveCards = drawCards(shuffledDeck);
+          newGameState.revealedCardValues = activeCards.revealedNumbers;
+          newGameState.revealedCardModifiers = activeCards.revealedModifiers.map((gameCard) => gameCard.backingType);
+          if (newGameState.latestEventLog) {
+            newGameState.latestEventLog?.push(`${currentPlayerState.playerId} has decided to shuffle the deck.`);
+          }
+        }
+      }
       currentTurnLog = addEventLog(
         currentTurnLog,
         `[${currentTurn}] ${currentPlayerState.playerId} is the first to complete City Plan ${idx + 1} for ${
