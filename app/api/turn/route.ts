@@ -324,8 +324,6 @@ async function updateGameState(
             `[${currentTurn}] ${currentPlayerState.playerId} has decided to shuffle the deck.`
           );
         }
-      } else {
-        throw new ShuffleTurnException();
       }
     }
   });
