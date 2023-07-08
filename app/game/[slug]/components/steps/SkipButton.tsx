@@ -1,8 +1,8 @@
 import React from "react";
 import { submitTurn } from "../../GameStateMachineActions";
 import { useGameStateMachineDispatch } from "../../GameStateMachineContext";
-import { BISStep, FenceStep } from "@/app/util/GameStateMachineTypes";
-import { GameState } from "@/app/util/GameTypes";
+import { BISStep, FenceStep } from "@/app/util/gameStateMachineTypes";
+import { GameState } from "@/app/util/gameTypes";
 
 interface ChooseBISProps {
   step: BISStep | FenceStep;

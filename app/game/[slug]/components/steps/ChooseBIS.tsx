@@ -1,7 +1,7 @@
 import React from "react";
 import { CancelButton } from "./CancelButton";
-import { BISStep } from "@/app/util/GameStateMachineTypes";
-import { GameState } from "@/app/util/GameTypes";
+import { BISStep } from "@/app/util/gameStateMachineTypes";
+import { GameState } from "@/app/util/gameTypes";
 import { SkipButton } from "./SkipButton";
 
 interface ChooseBISProps {

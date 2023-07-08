@@ -1,6 +1,6 @@
 import Game from "./components/Game";
 import { getGameServerAction } from "@/app/api/game/getGame";
-import { dummyGameState, dummyPlayerStates } from "@/app/util/TestData";
+import { dummyGameState, dummyPlayerStates } from "@/app/util/testData";
 import { GameNotFound } from "./components/GameNotFound";
 
 export default async function GamePage({

@@ -1,5 +1,5 @@
-import { GAME_DECK } from "@/app/util/GameDeck";
-import { GameCard } from "@/app/util/CardTypes";
+import { GAME_DECK } from "@/app/util/gameDeck";
+import { GameCard } from "@/app/util/cardTypes";
 import Srand from "seeded-rand";
 
 export interface ActiveCards {

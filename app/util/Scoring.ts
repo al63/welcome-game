@@ -1,6 +1,6 @@
-import { GameCardType } from "./CardTypes";
-import { ROW_ONE, ROW_THREE, ROW_TWO } from "./Neighborhoods";
-import { House, PlayerState, PlayerStates } from "./PlayerTypes";
+import { GameCardType } from "./cardTypes";
+import { ROW_ONE, ROW_THREE, ROW_TWO } from "./neighborhoods";
+import { House, PlayerState, PlayerStates } from "./playerTypes";
 
 export const POOL_SCORES = [0, 3, 6, 9, 13, 17, 21, 26, 31, 36];
 export const TEMP_SCORES = [7, 4, 1];

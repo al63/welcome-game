@@ -5,8 +5,8 @@ import {
   PERMIT_REFUSAL_SCORES,
   POOL_SCORES,
   TEMP_SCORES,
-} from "@/app/util/Scoring";
-import { computeScore } from "@/app/util/Scoring";
+  computeScore,
+} from "@/app/util/scoring";
 import classNames from "classnames";
 import React from "react";
 import { useGameStateMachineContext } from "../GameStateMachineContext";

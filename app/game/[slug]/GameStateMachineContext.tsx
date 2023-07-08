@@ -10,8 +10,8 @@
  */
 
 import { PlayerStateMap } from "@/app/api/models";
-import { GameStateMachine, GameStateMachineAction } from "@/app/util/GameStateMachineTypes";
-import { GameState } from "@/app/util/GameTypes";
+import { GameStateMachine, GameStateMachineAction } from "@/app/util/gameStateMachineTypes";
+import { GameState } from "@/app/util/gameTypes";
 import React, { useContext, useReducer } from "react";
 import { createContext } from "react";
 import { gameStateMachineReducer } from "./GameStateMachineReducer";

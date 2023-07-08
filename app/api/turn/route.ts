@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
 import { CreateTurnAPIRequest, PlayerStateMap, ShuffleTurnException, TurnAction } from "../models";
 import { Db, Document, Filter, UpdateFilter } from "mongodb";
-import { PlayerState } from "@/app/util/PlayerTypes";
-import { FinalScores, GameState, PlayerMetadataMap } from "@/app/util/GameTypes";
-import { computeScore, getEstatesResult } from "@/app/util/Scoring";
-import { PlanCard } from "@/app/util/CardTypes";
-import { ActiveCards, drawCards, shuffleWithSeedAndDrawOffset } from "../utils/Deck";
+import { PlayerState } from "@/app/util/playerTypes";
+import { FinalScores, GameState, PlayerMetadataMap } from "@/app/util/gameTypes";
+import { computeScore, getEstatesResult } from "@/app/util/scoring";
+import { PlanCard } from "@/app/util/cardTypes";
+import { ActiveCards, drawCards, shuffleWithSeedAndDrawOffset } from "../utils/deck";
 
 // User takes a turn. This means either
 // 1) playing a card

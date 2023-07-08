@@ -1,8 +1,8 @@
 import React from "react";
 import { submitTurn } from "../../GameStateMachineActions";
 import { useGameStateMachineDispatch } from "../../GameStateMachineContext";
-import { PromptReshuffleStep } from "@/app/util/GameStateMachineTypes";
-import { GameState } from "@/app/util/GameTypes";
+import { PromptReshuffleStep } from "@/app/util/gameStateMachineTypes";
+import { GameState } from "@/app/util/gameTypes";
 import { modifierDisplayName } from "./Card";
 
 interface ReshuffleProps {

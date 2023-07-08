@@ -1,5 +1,5 @@
-import { GameState } from "../util/GameTypes";
-import { House, PlayerState, PlayerStates } from "../util/PlayerTypes";
+import { GameState } from "../util/gameTypes";
+import { House, PlayerState } from "../util/playerTypes";
 
 export interface CreateGameAPIRequest {
   players?: string[];

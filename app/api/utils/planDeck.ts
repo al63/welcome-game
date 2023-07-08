@@ -1,4 +1,4 @@
-import { PlanCard } from "../../util/CardTypes";
+import { PlanCard } from "../../util/cardTypes";
 
 const PLAN_DECK_1: PlanCard[] = [
   {
@@ -36,7 +36,7 @@ const PLAN_DECK_1: PlanCard[] = [
     secondValue: 4,
     difficulty: 1,
     requirements: [{ size: 5, quantity: 2 }],
-  }
+  },
 ];
 
 const PLAN_DECK_2: PlanCard[] = [
@@ -93,7 +93,7 @@ const PLAN_DECK_2: PlanCard[] = [
       { size: 4, quantity: 1 },
       { size: 5, quantity: 1 },
     ],
-  }
+  },
 ];
 
 const PLAN_DECK_3: PlanCard[] = [
@@ -158,8 +158,9 @@ const PLAN_DECK_3: PlanCard[] = [
 ];
 
 export function drawPlans() {
-  return [PLAN_DECK_1[Math.floor(Math.random() * PLAN_DECK_1.length)], 
-  PLAN_DECK_2[Math.floor(Math.random() * PLAN_DECK_2.length)], 
-  PLAN_DECK_3[Math.floor(Math.random() * PLAN_DECK_3.length)]];
-
+  return [
+    PLAN_DECK_1[Math.floor(Math.random() * PLAN_DECK_1.length)],
+    PLAN_DECK_2[Math.floor(Math.random() * PLAN_DECK_2.length)],
+    PLAN_DECK_3[Math.floor(Math.random() * PLAN_DECK_3.length)],
+  ];
 }

@@ -1,4 +1,4 @@
-import { GameStateMachine, GameStateMachineAction } from "@/app/util/GameStateMachineTypes";
+import { GameStateMachine, GameStateMachineAction } from "@/app/util/gameStateMachineTypes";
 import { useEffect } from "react";
 import { poll } from "./GameStateMachineActions";
 import { GameStateMachineThunk } from "./GameStateMachineContext";

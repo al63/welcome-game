@@ -1,8 +1,8 @@
-import { ESTATE_MODIFIERS } from "@/app/util/Scoring";
+import { ESTATE_MODIFIERS } from "@/app/util/scoring";
 import { CancelButton } from "./CancelButton";
 import { useGameStateMachineContext, useGameStateMachineDispatch } from "../../GameStateMachineContext";
 import React from "react";
-import { RealEstateStep } from "@/app/util/GameStateMachineTypes";
+import { RealEstateStep } from "@/app/util/gameStateMachineTypes";
 import { submitEstateTurn } from "../../GameStateMachineActions";
 
 export function RealEstateModifier({ step }: { step: RealEstateStep }) {

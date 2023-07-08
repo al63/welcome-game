@@ -1,4 +1,4 @@
-import { GameCardType } from "./CardTypes";
+import { GameCardType } from "./cardTypes";
 
 export interface House {
   value: number;

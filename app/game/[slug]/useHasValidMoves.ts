@@ -1,6 +1,6 @@
 import { findBuildableColumns } from "@/app/util/findBuildableColumns";
 import { useGameStateMachineContext } from "./GameStateMachineContext";
-import { GameCard } from "@/app/util/CardTypes";
+import { GameCard } from "@/app/util/cardTypes";
 import React from "react";
 
 export function useHasValidMoves(revealedCards: GameCard[]) {

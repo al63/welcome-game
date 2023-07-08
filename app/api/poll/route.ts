@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
 import { Filter, Db } from "mongodb";
-import { GameState } from "@/app/util/GameTypes";
+import { GameState } from "@/app/util/gameTypes";
 import { PlayerStateMap, PollTurnAPIResponse } from "../models";
-import { PlayerState } from "@/app/util/PlayerTypes";
+import { PlayerState } from "@/app/util/playerTypes";
 
 // Poll API to inform the client if they are waiting for everyone to finish their turn or if it's time to play
 export async function GET(request: NextRequest) {

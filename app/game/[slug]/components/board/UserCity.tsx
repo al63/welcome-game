@@ -1,5 +1,5 @@
-import { Neighborhood, ROW_ONE, ROW_THREE, ROW_TWO } from "@/app/util/Neighborhoods";
-import { House } from "@/app/util/PlayerTypes";
+import { Neighborhood, ROW_ONE, ROW_THREE, ROW_TWO } from "@/app/util/neighborhoods";
+import { House } from "@/app/util/playerTypes";
 import classNames from "classnames";
 import React from "react";
 import { useGameStateMachineContext } from "../../GameStateMachineContext";

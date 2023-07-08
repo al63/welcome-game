@@ -1,7 +1,7 @@
 import React from "react";
 import { CancelButton } from "./CancelButton";
-import { FenceStep } from "@/app/util/GameStateMachineTypes";
-import { GameState } from "@/app/util/GameTypes";
+import { FenceStep } from "@/app/util/gameStateMachineTypes";
+import { GameState } from "@/app/util/gameTypes";
 import { SkipButton } from "./SkipButton";
 
 interface PlaceFenceProps {

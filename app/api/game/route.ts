@@ -1,11 +1,11 @@
-import { GameState, PlayerMetadataMap } from "@/app/util/GameTypes";
+import { GameState, PlayerMetadataMap } from "@/app/util/gameTypes";
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
 import { CreateGameAPIRequest, CreateGameResponse } from "../models";
-import { generateCityName, generateGameId } from "@/app/api/utils/GameIdGenerator";
-import { drawPlans } from "@/app/api/utils/PlanDeck";
-import { PlayerState } from "@/app/util/PlayerTypes";
-import { ActiveCards, drawCards, shuffleWithSeedAndDrawOffset } from "../utils/Deck";
+import { generateCityName, generateGameId } from "@/app/api/utils/gameIdGenerator";
+import { drawPlans } from "@/app/api/utils/planDeck";
+import { PlayerState } from "@/app/util/playerTypes";
+import { ActiveCards, drawCards, shuffleWithSeedAndDrawOffset } from "../utils/deck";
 
 // TODO: do stupid checking to make sure we don't have collisions
 // MAYBE TODO: clean up game state if player state somehow fails

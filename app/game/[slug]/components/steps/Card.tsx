@@ -1,4 +1,4 @@
-import { GameCardType } from "@/app/util/CardTypes";
+import { GameCardType } from "@/app/util/cardTypes";
 import React from "react";
 
 function modifierColor(modifier: GameCardType): string {

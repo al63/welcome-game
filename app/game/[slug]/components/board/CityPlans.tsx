@@ -1,4 +1,4 @@
-import { PlanCard } from "@/app/util/CardTypes";
+import { PlanCard } from "@/app/util/cardTypes";
 import classNames from "classnames";
 import React from "react";
 import { useGameStateMachineContext } from "../../GameStateMachineContext";

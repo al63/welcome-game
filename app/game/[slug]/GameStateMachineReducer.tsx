@@ -3,8 +3,8 @@ import {
   GameStateMachine,
   GameStateMachineAction,
   PlacedCardAction,
-} from "@/app/util/GameStateMachineTypes";
-import { ESTATE_MODIFIERS } from "@/app/util/Scoring";
+} from "@/app/util/gameStateMachineTypes";
+import { ESTATE_MODIFIERS } from "@/app/util/scoring";
 
 function reduceChoseAction(state: GameStateMachine, action: ChoseCardAction): GameStateMachine {
   switch (action.cardType) {

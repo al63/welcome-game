@@ -1,8 +1,8 @@
-import { GameStep } from "@/app/util/GameStateMachineTypes";
+import { GameStep } from "@/app/util/gameStateMachineTypes";
 import { Cards } from "./Cards";
 import { useGameStateMachineContext } from "../../GameStateMachineContext";
 import { modifierDisplayName } from "./Card";
-import { GameState } from "@/app/util/GameTypes";
+import { GameState } from "@/app/util/gameTypes";
 import { TempAgencyModifier } from "./TempAgencyModifier";
 import { CancelButton } from "./CancelButton";
 import { RealEstateModifier } from "./RealEstateModifier";

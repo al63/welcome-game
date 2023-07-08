@@ -1,6 +1,6 @@
 import "server-only";
-import { GameState } from "@/app/util/GameTypes";
-import { PlayerState } from "@/app/util/PlayerTypes";
+import { GameState } from "@/app/util/gameTypes";
+import { PlayerState } from "@/app/util/playerTypes";
 import clientPromise from "@/lib/mongodb";
 import { Filter } from "mongodb";
 import { GetGameActionResponse, PlayerStateMap } from "../models";

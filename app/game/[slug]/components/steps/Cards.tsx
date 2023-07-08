@@ -1,8 +1,8 @@
-import { GameCard } from "@/app/util/CardTypes";
+import { GameCard } from "@/app/util/cardTypes";
 import { Card, modifierDisplayName } from "./Card";
 import { useGameStateMachineDispatch } from "../../GameStateMachineContext";
 import { chooseCard, submitSkipTurn } from "../../GameStateMachineActions";
-import { GameState } from "@/app/util/GameTypes";
+import { GameState } from "@/app/util/gameTypes";
 import { useHasValidMoves } from "../../useHasValidMoves";
 
 interface CardsProps {

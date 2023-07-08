@@ -1,5 +1,5 @@
 import { CreateTurnAPIResponse, PollTurnAPIResponse, TurnAction } from "@/app/api/models";
-import { GameCardType } from "@/app/util/CardTypes";
+import { GameCardType } from "@/app/util/cardTypes";
 import {
   BISStep,
   CancelAction,
@@ -9,10 +9,10 @@ import {
   PlaceCardStep,
   PlacedCardAction,
   TempAgencyModifierChosenAction,
-} from "@/app/util/GameStateMachineTypes";
-import { GameState } from "@/app/util/GameTypes";
-import { ROW_ONE, ROW_THREE, ROW_TWO } from "@/app/util/Neighborhoods";
-import { House } from "@/app/util/PlayerTypes";
+} from "@/app/util/gameStateMachineTypes";
+import { GameState } from "@/app/util/gameTypes";
+import { ROW_ONE, ROW_THREE, ROW_TWO } from "@/app/util/neighborhoods";
+import { House } from "@/app/util/playerTypes";
 import { GameStateMachineThunk } from "./GameStateMachineContext";
 
 export function chooseCard(cardValue: number, cardType: GameCardType): ChoseCardAction {

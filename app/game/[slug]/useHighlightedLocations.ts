@@ -1,4 +1,4 @@
-import { House } from "@/app/util/PlayerTypes";
+import { House } from "@/app/util/playerTypes";
 import { useGameStateMachineContext, useGameStateMachineDispatch } from "./GameStateMachineContext";
 import { chooseBIS, placeHouse, submitBISTurn, submitFenceTurn } from "./GameStateMachineActions";
 import { findBuildableColumns } from "@/app/util/findBuildableColumns";
