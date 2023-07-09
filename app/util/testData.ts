@@ -2,12 +2,12 @@ import { PlayerStateMap } from "../api/models";
 import { drawPlans } from "../api/utils/planDeck";
 import { GameCard, GameCardType } from "./cardTypes";
 import { GameState } from "./gameTypes";
+import { PlayerState } from "./playerTypes";
 
-const dummy = {
+const dummy: PlayerState = {
   playerId: "bob",
   gameId: "bub",
   score: 12,
-  turn: 10,
   housesRowOne: new Array(10).fill(null),
   housesRowTwo: new Array(11).fill(null),
   housesRowThree: new Array(12).fill(null),
@@ -18,6 +18,9 @@ const dummy = {
   estateModifiers: [1, 2, 3, 4, 4, 4],
   permitRefusals: 2,
   createdAt: new Date(),
+  cityName: "city",
+  lastEvent: "event",
+  previousPlacements: null,
 };
 
 dummy.housesRowOne[1] = {
