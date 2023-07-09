@@ -64,6 +64,7 @@ export async function POST(request: NextRequest) {
         permitRefusals: 0,
         lastEvent: "",
         createdAt: new Date(),
+        previousPlacements: null,
       };
     });
     const playerRes = await db.collection("player_states").insertMany(playersStateList);

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
 import { CreateTurnAPIRequest, PlayerStateMap, ShuffleTurnException, TurnAction } from "../models";
 import { Db, Document, Filter, UpdateFilter } from "mongodb";
-import { PlayerState } from "@/app/util/playerTypes";
+import { PlayerState, PreviousPlacements } from "@/app/util/playerTypes";
 import { FinalScores, GameState, PlayerMetadataMap } from "@/app/util/gameTypes";
 import { computeScore, getEstatesResult } from "@/app/util/scoring";
 import { PlanCard } from "@/app/util/cardTypes";
@@ -119,14 +119,18 @@ function consolidateUpdate(
   plans: PlanCard[],
   shuffleForCompletedPlan: boolean | undefined
 ) {
-  const newPlayerState = {
+  const newPlayerState: PlayerState = {
     ...playerState,
   };
+
+  const previousPlacements: PreviousPlacements = {};
+
   switch (action.type) {
     case "refusal":
-      playerState.permitRefusals++;
-      playerState.lastEvent = `[${turn}] ${playerState.playerId} has no valid moves and has received a permit refusal.`;
-      return playerState;
+      newPlayerState.permitRefusals++;
+      newPlayerState.lastEvent = `[${turn}] ${newPlayerState.playerId} has no valid moves and has received a permit refusal.`;
+      newPlayerState.previousPlacements = null;
+      return newPlayerState;
     case "fence":
       if (action.fencePosition[0] == 0) {
         newPlayerState.fencesRowOne[action.fencePosition[1]] = true;
@@ -137,6 +141,7 @@ function consolidateUpdate(
       if (action.fencePosition[0] == 2) {
         newPlayerState.fencesRowThree[action.fencePosition[1]] = true;
       }
+      previousPlacements.fence = action.fencePosition;
       break;
     case "estate":
       newPlayerState.estateModifiers[action.sizeIncreased - 1]++;
@@ -151,6 +156,7 @@ function consolidateUpdate(
       if (action.bisPosition[0] == 2) {
         newPlayerState.housesRowThree[action.bisPosition[1]] = action.bisHouse;
       }
+      previousPlacements.bis = action.bisPosition;
       break;
   }
 
@@ -163,6 +169,8 @@ function consolidateUpdate(
   if (action.housePosition[0] == 2) {
     newPlayerState.housesRowThree[action.housePosition[1]] = action.house;
   }
+  previousPlacements.house = action.housePosition;
+  newPlayerState.previousPlacements = previousPlacements;
 
   let lastEvent = `[${turn}] ${newPlayerState.playerId} played value ${action.house.value}`;
   if (action.house.modifier) {

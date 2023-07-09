@@ -1,9 +1,10 @@
 import { Neighborhood, ROW_ONE, ROW_THREE, ROW_TWO } from "@/app/util/neighborhoods";
-import { House } from "@/app/util/playerTypes";
+import { House, PreviousPlacements } from "@/app/util/playerTypes";
 import classNames from "classnames";
 import React from "react";
 import { useGameStateMachineContext } from "../../GameStateMachineContext";
 import { PendingInfo, useHighlightedLocations } from "../../useHighlightedLocations";
+import { usePreviousPlacements } from "../../usePreviousPlacements";
 
 interface ParksProgressProps {
   scores: number[];
@@ -47,9 +48,10 @@ interface CellProps {
   pool?: boolean;
   onClick?: () => void;
   pendingHouse?: PendingInfo;
+  previouslyPlaced?: boolean;
 }
 
-function Cell({ house, pool, mini, highlighted, onClick, pendingHouse }: CellProps) {
+function Cell({ house, pool, mini, highlighted, onClick, pendingHouse, previouslyPlaced }: CellProps) {
   const renderedHouse = house || pendingHouse?.house;
   const occupied = renderedHouse != null;
 
@@ -58,6 +60,7 @@ function Cell({ house, pool, mini, highlighted, onClick, pendingHouse }: CellPro
       className={classNames("border relative flex justify-center items-center", {
         "bg-gray-100": occupied && !highlighted,
         "bg-white": !occupied && !highlighted,
+        "bg-blue-200": previouslyPlaced && !highlighted,
         "bg-green-300 hover:bg-green-400 cursor-pointer": highlighted,
         "border-t-black border-t-2": house?.usedForPlan,
         "w-6 h-6": mini,
@@ -76,9 +79,10 @@ interface FenceProps {
   active: boolean;
   highlighted?: boolean;
   onClick?: () => void;
+  previouslyPlaced?: boolean;
 }
 
-function Fence({ mini, active, highlighted, onClick }: FenceProps) {
+function Fence({ mini, active, highlighted, onClick, previouslyPlaced }: FenceProps) {
   return (
     <div
       className={classNames(
@@ -91,6 +95,7 @@ function Fence({ mini, active, highlighted, onClick }: FenceProps) {
         "border w-0 relative"
       )}
     >
+      {previouslyPlaced && !highlighted ? <div className="absolute h-6 z-10 w-1 -left-0.5 bg-blue-400" /> : null}
       {highlighted ? (
         <div
           className="absolute h-12 w-3 -left-1.5 z-10 bg-green-300 hover:bg-green-400 cursor-pointer"
@@ -111,6 +116,8 @@ interface RowProps {
   onFenceClick?: (column: number) => void;
   pendingHouses?: Array<PendingInfo>;
   highlightedFences?: Set<number>;
+  prevHouses?: Set<number>;
+  prevFences?: Set<number>;
 }
 
 function UserNeighborhood({
@@ -123,6 +130,8 @@ function UserNeighborhood({
   onFenceClick,
   pendingHouses,
   highlightedFences,
+  prevHouses,
+  prevFences,
 }: RowProps) {
   const numParks = React.useMemo(() => {
     return houses.filter((house) => house?.modifier === "PARK").length;
@@ -151,6 +160,7 @@ function UserNeighborhood({
                 highlighted={highlighted}
                 onClick={highlighted ? () => onHouseClick?.(index) : undefined}
                 pendingHouse={pendingHouse}
+                previouslyPlaced={prevHouses?.has(index)}
               />
               {index < houses.length - 1 ? (
                 <Fence
@@ -158,6 +168,7 @@ function UserNeighborhood({
                   mini={mini}
                   highlighted={highlightedFence}
                   onClick={highlightedFence ? () => onFenceClick?.(index) : undefined}
+                  previouslyPlaced={prevFences?.has(index)}
                 />
               ) : null}
             </div>
@@ -228,6 +239,7 @@ export function UserCity({ viewedPlayerId }: CityProps) {
 
 export function MiniUserCity({ playerId }: { playerId: string }) {
   const { playerStates } = useGameStateMachineContext();
+  const previousPlacements = usePreviousPlacements(playerId);
   const viewedPlayerState = playerStates[playerId];
   return (
     <div className="max-w-xs">
@@ -236,18 +248,24 @@ export function MiniUserCity({ playerId }: { playerId: string }) {
         config={ROW_ONE}
         houses={viewedPlayerState.housesRowOne}
         fences={viewedPlayerState.fencesRowOne}
+        prevHouses={previousPlacements?.houses[0]}
+        prevFences={previousPlacements?.fences[0]}
         mini
       />
       <UserNeighborhood
         config={ROW_TWO}
         houses={viewedPlayerState.housesRowTwo}
         fences={viewedPlayerState.fencesRowTwo}
+        prevHouses={previousPlacements?.houses[1]}
+        prevFences={previousPlacements?.fences[1]}
         mini
       />
       <UserNeighborhood
         config={ROW_THREE}
         houses={viewedPlayerState.housesRowThree}
         fences={viewedPlayerState.fencesRowThree}
+        prevHouses={previousPlacements?.houses[2]}
+        prevFences={previousPlacements?.fences[2]}
         mini
       />
     </div>

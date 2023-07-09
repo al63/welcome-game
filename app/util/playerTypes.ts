@@ -1,5 +1,11 @@
 import { GameCardType } from "./cardTypes";
 
+export interface PreviousPlacements {
+  house?: number[];
+  bis?: number[];
+  fence?: number[];
+}
+
 export interface House {
   value: number;
   modifier?: GameCardType;
@@ -9,7 +15,6 @@ export interface House {
 export interface PlayerStates {
   [playerId: string]: PlayerState;
 }
-
 export interface PlayerState {
   playerId: string;
   gameId: string;
@@ -26,4 +31,5 @@ export interface PlayerState {
   permitRefusals: number;
   lastEvent: string;
   createdAt: Date;
+  previousPlacements: PreviousPlacements | null;
 }
