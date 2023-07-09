@@ -236,9 +236,6 @@ function validateCityPlanCompletion(
     });
     // update house rows to be used for plans
     if (planCompleted) {
-      if (shuffleForCompletedPlan == null) {
-        throw new ShuffleTurnException();
-      }
       plan.requirements.forEach(function (req) {
         const size = req.size - 1;
         // look at each size of estates
@@ -281,6 +278,11 @@ function validateCityPlanCompletion(
         newPlayerState.lastEvent += ` and has completed City Plan ${idx + 1} for ${plan.secondValue} points!`;
       } else {
         newPlayerState.completedPlans[idx] = plan.firstValue;
+
+        // if a player is first to complete a plan, they must be prompted to shuffle
+        if (shuffleForCompletedPlan == null) {
+          throw new ShuffleTurnException();
+        }
       }
     }
   });
