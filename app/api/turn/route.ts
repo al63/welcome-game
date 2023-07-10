@@ -55,7 +55,8 @@ export async function POST(request: NextRequest) {
     if (req.turn != gameState.players[playerState.playerId].turn) {
       return NextResponse.json("Requested turn is not equal to the known player state's turn", { status: 400 });
     }
-    // Build the update request body for the player
+    // Build the update request body for the player. If they're the first to complete a city plan,
+    // they're eligible to shuffle and we won't mutate their turn until they have provided an answer on shuffling
     const newPlayerState = consolidateUpdate(req.action, playerState, gameState.turn, gameState.plans, req.shuffle);
     const playerFilter: Filter<Document> = { gameId: req.gameId, playerId: req.playerId };
     const playerBody: UpdateFilter<Document> = {
@@ -72,36 +73,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json("Unable to update the player state", { status: 500 });
     }
 
-    // update game state on completed plans / game end
+    // only update the gameState's completed plans / shuffle as well as ONLY the current player's turn (partial update)
+    const gameStateUpdated = await updateGameState(db, newPlayerState, gameState, req.shuffle);
 
-    const playerStates = db.collection<PlayerState>("player_states");
-    const playerStateQuery: Filter<PlayerState> = { gameId: req.gameId };
-    const playerStatesCursor = playerStates.find<PlayerState>(playerStateQuery);
-
-    const playerStatesMap: PlayerStateMap = {};
-    for await (const doc of playerStatesCursor) {
-      delete (doc as any)["_id"];
-      playerStatesMap[doc.playerId] = doc;
-    }
-
-    const newGameState = await updateGameState(db, newPlayerState, gameState, playerStatesMap, req.shuffle);
-    const gameFilter: Filter<Document> = { id: gameState.id };
-    const gameBody: UpdateFilter<Document> = {
-      $set: {
-        ...newGameState,
-      },
-    };
-
-    const gameRes = await db.collection("game_states").updateOne(gameFilter, gameBody);
-    if (gameRes.matchedCount != 1) {
-      return NextResponse.json("Did not find any game state matching the given parameters", { status: 500 });
-    }
-    if (gameRes.modifiedCount != 1) {
+    if (!gameStateUpdated) {
       return NextResponse.json("Unable to update the game state", { status: 500 });
     }
 
+    // grab the new game state and new player states to determine if the game is over / should advance turn
+    const finalGameState = await sanityCheckGameStateAndAdvanceTurn(db, req.gameId, newPlayerState);
+
     return NextResponse.json(
-      { gameState: newGameState, playerState: newPlayerState, promptReshuffle: false },
+      { gameState: finalGameState, playerState: newPlayerState, promptReshuffle: false },
       { status: 200 }
     );
   } catch (e: any) {
@@ -298,55 +281,38 @@ function validateCityPlanCompletion(
   return newPlayerState;
 }
 
-async function updateGameState(
+async function sanityCheckGameStateAndAdvanceTurn(
   db: Db,
-  currentPlayerState: PlayerState,
-  gameState: GameState,
-  playerStatesMap: PlayerStateMap,
-  shuffle: boolean | undefined
+  gameId: string,
+  currentPlayerState: PlayerState
 ): Promise<GameState> {
-  const newGameState = {
-    ...gameState,
-  };
-  const currentTurn = gameState.turn;
-  let currentTurnLog = [...gameState.latestEventLog];
-  currentTurnLog = addEventLog(currentTurnLog, currentPlayerState.lastEvent);
+  const gameQuery: Filter<GameState> = { id: gameId };
+  const gameState = await db.collection<GameState>("game_states").findOne(gameQuery);
 
-  // Update the completed plans for the GameState so that players can determine if
-  // they get first or second score for completing a plan
-  currentPlayerState.completedPlans.forEach((_, idx) => {
-    if (
-      (gameState.plans[idx].completed != true || gameState.plans[idx].turnCompleted == gameState.turn) &&
-      currentPlayerState.completedPlans[idx] > 0
-    ) {
-      newGameState.plans[idx].completed = true;
-      if (shuffle != null) {
-        if (shuffle) {
-          newGameState.shuffleOffset = 1;
-          const seed = new Date().getTime();
-          const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, 1);
-          const activeCards: ActiveCards = drawCards(shuffledDeck);
-          newGameState.seed = seed;
-          newGameState.revealedCardValues = activeCards.revealedNumbers;
-          newGameState.revealedCardModifiers = activeCards.revealedModifiers.map((gameCard) => gameCard.backingType);
-          currentTurnLog = addEventLog(
-            currentTurnLog,
-            `[${currentTurn}] ${currentPlayerState.playerId} has decided to shuffle the deck.`
-          );
-        }
-      }
-    }
-  });
+  if (!gameState) {
+    throw new Error("Unable to retrieve game state while checking to advance turn");
+  }
 
-  // game completion used to be here
+  const newGameState = { ...gameState };
   const nextTurn = gameState.turn + 1;
-  newGameState.players[currentPlayerState.playerId].turn = nextTurn;
+
+  let currentTurnLog = [...gameState.latestEventLog];
   const advanceTurn = Object.keys(newGameState.players).every(function (e) {
     return newGameState.players[e].turn == nextTurn;
   });
 
+  const playerStates = db.collection<PlayerState>("player_states");
+  const playerStateQuery: Filter<PlayerState> = { gameId: gameId };
+  const playerStatesCursor = playerStates.find<PlayerState>(playerStateQuery);
+
+  const playerStatesMap: PlayerStateMap = {};
+  for await (const doc of playerStatesCursor) {
+    delete (doc as any)["_id"];
+    playerStatesMap[doc.playerId] = doc;
+  }
+
   if (advanceTurn) {
-    newGameState.turn++;
+    newGameState.turn = nextTurn;
     const playerIdKeys = Object.keys(playerStatesMap);
     playerIdKeys.forEach((key) => {
       const gameCompleted = isGameCompleted(playerStatesMap[key]);
@@ -383,8 +349,89 @@ async function updateGameState(
     });
     currentTurnLog = addEventLog(currentTurnLog, `Congratulations to ${finalScores.scoringInfo[0].playerId}!`);
   }
-  newGameState.latestEventLog = currentTurnLog;
+
+  const gameFilter: Filter<Document> = { id: newGameState.id };
+  const gameBody: UpdateFilter<Document> = {
+    $set: {
+      ...newGameState,
+    },
+  };
+
+  const gameRes = await db.collection("game_states").updateOne(gameFilter, gameBody);
+  if (!gameRes.acknowledged) {
+    throw new Error("Unable to update the game state in 'sanityCheckGameStateAndAdvanceTurn'");
+  }
+
   return newGameState;
+}
+
+// This only updates if a plan has been completed or shuffling the deck for completing a city plan first
+async function updateGameState(
+  db: Db,
+  currentPlayerState: PlayerState,
+  gameState: GameState,
+  shuffle: boolean | undefined
+): Promise<number> {
+  const newGameState = {
+    ...gameState,
+  };
+  const currentTurn = gameState.turn;
+  let currentTurnLog = [...gameState.latestEventLog];
+  let updatedPlanIdx = -1;
+  let isShuffled = false;
+  // currentTurnLog = addEventLog(currentTurnLog, currentPlayerState.lastEvent);
+
+  // Update the completed plans for the GameState so that players can determine if
+  // they get first or second score for completing a plan
+  currentPlayerState.completedPlans.forEach((_, idx) => {
+    if (
+      (gameState.plans[idx].completed != true || gameState.plans[idx].turnCompleted == gameState.turn) &&
+      currentPlayerState.completedPlans[idx] > 0
+    ) {
+      newGameState.plans[idx].completed = true;
+      updatedPlanIdx = idx;
+      if (shuffle != null) {
+        if (shuffle) {
+          newGameState.shuffleOffset = 1;
+          const seed = new Date().getTime();
+          const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, 1);
+          const activeCards: ActiveCards = drawCards(shuffledDeck);
+          newGameState.seed = seed;
+          newGameState.revealedCardValues = activeCards.revealedNumbers;
+          newGameState.revealedCardModifiers = activeCards.revealedModifiers.map((gameCard) => gameCard.backingType);
+          currentTurnLog = addEventLog(
+            currentTurnLog,
+            `[${currentTurn}] ${currentPlayerState.playerId} has decided to shuffle the deck.`
+          );
+        }
+      }
+    }
+  });
+
+  const nextTurn = gameState.turn + 1;
+  newGameState.players[currentPlayerState.playerId].turn = nextTurn;
+  newGameState.latestEventLog = currentTurnLog;
+
+  const gameQuery: Filter<Document> = { id: gameState.id };
+  const setBody: Record<string, any> = {
+    [`players.${currentPlayerState.playerId}`]: newGameState.players[currentPlayerState.playerId],
+  };
+  if (updatedPlanIdx > -1) {
+    setBody[`plans[${updatedPlanIdx}]`] = newGameState.plans[updatedPlanIdx];
+  }
+  if (isShuffled) {
+    setBody["shuffleOffset"] = newGameState.shuffleOffset;
+    setBody["seed"] = newGameState.seed;
+    setBody["revealedCardValues"] = newGameState.revealedCardValues;
+    setBody["revealedCardModifiers"] = newGameState.revealedCardModifiers;
+  }
+
+  setBody["latestEventLog"] = currentTurnLog;
+  // only do a partial update for what has changed to avoid players clobbering the game state
+  const gameRes = await db.collection("game_states").findOneAndUpdate(gameQuery, {
+    $set: setBody,
+  });
+  return gameRes.ok;
 }
 
 async function calculateFinalScores(db: Db, currPlayerMap: PlayerMetadataMap, gameId: string): Promise<FinalScores> {
