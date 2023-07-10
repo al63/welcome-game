@@ -58,7 +58,7 @@ export function computeScore(playerId: string, playerStates: PlayerStates): User
   const parkScores = [
     ROW_ONE.parkScores[parks[0]] ?? ROW_ONE.parkScores[ROW_ONE.parkScores.length - 1],
     ROW_TWO.parkScores[parks[1]] ?? ROW_TWO.parkScores[ROW_TWO.parkScores.length - 1],
-    ROW_THREE.parkScores[parks[2] ?? ROW_THREE.parkScores[ROW_THREE.parkScores.length - 1]],
+    ROW_THREE.parkScores[parks[2]] ?? ROW_THREE.parkScores[ROW_THREE.parkScores.length - 1],
   ];
 
   const pools = houseRows.reduce((accum, cur) => accum + countType(cur, "POOL"), 0);
