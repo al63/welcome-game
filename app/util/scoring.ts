@@ -96,7 +96,7 @@ export function computeScore(playerId: string, playerStates: PlayerStates): User
       break;
     }
   }
-  const tempAgenciesScore = tempAgenciesCount > 0 ? TEMP_SCORES[place] ?? 0 : 0;
+  const tempAgenciesScore = TEMP_SCORES[place] ?? 0;
 
   const estatesScore = calculateEstatesScore(playerState);
   const estatesScoreSum = estatesScore.reduce((accum, cur) => {
