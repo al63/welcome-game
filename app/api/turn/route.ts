@@ -106,7 +106,9 @@ function consolidateUpdate(
     ...playerState,
   };
 
-  const previousPlacements: PreviousPlacements = {};
+  const previousPlacements: PreviousPlacements = {
+    houses: [],
+  };
 
   switch (action.type) {
     case "refusal":
@@ -139,7 +141,10 @@ function consolidateUpdate(
       if (action.bisPosition[0] == 2) {
         newPlayerState.housesRowThree[action.bisPosition[1]] = action.bisHouse;
       }
-      previousPlacements.bis = action.bisPosition;
+      previousPlacements.houses.push({
+        position: action.bisPosition,
+        modifier: "BIS",
+      });
       break;
   }
 
@@ -152,7 +157,12 @@ function consolidateUpdate(
   if (action.housePosition[0] == 2) {
     newPlayerState.housesRowThree[action.housePosition[1]] = action.house;
   }
-  previousPlacements.house = action.housePosition;
+
+  // overwrite house modifier for BIS for previous placements, since it will be undefined
+  previousPlacements.houses.push({
+    position: action.housePosition,
+    modifier: action.type === "bis" ? "BIS" : action.house.modifier,
+  });
   newPlayerState.previousPlacements = previousPlacements;
 
   let lastEvent = `[${turn}] ${newPlayerState.playerId} played value ${action.house.value}`;

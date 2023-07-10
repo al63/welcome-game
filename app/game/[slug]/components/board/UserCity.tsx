@@ -4,7 +4,7 @@ import classNames from "classnames";
 import React from "react";
 import { useGameStateMachineContext } from "../../GameStateMachineContext";
 import { PendingInfo, useHighlightedLocations } from "../../useHighlightedLocations";
-import { usePreviousPlacements } from "../../usePreviousPlacements";
+import { PreviousPlacementColumn, usePreviousPlacements } from "../../usePreviousPlacements";
 
 interface ParksProgressProps {
   scores: number[];
@@ -48,20 +48,46 @@ interface CellProps {
   pool?: boolean;
   onClick?: () => void;
   pendingHouse?: PendingInfo;
-  previouslyPlaced?: boolean;
+  previouslyPlaced?: PreviousPlacementColumn;
 }
 
 function Cell({ house, pool, mini, highlighted, onClick, pendingHouse, previouslyPlaced }: CellProps) {
   const renderedHouse = house || pendingHouse?.house;
   const occupied = renderedHouse != null;
 
+  let bgColor = "bg-white";
+  if (previouslyPlaced != null) {
+    switch (previouslyPlaced.modifier) {
+      case "BIS":
+        bgColor = "bg-red-200";
+        break;
+      case "ESTATE":
+        bgColor = "bg-purple-200";
+        break;
+      case "PARK":
+        bgColor = "bg-green-200";
+        break;
+      case "POOL":
+        bgColor = "bg-blue-200";
+        break;
+      case "TEMP":
+        bgColor = "bg-orange-200";
+        break;
+      case "FENCE":
+      default:
+        bgColor = "bg-gray-300";
+        break;
+    }
+  } else if (highlighted) {
+    bgColor = "bg-green-300 hover:bg-green-400 cursor-pointer";
+  } else if (occupied) {
+    bgColor = "bg-gray-100";
+  }
+
   return (
     <div
       className={classNames("border relative flex justify-center items-center", {
-        "bg-gray-100": !previouslyPlaced && occupied && !highlighted,
-        "bg-white": !previouslyPlaced && !occupied && !highlighted,
-        "bg-blue-200": previouslyPlaced && !highlighted,
-        "bg-green-300 hover:bg-green-400 cursor-pointer": highlighted,
+        [bgColor]: true,
         "border-t-black border-t-2": house?.usedForPlan,
         "w-6 h-6": mini,
         "w-12 h-12": !mini,
@@ -95,7 +121,7 @@ function Fence({ mini, active, highlighted, onClick, previouslyPlaced }: FencePr
         "border w-0 relative"
       )}
     >
-      {previouslyPlaced && !highlighted ? <div className="absolute h-6 z-10 w-1 -left-0.5 bg-blue-400" /> : null}
+      {previouslyPlaced && !highlighted ? <div className="absolute h-6 z-10 w-1 -left-0.5 bg-gray-500" /> : null}
       {highlighted ? (
         <div
           className="absolute h-12 w-3 -left-1.5 z-10 bg-green-300 hover:bg-green-400 cursor-pointer"
@@ -116,7 +142,7 @@ interface RowProps {
   onFenceClick?: (column: number) => void;
   pendingHouses?: Array<PendingInfo>;
   highlightedFences?: Set<number>;
-  prevHouses?: Set<number>;
+  prevHouses?: Array<PreviousPlacementColumn>;
   prevFences?: Set<number>;
 }
 
@@ -151,6 +177,9 @@ function UserNeighborhood({
           const highlighted = highlightedColumns?.has(index);
           const highlightedFence = highlightedFences?.has(index);
           const pendingHouse = pendingHouses?.find((pending) => pending.column === index);
+
+          const previouslyPlaced = prevHouses?.find((house) => house.column === index);
+
           return (
             <div className="flex" key={index}>
               <Cell
@@ -160,7 +189,7 @@ function UserNeighborhood({
                 highlighted={highlighted}
                 onClick={highlighted ? () => onHouseClick?.(index) : undefined}
                 pendingHouse={pendingHouse}
-                previouslyPlaced={prevHouses?.has(index)}
+                previouslyPlaced={previouslyPlaced}
               />
               {index < houses.length - 1 ? (
                 <Fence

@@ -1,8 +1,12 @@
 import { GameCardType } from "./cardTypes";
 
+export interface PreviousPlacement {
+  position: number[];
+  modifier: GameCardType | undefined;
+}
+
 export interface PreviousPlacements {
-  house?: number[];
-  bis?: number[];
+  houses: Array<PreviousPlacement>;
   fence?: number[];
 }
 
