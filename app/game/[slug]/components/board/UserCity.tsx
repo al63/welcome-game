@@ -58,8 +58,8 @@ function Cell({ house, pool, mini, highlighted, onClick, pendingHouse, previousl
   return (
     <div
       className={classNames("border relative flex justify-center items-center", {
-        "bg-gray-100": occupied && !highlighted,
-        "bg-white": !occupied && !highlighted,
+        "bg-gray-100": !previouslyPlaced && occupied && !highlighted,
+        "bg-white": !previouslyPlaced && !occupied && !highlighted,
         "bg-blue-200": previouslyPlaced && !highlighted,
         "bg-green-300 hover:bg-green-400 cursor-pointer": highlighted,
         "border-t-black border-t-2": house?.usedForPlan,
