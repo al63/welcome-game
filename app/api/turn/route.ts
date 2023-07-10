@@ -110,6 +110,8 @@ function consolidateUpdate(
     houses: [],
   };
 
+  newPlayerState.lastEvent = "";
+
   switch (action.type) {
     case "refusal":
       newPlayerState.permitRefusals++;
