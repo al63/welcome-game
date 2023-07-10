@@ -130,6 +130,8 @@ function consolidateUpdate(
       break;
     case "estate":
       newPlayerState.estateModifiers[action.sizeIncreased - 1]++;
+      let estateLastEvent = `[${turn}] ${newPlayerState.playerId} upgraded the value of estates size ${action.sizeIncreased}`;
+      newPlayerState.lastEvent = estateLastEvent;
       break;
     case "bis":
       if (action.bisPosition[0] == 0) {
@@ -165,17 +167,18 @@ function consolidateUpdate(
   });
   newPlayerState.previousPlacements = previousPlacements;
 
-  let lastEvent = `[${turn}] ${newPlayerState.playerId} played value ${action.house.value}`;
-  if (action.house.modifier) {
-    lastEvent += ` ${action.house.modifier}`;
-  }
-  lastEvent += ` on row ${action.housePosition[0]} column ${action.housePosition[1]}`;
-  if (action.type == "estate") {
-    lastEvent += `, upgrading the value of estates size ${action.sizeIncreased}`;
-  } else if (action.type == "bis") {
-    lastEvent += ` with the BIS on row ${action.bisPosition[0]} column ${action.bisPosition[1]}`;
-  }
-  newPlayerState.lastEvent = lastEvent;
+  // let lastEvent = `[${turn}] ${newPlayerState.playerId} played value ${action.house.value}`;
+  // if (action.house.modifier) {
+  //   lastEvent += ` ${action.house.modifier}`;
+  // }
+  // lastEvent += ` on row ${action.housePosition[0]} column ${action.housePosition[1]}`;
+  // if (action.type == "estate") {
+  //   lastEvent += `, upgrading the value of estates size ${action.sizeIncreased}`;
+  // } else if (action.type == "bis") {
+  //   lastEvent += ` with the BIS on row ${action.bisPosition[0]} column ${action.bisPosition[1]}`;
+  // }
+
+  // newPlayerState.lastEvent = lastEvent;
   return validateCityPlanCompletion(newPlayerState, plans, turn, shuffleForCompletedPlan);
 }
 
@@ -221,7 +224,12 @@ function validateCityPlanCompletion(
     });
 
   plans.forEach(function (plan, idx) {
-    let planCompleted = true;
+    let planCompleted = false;
+
+    // player has already completed the plan, don't check it twice
+    if (newPlayerState.completedPlans[idx] > 0) {
+      return;
+    }
     plan.requirements.forEach(function (req) {
       const size = req.size - 1;
       // look at each size of estates
@@ -231,8 +239,8 @@ function validateCityPlanCompletion(
         return !e.usedForPlan;
       });
       // check the length of this array to determine if there's even enough houses that meet the criteria of the plan
-      if (availableEstates.length < req.quantity) {
-        planCompleted = false;
+      if (availableEstates.length >= req.quantity) {
+        planCompleted = true;
       }
     });
     // update house rows to be used for plans
@@ -274,7 +282,7 @@ function validateCityPlanCompletion(
         }
       });
 
-      if (plan.completed || (plan.turnCompleted != null && plan.turnCompleted < turn)) {
+      if (plan.turnCompleted != null && plan.turnCompleted < turn) {
         newPlayerState.completedPlans[idx] = plan.secondValue;
         newPlayerState.lastEvent += ` and has completed City Plan ${idx + 1} for ${plan.secondValue} points!`;
       } else {
@@ -360,6 +368,7 @@ async function sanityCheckGameStateAndAdvanceTurn(
     currentTurnLog = addEventLog(currentTurnLog, `Congratulations to ${finalScores.scoringInfo[0].playerId}!`);
   }
 
+  newGameState.latestEventLog = currentTurnLog;
   const gameFilter: Filter<Document> = { id: newGameState.id };
   const gameBody: UpdateFilter<Document> = {
     $set: {
