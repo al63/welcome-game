@@ -66,19 +66,17 @@ export function computeScore(playerId: string, playerStates: PlayerStates): User
 
   // pain ahead: have to compute the count of temp agencies for each player, and determine what our place is accounting for ties
   const playerStatesArray = Object.values(playerStates);
-  const tempAgenciesByPlayer = playerStatesArray
-    .map((state) => {
-      const rows = [state.housesRowOne, state.housesRowTwo, state.housesRowThree];
-      const tempAgencies = Math.min(
-        rows.reduce((accum, cur) => accum + countType(cur, "TEMP"), 0),
-        11
-      );
-      return {
-        playerId: state.playerId,
-        tempAgencies,
-      };
-    })
-    .filter((x) => x.tempAgencies > 0);
+  const tempAgenciesByPlayer = playerStatesArray.map((state) => {
+    const rows = [state.housesRowOne, state.housesRowTwo, state.housesRowThree];
+    const tempAgencies = Math.min(
+      rows.reduce((accum, cur) => accum + countType(cur, "TEMP"), 0),
+      11
+    );
+    return {
+      playerId: state.playerId,
+      tempAgencies,
+    };
+  });
 
   tempAgenciesByPlayer.sort((x, y) => {
     return y.tempAgencies - x.tempAgencies;
