@@ -1128,7 +1128,7 @@ const NOUNS = [
   "Towels",
   "Trains",
   "Trash",
-  "TrashCans",
+  "Trash Cans",
   "Trees",
   "Trumpets",
   "TShirts",
@@ -1165,18 +1165,19 @@ const NOUNS = [
   "Zucchinis",
 ];
 
-const randomNumber = Math.floor(Math.random() * 2);
 export function generateGameId() {
+  const randomNumber = Math.floor(Math.random() * 100);
   const gameId =
     ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)] +
     COLORS[Math.floor(Math.random() * COLORS.length)] +
-    (randomNumber == 0
+    (randomNumber % 2 == 0
       ? ANIMALS[Math.floor(Math.random() * ANIMALS.length)]
       : NOUNS[Math.floor(Math.random() * NOUNS.length)]);
   return gameId.replaceAll(" ", "");
 }
 
 export function generateCityName() {
+  const randomNumber = Math.floor(Math.random() * 100);
   return (
     ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)] +
     " " +

@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     }
 
     // grab the new game state and new player states to determine if the game is over / should advance turn
-    const finalGameState = await sanityCheckGameStateAndAdvanceTurn(db, req.gameId, newPlayerState);
+    const finalGameState = await sanityCheckGameStateAndAdvanceTurn(db, req.gameId);
 
     return NextResponse.json(
       { gameState: finalGameState, playerState: newPlayerState, promptReshuffle: false },
@@ -255,6 +255,9 @@ function validateCityPlanCompletion(
         });
         // for each requirement, start marking houses as used for a plan up to the quantity of the requirement
         for (let i = 0; i < req.quantity; i++) {
+          if (availableEstates.length == 0) {
+            break;
+          }
           const estate = availableEstates[i];
           for (let j = estate.columns[0]; j <= estate.columns[1]; j++) {
             switch (estate.row) {
@@ -282,15 +285,21 @@ function validateCityPlanCompletion(
         }
       });
 
-      if (plan.turnCompleted != null && plan.turnCompleted < turn) {
-        newPlayerState.completedPlans[idx] = plan.secondValue;
-        newPlayerState.lastEvent += ` and has completed City Plan ${idx + 1} for ${plan.secondValue} points!`;
-      } else {
-        newPlayerState.completedPlans[idx] = plan.firstValue;
-
-        // if a player is first to complete a plan, they must be prompted to shuffle
-        if (shuffleForCompletedPlan == null) {
-          throw new ShuffleTurnException();
+      if (planCompleted && newPlayerState.completedPlans[idx] == 0) {
+        if (plan.turnCompleted != -1 && plan.turnCompleted < turn) {
+          newPlayerState.completedPlans[idx] = plan.secondValue;
+          newPlayerState.lastEvent = `[${turn}] ${newPlayerState.playerId} has completed City Plan ${idx + 1} for ${
+            plan.secondValue
+          } points!`;
+        } else {
+          newPlayerState.completedPlans[idx] = plan.firstValue;
+          newPlayerState.lastEvent = `[${turn}] ${newPlayerState.playerId} has completed City Plan ${idx + 1} for ${
+            plan.firstValue
+          } points!`;
+          // if a player is first to complete a plan, they must be prompted to shuffle
+          if (shuffleForCompletedPlan == null) {
+            throw new ShuffleTurnException();
+          }
         }
       }
     }
@@ -299,11 +308,7 @@ function validateCityPlanCompletion(
   return newPlayerState;
 }
 
-async function sanityCheckGameStateAndAdvanceTurn(
-  db: Db,
-  gameId: string,
-  currentPlayerState: PlayerState
-): Promise<GameState> {
+async function sanityCheckGameStateAndAdvanceTurn(db: Db, gameId: string): Promise<GameState> {
   const gameQuery: Filter<GameState> = { id: gameId };
   const gameState = await db.collection<GameState>("game_states").findOne(gameQuery);
 
@@ -396,9 +401,9 @@ async function updateGameState(
   };
   const currentTurn = gameState.turn;
   let currentTurnLog = [...gameState.latestEventLog];
-  let updatedPlanIdx = -1;
+  let updatedPlanIdxs: number[] = [];
   let isShuffled = false;
-  // currentTurnLog = addEventLog(currentTurnLog, currentPlayerState.lastEvent);
+  currentTurnLog = addEventLog(currentTurnLog, currentPlayerState.lastEvent);
 
   // Update the completed plans for the GameState so that players can determine if
   // they get first or second score for completing a plan
@@ -408,9 +413,11 @@ async function updateGameState(
       currentPlayerState.completedPlans[idx] > 0
     ) {
       newGameState.plans[idx].completed = true;
-      updatedPlanIdx = idx;
+      newGameState.plans[idx].turnCompleted = currentTurn;
+      updatedPlanIdxs.push(idx);
       if (shuffle != null) {
         if (shuffle) {
+          isShuffled = true;
           newGameState.shuffleOffset = 1;
           const seed = new Date().getTime();
           const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, 1);
@@ -435,9 +442,11 @@ async function updateGameState(
   const setBody: Record<string, any> = {
     [`players.${currentPlayerState.playerId}`]: newGameState.players[currentPlayerState.playerId],
   };
-  if (updatedPlanIdx > -1) {
-    setBody[`plans[${updatedPlanIdx}]`] = newGameState.plans[updatedPlanIdx];
-  }
+  updatedPlanIdxs.forEach((val) => {
+    setBody[`plans.${val}.completed`] = newGameState.plans[val].completed;
+    setBody[`plans.${val}.turnCompleted`] = newGameState.plans[val].turnCompleted;
+  });
+
   if (isShuffled) {
     setBody["shuffleOffset"] = newGameState.shuffleOffset;
     setBody["seed"] = newGameState.seed;
@@ -531,6 +540,11 @@ async function calculateFinalScores(db: Db, currPlayerMap: PlayerMetadataMap, ga
 
 function addEventLog(log: string[], val: string): string[] {
   const newLog = [...log];
+
+  if (val.trim() == "") {
+    return newLog;
+  }
+
   if (newLog.length > 15) {
     newLog.shift();
   }
