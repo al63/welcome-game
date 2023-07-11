@@ -10,9 +10,13 @@ function Requirement({ size, quantity }: { size: number; quantity: number }) {
   }
 
   return (
-    <div className="flex flex-col items-start mb-2">
-      <div className="text-xs">{quantity}x</div>
-      <div className="flex flex-row items-center">{cells}</div>
+    <div aria-description={`${quantity} neighborhoods of size ${size}`} className="flex flex-col items-start mb-2">
+      <div aria-hidden className="text-xs">
+        {quantity}x
+      </div>
+      <div aria-hidden className="flex flex-row items-center">
+        {cells}
+      </div>
     </div>
   );
 }
@@ -47,6 +51,7 @@ function CityPlan({ plan, state }: CityPlanProps) {
       </div>
       <div className="flex items-center justify-around w-full mt-2">
         <div
+          aria-description="Points for first place"
           className={classNames("rounded-full w-6 h-6 flex items-center justify-center", {
             "bg-green-500 text-white": state === "completeFirst",
             "bg-red-700 text-white": state === "completeSecond",
@@ -55,7 +60,10 @@ function CityPlan({ plan, state }: CityPlanProps) {
         >
           {first}
         </div>
-        <div className="rounded-full bg-gray-300 text-gray-700 w-6 h-6 flex items-center justify-center">
+        <div
+          aria-description="Points for second place"
+          className="rounded-full bg-gray-300 text-gray-700 w-6 h-6 flex items-center justify-center"
+        >
           {plan.secondValue}
         </div>
       </div>

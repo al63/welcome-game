@@ -13,7 +13,7 @@ interface ParksProgressProps {
 
 function ParksProgress({ scores, count }: ParksProgressProps) {
   return (
-    <div className="flex">
+    <div aria-description="Points for parks" className="flex">
       {scores.map((score, index) => {
         return (
           <div
@@ -23,6 +23,7 @@ function ParksProgress({ scores, count }: ParksProgressProps) {
               "bg-green-300 line-through text-gray-400": index < count,
             })}
             key={index}
+            aria-checked={count === index}
           >
             {score}
           </div>
