@@ -36,6 +36,7 @@ export function StartGame({ createdGame }: StartGameProps) {
                   }}
                 >
                   <Image
+                    aria-hidden
                     className="inline cursor-pointer hover:bg-slate-200 rounded-full p-1"
                     height="22"
                     width="22"

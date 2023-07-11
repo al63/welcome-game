@@ -47,12 +47,17 @@ export function Players({ players, onUpdate }: PlayersProps) {
               onChange={(e) => onNameChange(index, e.target.value)}
             />
             {players.length < 6 ? (
-              <button className="ml-2 hover:bg-slate-200 px-3 rounded-full" onClick={() => onNewPlayerClicked(index)}>
+              <button
+                aria-label="Add new player"
+                className="ml-2 hover:bg-slate-200 px-3 rounded-full"
+                onClick={() => onNewPlayerClicked(index)}
+              >
                 +
               </button>
             ) : null}
             {players.length > 2 ? (
               <button
+                aria-label={`Remove ${player || "player"}`}
                 className="ml-2 hover:bg-slate-200 px-3 rounded-full"
                 onClick={() => onRemovePlayerClicked(index)}
               >
