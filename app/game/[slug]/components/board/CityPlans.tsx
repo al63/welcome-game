@@ -51,7 +51,6 @@ function CityPlan({ plan, state }: CityPlanProps) {
       </div>
       <div className="flex items-center justify-around w-full mt-2">
         <div
-          aria-description="Points for first place"
           className={classNames("rounded-full w-6 h-6 flex items-center justify-center", {
             "bg-green-500 text-white": state === "completeFirst",
             "bg-red-700 text-white": state === "completeSecond",
@@ -60,10 +59,7 @@ function CityPlan({ plan, state }: CityPlanProps) {
         >
           {first}
         </div>
-        <div
-          aria-description="Points for second place"
-          className="rounded-full bg-gray-300 text-gray-700 w-6 h-6 flex items-center justify-center"
-        >
+        <div className="rounded-full bg-gray-300 text-gray-700 w-6 h-6 flex items-center justify-center">
           {plan.secondValue}
         </div>
       </div>
