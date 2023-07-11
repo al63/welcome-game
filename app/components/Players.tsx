@@ -40,6 +40,7 @@ export function Players({ players, onUpdate }: PlayersProps) {
         return (
           <div key={index} className="flex mb-2">
             <input
+              aria-label={`Player ${index + 1} name`}
               className="border rounded-sm flex-grow p-1 w-72"
               maxLength={20}
               placeholder={`Player ${index + 1}`}

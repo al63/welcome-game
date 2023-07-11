@@ -84,18 +84,29 @@ function Cell({ house, pool, mini, highlighted, onClick, pendingHouse, previousl
     bgColor = "bg-gray-100";
   }
 
-  return (
-    <div
-      className={classNames("border relative flex justify-center items-center", {
-        [bgColor]: true,
-        "border-t-black border-t-2": house?.usedForPlan,
-        "w-6 h-6": mini,
-        "w-12 h-12": !mini,
-      })}
-      onClick={onClick}
-    >
-      {pool && !mini ? <div className="bg-blue-500 w-2 h-2 top-1 right-1.5 absolute" /> : null}
+  const className = classNames("border relative flex justify-center items-center", {
+    [bgColor]: true,
+    "border-t-black border-t-2": house?.usedForPlan,
+    "w-6 h-6": mini,
+    "w-12 h-12": !mini,
+  });
+
+  const children = (
+    <>
+      {pool && !mini ? (
+        <div aria-label="Pool Location" className="bg-blue-500 w-2 h-2 top-1 right-1.5 absolute" />
+      ) : null}
       {renderedHouse != null ? <House house={renderedHouse} showModifiers={!mini} /> : null}
+    </>
+  );
+
+  return onClick != null ? (
+    <button role="gridcell" aria-label="Place house" className={className} onClick={onClick}>
+      {children}
+    </button>
+  ) : (
+    <div role="gridcell" aria-label="House" className={className}>
+      {children}
     </div>
   );
 }
@@ -111,6 +122,7 @@ interface FenceProps {
 function Fence({ mini, active, highlighted, onClick, previouslyPlaced }: FenceProps) {
   return (
     <div
+      aria-label={active ? "Active fence" : "Inactive fence"}
       className={classNames(
         {
           "border-black": active && !highlighted,
@@ -123,7 +135,8 @@ function Fence({ mini, active, highlighted, onClick, previouslyPlaced }: FencePr
     >
       {previouslyPlaced && !highlighted ? <div className="absolute h-6 z-10 w-1 -left-0.5 bg-gray-500" /> : null}
       {highlighted ? (
-        <div
+        <button
+          aria-label="Place fence"
           className="absolute h-12 w-3 -left-1.5 z-10 bg-green-300 hover:bg-green-400 cursor-pointer"
           onClick={onClick}
         />
@@ -181,7 +194,7 @@ function UserNeighborhood({
           const previouslyPlaced = prevHouses?.find((house) => house.column === index);
 
           return (
-            <div className="flex" key={index}>
+            <div role="row" className="flex" key={index}>
               <Cell
                 house={house}
                 pool={config.pools.includes(index)}
@@ -228,7 +241,10 @@ export function UserCity({ viewedPlayerId }: CityProps) {
 
   return (
     <div>
-      <h1 className="text-xl font-bold p-2 truncate">{`${viewedPlayerState.playerId}'s City: ${viewedPlayerState.cityName}`}</h1>
+      <h1
+        role="grid"
+        className="text-xl font-bold p-2 truncate"
+      >{`${viewedPlayerState.playerId}'s City: ${viewedPlayerState.cityName}`}</h1>
       <UserNeighborhood
         config={ROW_ONE}
         houses={viewedPlayerState.housesRowOne}

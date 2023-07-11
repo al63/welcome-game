@@ -43,15 +43,16 @@ interface CardProps {
 
 export function Card({ value, modifier, onClick }: CardProps) {
   return (
-    <div
+    <button
+      aria-label={`${modifierDisplayName(modifier)} card of value ${value}`}
       className="flex relative justify-center items-center m-1 rounded-md text-center w-20 h-28 border border-black bg-amber-50 text-lg cursor-pointer hover:bg-amber-100"
       onClick={onClick}
     >
-      <div className="flex flex-col justify-center items-center text-sm">
+      <div aria-hidden className="flex flex-col justify-center items-center text-sm">
         <p className="text-xl">{value}</p>
         {modifierDisplayName(modifier)}
         <div className={`m-1 rounded-sm w-6 h-6 border border-black ${modifierColor(modifier)}`} />
       </div>
-    </div>
+    </button>
   );
 }

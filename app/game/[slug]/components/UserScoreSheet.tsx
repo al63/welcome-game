@@ -40,6 +40,7 @@ function Score({ score }: { score: number }) {
 function Value({ value, checked, active }: { value?: number; checked?: boolean; active?: boolean }) {
   return (
     <div
+      aria-checked={active}
       className={classNames("flex items-center justify-center h-6 w-6 rounded-md text-sm bg-white", {
         "font-bold": active,
         "line-through text-gray-400": checked,
@@ -198,7 +199,9 @@ export function UserScoreSheet({ playerId }: UserScoreSheetProps) {
         <Divider symbol="-" />
         <PermitRefusals count={playerState.permitRefusals} />
         <Divider symbol="=" />
-        <div className="mb-20 ml-2 text-xl font-bold">{userScores.summation}</div>
+        <div className="mb-20 ml-2 text-xl font-bold" aria-label="User's Score">
+          {userScores.summation}
+        </div>
       </div>
     </>
   );

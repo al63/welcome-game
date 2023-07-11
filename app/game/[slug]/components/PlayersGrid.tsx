@@ -23,7 +23,7 @@ export function PlayersGrid({ onSetViewedPlayer, playerId, viewedPlayerId }: Pla
       <div className="flex flex-wrap">
         {Object.keys(playerStates).map((p) => {
           return (
-            <div
+            <button
               className={classNames("flex flex-col border m-2 p-2 items-center cursor-pointer", {
                 "border-black": viewedPlayerId === p,
                 "border-gray": viewedPlayerId !== p,
@@ -33,7 +33,7 @@ export function PlayersGrid({ onSetViewedPlayer, playerId, viewedPlayerId }: Pla
             >
               <h2 className="text-md font-semibold">{p}</h2>
               <MiniUserCity playerId={p} />
-            </div>
+            </button>
           );
         })}
       </div>
