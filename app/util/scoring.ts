@@ -154,17 +154,12 @@ export function calculateEstatesScore(playerState: PlayerState): Array<EstatesSc
 // we need to check if all houses between two fences are built
 // check fence arrays, for fence = true, check all houses to the next fence = true
 // the edges of each street have fences by default, but aren't represented in the array
-// the return value will be an array of estate size to an array of arrays representing the start and end index of the estate
-// example
-// [[[0,0],[1,1],[2,2]]], [[],[[0,1],[2,3],[4,5]]]
-// [0][0] returns an array of estates of size 1
-// [1][0] returns an array of estates of size 2
-// [0][0][0] returns the first house position of an estate of size 1
-
+// the return value will be an array of estate size to an array of results
 interface EstatesResult {
   columns: number[];
   usedForPlan: boolean;
 }
+
 export function getEstatesResult(fenceRow: boolean[], houseRow: Array<House | null>): EstatesResult[][] {
   const estateResult: EstatesResult[][] = [[], [], [], [], [], []];
 
