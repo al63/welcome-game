@@ -6,36 +6,48 @@ const PLAN_DECK_1: PlanCard[] = [
     secondValue: 6,
     difficulty: 1,
     requirements: [{ size: 6, quantity: 2 }],
+    completed: false,
+    turnCompleted: -1,
   },
   {
     firstValue: 8,
     secondValue: 4,
     difficulty: 1,
     requirements: [{ size: 1, quantity: 6 }],
+    completed: false,
+    turnCompleted: -1,
   },
   {
     firstValue: 6,
     secondValue: 3,
     difficulty: 1,
     requirements: [{ size: 4, quantity: 2 }],
+    completed: false,
+    turnCompleted: -1,
   },
   {
     firstValue: 8,
     secondValue: 4,
     difficulty: 1,
     requirements: [{ size: 3, quantity: 3 }],
+    completed: false,
+    turnCompleted: -1,
   },
   {
     firstValue: 8,
     secondValue: 4,
     difficulty: 1,
     requirements: [{ size: 2, quantity: 4 }],
+    completed: false,
+    turnCompleted: -1,
   },
   {
     firstValue: 8,
     secondValue: 4,
     difficulty: 1,
     requirements: [{ size: 5, quantity: 2 }],
+    completed: false,
+    turnCompleted: -1,
   },
 ];
 
@@ -48,6 +60,8 @@ const PLAN_DECK_2: PlanCard[] = [
       { size: 4, quantity: 1 },
       { size: 1, quantity: 3 },
     ],
+    completed: false,
+    turnCompleted: -1,
   },
   {
     firstValue: 12,
@@ -57,6 +71,8 @@ const PLAN_DECK_2: PlanCard[] = [
       { size: 3, quantity: 2 },
       { size: 4, quantity: 1 },
     ],
+    completed: false,
+    turnCompleted: -1,
   },
   {
     firstValue: 8,
@@ -66,6 +82,8 @@ const PLAN_DECK_2: PlanCard[] = [
       { size: 3, quantity: 1 },
       { size: 6, quantity: 1 },
     ],
+    completed: false,
+    turnCompleted: -1,
   },
   {
     firstValue: 10,
@@ -75,6 +93,8 @@ const PLAN_DECK_2: PlanCard[] = [
       { size: 5, quantity: 1 },
       { size: 2, quantity: 2 },
     ],
+    completed: false,
+    turnCompleted: -1,
   },
   {
     firstValue: 11,
@@ -84,6 +104,8 @@ const PLAN_DECK_2: PlanCard[] = [
       { size: 1, quantity: 3 },
       { size: 6, quantity: 1 },
     ],
+    completed: false,
+    turnCompleted: -1,
   },
   {
     firstValue: 9,
@@ -93,6 +115,8 @@ const PLAN_DECK_2: PlanCard[] = [
       { size: 4, quantity: 1 },
       { size: 5, quantity: 1 },
     ],
+    completed: false,
+    turnCompleted: -1,
   },
 ];
 
@@ -106,6 +130,8 @@ const PLAN_DECK_3: PlanCard[] = [
       { size: 3, quantity: 1 },
       { size: 5, quantity: 1 },
     ],
+    completed: false,
+    turnCompleted: -1,
   },
   {
     firstValue: 7,
@@ -115,6 +141,8 @@ const PLAN_DECK_3: PlanCard[] = [
       { size: 3, quantity: 1 },
       { size: 4, quantity: 1 },
     ],
+    completed: false,
+    turnCompleted: -1,
   },
   {
     firstValue: 13,
@@ -125,6 +153,8 @@ const PLAN_DECK_3: PlanCard[] = [
       { size: 4, quantity: 1 },
       { size: 5, quantity: 1 },
     ],
+    completed: false,
+    turnCompleted: -1,
   },
   {
     firstValue: 11,
@@ -135,6 +165,8 @@ const PLAN_DECK_3: PlanCard[] = [
       { size: 2, quantity: 2 },
       { size: 3, quantity: 1 },
     ],
+    completed: false,
+    turnCompleted: -1,
   },
   {
     firstValue: 7,
@@ -144,6 +176,8 @@ const PLAN_DECK_3: PlanCard[] = [
       { size: 2, quantity: 1 },
       { size: 5, quantity: 1 },
     ],
+    completed: false,
+    turnCompleted: -1,
   },
   {
     firstValue: 12,
@@ -154,6 +188,8 @@ const PLAN_DECK_3: PlanCard[] = [
       { size: 2, quantity: 1 },
       { size: 5, quantity: 1 },
     ],
+    completed: false,
+    turnCompleted: -1,
   },
 ];
 

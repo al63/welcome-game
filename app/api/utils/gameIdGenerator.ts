@@ -733,14 +733,16 @@ const ANIMALS = [
 ];
 
 const CITY_DESCRIPTORS = [
-  "Abode",
+  "Abodes",
   "Acreage",
   "Area",
   "Avenue",
   "Borough",
   "Boulevard",
-  "Building",
+  "Buildings",
   "Bungalow",
+  "Burb",
+  "Burbs",
   "Capital City",
   "Capital",
   "Castle",
@@ -767,14 +769,12 @@ const CITY_DESCRIPTORS = [
   "Downtown",
   "Duchy",
   "Dwelling",
-  "Earth",
   "Empire",
   "Enclave",
   "Estate",
-  "Farm",
+  "Farms",
   "Farmhouse",
   "Farmland",
-  "Field",
   "Field",
   "Green",
   "Ground",
@@ -807,10 +807,10 @@ const CITY_DESCRIPTORS = [
   "Monarchy",
   "Municipality",
   "Nation",
-  "Nature",
   "Neighborhood",
   "Outback",
   "Palace",
+  "Palatinate",
   "Parcel",
   "Park",
   "Parkland",
@@ -841,6 +841,7 @@ const CITY_DESCRIPTORS = [
   "Subdivision",
   "Suburb",
   "Suburbia",
+  "Suzerain",
   "Terrain",
   "Territory",
   "Tower",
@@ -848,6 +849,7 @@ const CITY_DESCRIPTORS = [
   "Townlet",
   "Township",
   "Tract",
+  "Utopia",
   "Villa",
   "Village",
   "Wild",
@@ -1128,7 +1130,7 @@ const NOUNS = [
   "Towels",
   "Trains",
   "Trash",
-  "TrashCans",
+  "Trash Cans",
   "Trees",
   "Trumpets",
   "TShirts",
@@ -1165,24 +1167,25 @@ const NOUNS = [
   "Zucchinis",
 ];
 
-const randomNumber = Math.floor(Math.random() * 2);
 export function generateGameId() {
+  const randomNumber = Math.floor(Math.random() * 100);
   const gameId =
     ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)] +
     COLORS[Math.floor(Math.random() * COLORS.length)] +
-    (randomNumber == 0
+    (randomNumber % 2 == 0
       ? ANIMALS[Math.floor(Math.random() * ANIMALS.length)]
       : NOUNS[Math.floor(Math.random() * NOUNS.length)]);
   return gameId.replaceAll(" ", "");
 }
 
 export function generateCityName() {
+  const randomNumber = Math.floor(Math.random() * 100);
   return (
     ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)] +
     " " +
     CITY_DESCRIPTORS[Math.floor(Math.random() * CITY_DESCRIPTORS.length)] +
     " of " +
-    (randomNumber == 0
+    (randomNumber % 2 == 0
       ? NOUNS[Math.floor(Math.random() * NOUNS.length)]
       : "the " + ANIMALS[Math.floor(Math.random() * ANIMALS.length)])
   );

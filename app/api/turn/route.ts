@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     }
 
     // grab the new game state and new player states to determine if the game is over / should advance turn
-    const finalGameState = await sanityCheckGameStateAndAdvanceTurn(db, req.gameId, newPlayerState);
+    const finalGameState = await sanityCheckGameStateAndAdvanceTurn(db, req.gameId);
 
     return NextResponse.json(
       { gameState: finalGameState, playerState: newPlayerState, promptReshuffle: false },
@@ -110,6 +110,8 @@ function consolidateUpdate(
     houses: [],
   };
 
+  newPlayerState.lastEvent = "";
+
   switch (action.type) {
     case "refusal":
       newPlayerState.permitRefusals++;
@@ -130,6 +132,8 @@ function consolidateUpdate(
       break;
     case "estate":
       newPlayerState.estateModifiers[action.sizeIncreased - 1]++;
+      let estateLastEvent = `[${turn}] ${newPlayerState.playerId} upgraded the value of estates size ${action.sizeIncreased}`;
+      newPlayerState.lastEvent = estateLastEvent;
       break;
     case "bis":
       if (action.bisPosition[0] == 0) {
@@ -165,17 +169,18 @@ function consolidateUpdate(
   });
   newPlayerState.previousPlacements = previousPlacements;
 
-  let lastEvent = `[${turn}] ${newPlayerState.playerId} played value ${action.house.value}`;
-  if (action.house.modifier) {
-    lastEvent += ` ${action.house.modifier}`;
-  }
-  lastEvent += ` on row ${action.housePosition[0]} column ${action.housePosition[1]}`;
-  if (action.type == "estate") {
-    lastEvent += `, upgrading the value of estates size ${action.sizeIncreased}`;
-  } else if (action.type == "bis") {
-    lastEvent += ` with the BIS on row ${action.bisPosition[0]} column ${action.bisPosition[1]}`;
-  }
-  newPlayerState.lastEvent = lastEvent;
+  // let lastEvent = `[${turn}] ${newPlayerState.playerId} played value ${action.house.value}`;
+  // if (action.house.modifier) {
+  //   lastEvent += ` ${action.house.modifier}`;
+  // }
+  // lastEvent += ` on row ${action.housePosition[0]} column ${action.housePosition[1]}`;
+  // if (action.type == "estate") {
+  //   lastEvent += `, upgrading the value of estates size ${action.sizeIncreased}`;
+  // } else if (action.type == "bis") {
+  //   lastEvent += ` with the BIS on row ${action.bisPosition[0]} column ${action.bisPosition[1]}`;
+  // }
+
+  // newPlayerState.lastEvent = lastEvent;
   return validateCityPlanCompletion(newPlayerState, plans, turn, shuffleForCompletedPlan);
 }
 
@@ -221,7 +226,12 @@ function validateCityPlanCompletion(
     });
 
   plans.forEach(function (plan, idx) {
-    let planCompleted = true;
+    let planCompleted = false;
+
+    // player has already completed the plan, don't check it twice
+    if (newPlayerState.completedPlans[idx] > 0) {
+      return;
+    }
     plan.requirements.forEach(function (req) {
       const size = req.size - 1;
       // look at each size of estates
@@ -231,8 +241,8 @@ function validateCityPlanCompletion(
         return !e.usedForPlan;
       });
       // check the length of this array to determine if there's even enough houses that meet the criteria of the plan
-      if (availableEstates.length < req.quantity) {
-        planCompleted = false;
+      if (availableEstates.length >= req.quantity) {
+        planCompleted = true;
       }
     });
     // update house rows to be used for plans
@@ -247,6 +257,9 @@ function validateCityPlanCompletion(
         });
         // for each requirement, start marking houses as used for a plan up to the quantity of the requirement
         for (let i = 0; i < req.quantity; i++) {
+          if (availableEstates.length == 0) {
+            break;
+          }
           const estate = availableEstates[i];
           for (let j = estate.columns[0]; j <= estate.columns[1]; j++) {
             switch (estate.row) {
@@ -274,15 +287,21 @@ function validateCityPlanCompletion(
         }
       });
 
-      if (plan.completed || (plan.turnCompleted != null && plan.turnCompleted < turn)) {
-        newPlayerState.completedPlans[idx] = plan.secondValue;
-        newPlayerState.lastEvent += ` and has completed City Plan ${idx + 1} for ${plan.secondValue} points!`;
-      } else {
-        newPlayerState.completedPlans[idx] = plan.firstValue;
-
-        // if a player is first to complete a plan, they must be prompted to shuffle
-        if (shuffleForCompletedPlan == null) {
-          throw new ShuffleTurnException();
+      if (planCompleted && newPlayerState.completedPlans[idx] == 0) {
+        if (plan.turnCompleted != -1 && plan.turnCompleted < turn) {
+          newPlayerState.completedPlans[idx] = plan.secondValue;
+          newPlayerState.lastEvent = `[${turn}] ${newPlayerState.playerId} has completed City Plan ${idx + 1} for ${
+            plan.secondValue
+          } points!`;
+        } else {
+          newPlayerState.completedPlans[idx] = plan.firstValue;
+          newPlayerState.lastEvent = `[${turn}] ${newPlayerState.playerId} has completed City Plan ${idx + 1} for ${
+            plan.firstValue
+          } points!`;
+          // if a player is first to complete a plan, they must be prompted to shuffle
+          if (shuffleForCompletedPlan == null) {
+            throw new ShuffleTurnException();
+          }
         }
       }
     }
@@ -291,11 +310,7 @@ function validateCityPlanCompletion(
   return newPlayerState;
 }
 
-async function sanityCheckGameStateAndAdvanceTurn(
-  db: Db,
-  gameId: string,
-  currentPlayerState: PlayerState
-): Promise<GameState> {
+async function sanityCheckGameStateAndAdvanceTurn(db: Db, gameId: string): Promise<GameState> {
   const gameQuery: Filter<GameState> = { id: gameId };
   const gameState = await db.collection<GameState>("game_states").findOne(gameQuery);
 
@@ -360,6 +375,7 @@ async function sanityCheckGameStateAndAdvanceTurn(
     currentTurnLog = addEventLog(currentTurnLog, `Congratulations to ${finalScores.scoringInfo[0].playerId}!`);
   }
 
+  newGameState.latestEventLog = currentTurnLog;
   const gameFilter: Filter<Document> = { id: newGameState.id };
   const gameBody: UpdateFilter<Document> = {
     $set: {
@@ -387,9 +403,9 @@ async function updateGameState(
   };
   const currentTurn = gameState.turn;
   let currentTurnLog = [...gameState.latestEventLog];
-  let updatedPlanIdx = -1;
+  let updatedPlanIdxs: number[] = [];
   let isShuffled = false;
-  // currentTurnLog = addEventLog(currentTurnLog, currentPlayerState.lastEvent);
+  currentTurnLog = addEventLog(currentTurnLog, currentPlayerState.lastEvent);
 
   // Update the completed plans for the GameState so that players can determine if
   // they get first or second score for completing a plan
@@ -399,9 +415,11 @@ async function updateGameState(
       currentPlayerState.completedPlans[idx] > 0
     ) {
       newGameState.plans[idx].completed = true;
-      updatedPlanIdx = idx;
+      newGameState.plans[idx].turnCompleted = currentTurn;
+      updatedPlanIdxs.push(idx);
       if (shuffle != null) {
         if (shuffle) {
+          isShuffled = true;
           newGameState.shuffleOffset = 1;
           const seed = new Date().getTime();
           const shuffledDeck = shuffleWithSeedAndDrawOffset(seed, 1);
@@ -426,9 +444,11 @@ async function updateGameState(
   const setBody: Record<string, any> = {
     [`players.${currentPlayerState.playerId}`]: newGameState.players[currentPlayerState.playerId],
   };
-  if (updatedPlanIdx > -1) {
-    setBody[`plans[${updatedPlanIdx}]`] = newGameState.plans[updatedPlanIdx];
-  }
+  updatedPlanIdxs.forEach((val) => {
+    setBody[`plans.${val}.completed`] = newGameState.plans[val].completed;
+    setBody[`plans.${val}.turnCompleted`] = newGameState.plans[val].turnCompleted;
+  });
+
   if (isShuffled) {
     setBody["shuffleOffset"] = newGameState.shuffleOffset;
     setBody["seed"] = newGameState.seed;
@@ -522,6 +542,11 @@ async function calculateFinalScores(db: Db, currPlayerMap: PlayerMetadataMap, ga
 
 function addEventLog(log: string[], val: string): string[] {
   const newLog = [...log];
+
+  if (val.trim() == "") {
+    return newLog;
+  }
+
   if (newLog.length > 15) {
     newLog.shift();
   }
