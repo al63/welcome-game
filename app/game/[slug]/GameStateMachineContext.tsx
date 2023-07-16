@@ -17,11 +17,11 @@ import { createContext } from "react";
 import { gameStateMachineReducer } from "./GameStateMachineReducer";
 import { useCheckTurnCompletion } from "./useCheckTurnCompletion";
 
-const GameStateMachineContext = createContext<GameStateMachine | null>(null);
+export const GameStateMachineContext = createContext<GameStateMachine | null>(null);
 
 export type GameStateMachineThunk = (dispatch: React.Dispatch<GameStateMachineAction>) => void;
 
-const GameStateMachineDispatchContext = createContext<
+export const GameStateMachineDispatchContext = createContext<
   ((action: GameStateMachineAction | GameStateMachineThunk) => void) | null
 >(null);
 

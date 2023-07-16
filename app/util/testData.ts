@@ -23,86 +23,23 @@ const dummy: PlayerState = {
   previousPlacements: null,
 };
 
-dummy.housesRowOne[1] = {
-  value: 4,
-  modifier: "TEMP",
-  usedForPlan: true,
-};
-
-dummy.housesRowOne[2] = {
-  value: 5,
-  modifier: "PARK",
-  usedForPlan: true,
-};
-dummy.housesRowOne[3] = {
-  value: 6,
-  modifier: "TEMP",
-  usedForPlan: true,
-};
-dummy.housesRowOne[4] = {
-  value: 6,
-  modifier: "TEMP",
-  usedForPlan: true,
-};
-dummy.housesRowOne[5] = {
-  value: 6,
-  modifier: "TEMP",
-};
-dummy.housesRowOne[6] = {
-  value: 6,
-  modifier: "TEMP",
-};
-dummy.housesRowTwo[1] = {
-  value: 2,
-  modifier: "TEMP",
-};
-dummy.housesRowTwo[2] = {
-  value: 3,
-  modifier: "TEMP",
-};
-dummy.housesRowTwo[3] = {
-  value: 4,
-  modifier: "TEMP",
-};
-dummy.housesRowTwo[4] = {
-  value: 5,
-  modifier: "TEMP",
-};
-dummy.housesRowTwo[5] = {
-  value: 5,
-  modifier: "TEMP",
-};
-dummy.housesRowTwo[6] = {
-  value: 8,
-  modifier: "TEMP",
-};
+export function fakePlayerState(overrides: Partial<PlayerState>) {
+  return {
+    ...dummy,
+    ...overrides,
+  };
+}
 
 export const dummyPlayerStates: PlayerStateMap = {
-  [dummy.playerId]: {
-    ...dummy,
+  bob: fakePlayerState({
     cityName: "The Cool Zone",
-    completedPlans: [6, 0, 13],
     lastEvent: "",
-  },
-  bub: {
-    ...dummy,
+  }),
+  bub: fakePlayerState({
     playerId: "bub",
     cityName: "BubTown, USA",
-    completedPlans: [8, 10, 0],
     lastEvent: "",
-  },
-  bubbo: {
-    ...dummy,
-    playerId: "bubbo",
-    cityName: "Bubbolubbo",
-    lastEvent: "",
-  },
-  bibby: {
-    ...dummy,
-    playerId: "bibby",
-    cityName: "The Bibcrib",
-    lastEvent: "",
-  },
+  }),
 };
 
 const dummyRevealedCardValues: GameCard[] = [
@@ -130,3 +67,10 @@ export const dummyGameState: GameState = {
   latestEventLog: [],
   createdAt: new Date(),
 };
+
+export function fakeGameState(overrides: Partial<GameState>) {
+  return {
+    ...dummyGameState,
+    ...overrides,
+  };
+}

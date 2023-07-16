@@ -5,6 +5,7 @@ import { LoadingSpinner } from "./LoadingSpinner";
 import classNames from "classnames";
 import { Players } from "./Players";
 import { StartGame } from "./StartGame";
+import { createGame } from "../util/createGame";
 
 export default function NewGame() {
   const [players, setPlayers] = React.useState<string[]>(["", ""]);
@@ -18,24 +19,11 @@ export default function NewGame() {
 
   const onCreate = React.useCallback(async () => {
     setLoading(true);
-    const playerIds = players.map((player, index) => player || `Player ${index + 1}`);
     try {
-      const res = await fetch("/api/game", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ players: playerIds }),
-      });
-      const json = (await res.json()) as CreateGameResponse;
-      if (!res.ok) {
-        console.log(json);
-        alert("Error creating game");
-      } else {
-        setCreatedGame(json);
-      }
+      const json = await createGame(players);
+      setCreatedGame(json);
     } catch (e) {
+      console.log(e);
       alert("Error creating game");
     }
     setLoading(false);

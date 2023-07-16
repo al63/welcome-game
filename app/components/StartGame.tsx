@@ -11,7 +11,7 @@ export function StartGame({ createdGame }: StartGameProps) {
   const [copiedPlayer, setCopiedPlayer] = React.useState<string>("");
 
   return (
-    <div className="mt-6">
+    <div data-testid="start-game" className="mt-6">
       <h1>To start the game, share the links below to the respective players and click on your own.</h1>
       <ul className="list-disc">
         {createdGame.players.map((player) => {
