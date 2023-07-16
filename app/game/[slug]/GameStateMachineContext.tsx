@@ -21,7 +21,7 @@ export const GameStateMachineContext = createContext<GameStateMachine | null>(nu
 
 export type GameStateMachineThunk = (dispatch: React.Dispatch<GameStateMachineAction>) => void;
 
-const GameStateMachineDispatchContext = createContext<
+export const GameStateMachineDispatchContext = createContext<
   ((action: GameStateMachineAction | GameStateMachineThunk) => void) | null
 >(null);
 

@@ -1,12 +1,8 @@
 import { GameStateMachine } from "@/app/util/gameStateMachineTypes";
-import { GameStateMachineContext } from "../../GameStateMachineContext";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { CityPlans } from "./CityPlans";
 import { fakeGameState, fakePlayerState } from "@/app/util/testData";
-
-const gameRenderer = (children: React.ReactNode, state: GameStateMachine) => {
-  return render(<GameStateMachineContext.Provider value={state}>{children}</GameStateMachineContext.Provider>);
-};
+import { render } from "@/app/util/testUtils";
 
 const gameState = fakeGameState({
   plans: [
@@ -34,7 +30,7 @@ describe("CityPlans", () => {
       },
       gameState,
     };
-    gameRenderer(<CityPlans viewedPlayerId={state.playerId} />, state);
+    render(<CityPlans viewedPlayerId={state.playerId} />, state);
     screen.getByText("10");
   });
 
@@ -50,7 +46,7 @@ describe("CityPlans", () => {
       },
       gameState,
     };
-    gameRenderer(<CityPlans viewedPlayerId={state.playerId} />, state);
+    render(<CityPlans viewedPlayerId={state.playerId} />, state);
     screen.getByText("\u2713");
     expect(screen.findByText("10")).not.toBeInTheDocument;
   });
@@ -72,7 +68,7 @@ describe("CityPlans", () => {
       gameState,
     };
 
-    gameRenderer(<CityPlans viewedPlayerId={state.playerId} />, state);
+    render(<CityPlans viewedPlayerId={state.playerId} />, state);
     screen.getByText("x");
     expect(screen.findByText("10")).not.toBeInTheDocument;
   });
