@@ -45,7 +45,7 @@ function House({ house, showModifiers }: { house: House; showModifiers: boolean 
 interface CellProps {
   house: House | null;
   mini: boolean;
-  highlighted?: boolean;
+  highlighted: boolean;
   pool?: boolean;
   onClick?: () => void;
   pendingHouse?: PendingInfo;
@@ -208,7 +208,7 @@ function UserNeighborhood({
                 house={house}
                 pool={config.pools.includes(index)}
                 mini={mini}
-                highlighted={highlighted}
+                highlighted={highlighted ?? false}
                 onClick={highlighted ? () => onHouseClick?.(index) : undefined}
                 pendingHouse={pendingHouse}
                 previouslyPlaced={previouslyPlaced}
