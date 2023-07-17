@@ -232,7 +232,7 @@ function validateCityPlanCompletion(
     if (newPlayerState.completedPlans[idx] > 0) {
       return;
     }
-    plan.requirements.forEach(function (req) {
+    planCompleted = plan.requirements.every(function (req) {
       const size = req.size - 1;
       // look at each size of estates
       const estatesBucket = combined[size];
@@ -241,9 +241,7 @@ function validateCityPlanCompletion(
         return !e.usedForPlan;
       });
       // check the length of this array to determine if there's even enough houses that meet the criteria of the plan
-      if (availableEstates.length >= req.quantity) {
-        planCompleted = true;
-      }
+      return availableEstates.length >= req.quantity;
     });
     // update house rows to be used for plans
     if (planCompleted) {

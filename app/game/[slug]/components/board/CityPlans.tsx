@@ -28,7 +28,7 @@ interface CityPlanProps {
   state: CompletionState;
 }
 
-function CityPlan({ plan, state }: CityPlanProps) {
+const CityPlan = React.memo(function CityPlan({ plan, state }: CityPlanProps) {
   let first;
   switch (state) {
     case "incomplete":
@@ -65,7 +65,7 @@ function CityPlan({ plan, state }: CityPlanProps) {
       </div>
     </div>
   );
-}
+});
 
 export function CityPlans({ viewedPlayerId }: { viewedPlayerId: string }) {
   const { playerStates, gameState } = useGameStateMachineContext();

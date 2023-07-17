@@ -11,7 +11,7 @@ interface ParksProgressProps {
   count: number;
 }
 
-function ParksProgress({ scores, count }: ParksProgressProps) {
+const ParksProgress = React.memo(function ParksProgress({ scores, count }: ParksProgressProps) {
   return (
     <div aria-description="Points for parks" className="flex">
       {scores.map((score, index) => {
@@ -31,7 +31,7 @@ function ParksProgress({ scores, count }: ParksProgressProps) {
       })}
     </div>
   );
-}
+});
 
 function House({ house, showModifiers }: { house: House; showModifiers: boolean }) {
   return (
@@ -45,14 +45,22 @@ function House({ house, showModifiers }: { house: House; showModifiers: boolean 
 interface CellProps {
   house: House | null;
   mini: boolean;
-  highlighted?: boolean;
+  highlighted: boolean;
   pool?: boolean;
   onClick?: () => void;
   pendingHouse?: PendingInfo;
   previouslyPlaced?: PreviousPlacementColumn;
 }
 
-function Cell({ house, pool, mini, highlighted, onClick, pendingHouse, previouslyPlaced }: CellProps) {
+const Cell = React.memo(function Cell({
+  house,
+  pool,
+  mini,
+  highlighted,
+  onClick,
+  pendingHouse,
+  previouslyPlaced,
+}: CellProps) {
   const renderedHouse = house || pendingHouse?.house;
   const occupied = renderedHouse != null;
 
@@ -110,7 +118,7 @@ function Cell({ house, pool, mini, highlighted, onClick, pendingHouse, previousl
       {children}
     </div>
   );
-}
+});
 
 interface FenceProps {
   mini: boolean;
@@ -120,7 +128,7 @@ interface FenceProps {
   previouslyPlaced?: boolean;
 }
 
-function Fence({ mini, active, highlighted, onClick, previouslyPlaced }: FenceProps) {
+const Fence = React.memo(function Fence({ mini, active, highlighted, onClick, previouslyPlaced }: FenceProps) {
   return (
     <div
       aria-label={active ? "Active fence" : "Inactive fence"}
@@ -144,7 +152,7 @@ function Fence({ mini, active, highlighted, onClick, previouslyPlaced }: FencePr
       ) : null}
     </div>
   );
-}
+});
 
 interface RowProps {
   config: Neighborhood;
@@ -200,7 +208,7 @@ function UserNeighborhood({
                 house={house}
                 pool={config.pools.includes(index)}
                 mini={mini}
-                highlighted={highlighted}
+                highlighted={highlighted ?? false}
                 onClick={highlighted ? () => onHouseClick?.(index) : undefined}
                 pendingHouse={pendingHouse}
                 previouslyPlaced={previouslyPlaced}
