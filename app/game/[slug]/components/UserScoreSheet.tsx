@@ -11,9 +11,9 @@ import classNames from "classnames";
 import React from "react";
 import { useGameStateMachineContext } from "../GameStateMachineContext";
 
-function Divider({ symbol }: { symbol: string }) {
+const Divider = React.memo(function Divider({ symbol }: { symbol: string }) {
   return <div className="mb-20 text-xl font-bold">{symbol}</div>;
-}
+});
 
 function SectionContainer({
   children,
@@ -33,9 +33,9 @@ function SectionContainer({
   );
 }
 
-function Score({ score }: { score: number }) {
+const Score = React.memo(function Score({ score }: { score: number }) {
   return <div className="m-1 flex items-center justify-center h-8 w-8 rounded-full bg-white text-black">{score}</div>;
-}
+});
 
 function Value({ value, checked, active }: { value?: number; checked?: boolean; active?: boolean }) {
   return (
@@ -52,7 +52,7 @@ function Value({ value, checked, active }: { value?: number; checked?: boolean; 
   );
 }
 
-function Plans({ scores }: { scores: number[] }) {
+const Plans = React.memo(function Plans({ scores }: { scores: number[] }) {
   return (
     <SectionContainer title="Plans">
       {scores.map((score, index) => {
@@ -65,9 +65,9 @@ function Plans({ scores }: { scores: number[] }) {
       })}
     </SectionContainer>
   );
-}
+});
 
-function Parks({ scores }: { scores: number[] }) {
+const Parks = React.memo(function Parks({ scores }: { scores: number[] }) {
   return (
     <SectionContainer title="Parks">
       {scores.map((score, index) => {
@@ -75,9 +75,9 @@ function Parks({ scores }: { scores: number[] }) {
       })}
     </SectionContainer>
   );
-}
+});
 
-function Pools({ score }: { score: number }) {
+const Pools = React.memo(function Pools({ score }: { score: number }) {
   return (
     <SectionContainer title="Pools">
       <div className="grid grid-cols-2 gap-1">
@@ -87,9 +87,9 @@ function Pools({ score }: { score: number }) {
       </div>
     </SectionContainer>
   );
-}
+});
 
-function TempAgencies({ count, score }: { count: number; score: number }) {
+const TempAgencies = React.memo(function TempAgencies({ count, score }: { count: number; score: number }) {
   const agencies = [];
   for (let i = 0; i < 11; i++) {
     agencies.push(
@@ -109,9 +109,15 @@ function TempAgencies({ count, score }: { count: number; score: number }) {
       </div>
     </SectionContainer>
   );
-}
+});
 
-function Estates({ playerModifiers, score }: { playerModifiers: number[]; score: Array<EstatesScore> }) {
+const Estates = React.memo(function Estates({
+  playerModifiers,
+  score,
+}: {
+  playerModifiers: number[];
+  score: Array<EstatesScore>;
+}) {
   return (
     <SectionContainer title="Real Estate">
       <div className="flex flex-row">
@@ -141,9 +147,9 @@ function Estates({ playerModifiers, score }: { playerModifiers: number[]; score:
       </div>
     </SectionContainer>
   );
-}
+});
 
-function BIS({ count }: { count: number }) {
+const BIS = React.memo(function BIS({ count }: { count: number }) {
   return (
     <SectionContainer title="BIS" negative>
       <div className="grid grid-cols-2 gap-1 min-w-fit">
@@ -153,9 +159,9 @@ function BIS({ count }: { count: number }) {
       </div>
     </SectionContainer>
   );
-}
+});
 
-function PermitRefusals({ count }: { count: number }) {
+const PermitRefusals = React.memo(function PermitRefusals({ count }: { count: number }) {
   return (
     <SectionContainer title="Refusals" negative>
       {PERMIT_REFUSAL_SCORES.map((s, index) => {
@@ -167,7 +173,7 @@ function PermitRefusals({ count }: { count: number }) {
       })}
     </SectionContainer>
   );
-}
+});
 
 interface UserScoreSheetProps {
   playerId: string;
